@@ -1,0 +1,71 @@
+/* Layout Rules
+   See layout-small.css for < 992 px
+   See layout-xl.css for >= 1600 px
+*/
+div#main, div#sidebar, div#lightbox, div#lightbox-content {
+     display: block;
+     position: fixed;
+     box-sizing: border-box;
+     top: 0;
+     right: 0;
+     bottom: 0;
+     left: 0;
+     width: auto;
+     height: auto;
+}
+div#main {
+    right: auto;
+    width: 67%;
+    z-index: $zindex-main;
+}
+div#sidebar {
+    left: auto;
+    width: 33%;
+    z-index: 2;
+    transition: 100ms ease-out;
+}
+
+/* Layout Rules for < 992 px */
+@media (max-width: 991px) {
+    div#main {
+        right: 48px;
+        width: auto;
+    }
+    div#sidebar {
+        width: 330px;
+        white-space: nowrap;
+    }
+    div#sidebar.inactive:not(:hover) {
+        right: 48px - 330px;
+    }
+}
+
+/* Layout Rules for >= 1600 px */
+@media (min-width: 1600px) {
+    div#main {
+        right: 528px;
+        width: auto;
+    }
+    div#sidebar {
+        width: 528px;
+    }
+}
+
+/* Lightbox */
+div#lightbox {
+    background-color: rgba($gray-dark, 0.85);
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAQElEQVQYlW2OwQ0AMAgCbw7XcMFubj81RVpeGgIcQHK1gJC/+shjtkLNTmpTaZMm05IB76YzfTedaW46k28Opg1VYQ5hW3JdzwAAAABJRU5ErkJggg==);
+    z-index: $zindex-lightbox;
+    transition: visibility 200ms linear, opacity 200ms ease-in-out;
+    visibility: visible;
+}
+div#lightbox.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+@media (min-width: 38em) {
+  div#lightbox .container {
+    max-width: 36rem;
+  }
+}

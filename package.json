@@ -1,0 +1,45 @@
+{
+  "version": "0.0.0",
+  "name": "kgs-leben",
+  "description": "",
+
+  "license": "MIT",
+  "private": true,
+
+  "author": "Stephen Martindale",
+  "homepage": "https://github.com/stephenmartindale/kgs-leben#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stephenmartindale/kgs-leben.git"
+  },
+  "bugs": {
+    "url": "https://github.com/stephenmartindale/kgs-leben/issues"
+  },
+
+  "scripts": {
+    "build": "gulp build",
+    "clean": "gulp clean",
+    "rebuild": "gulp rebuild"
+  },
+
+  "devDependencies": {
+    "typescript": "1.8.9",
+    "node-sass": "^3.4.2",
+    "autoprefixer": "^6.3.5",
+
+    "gulp": "^3.9.1",
+    "rimraf": "^2.5.2",
+    "merge-stream": "^1.0.0",
+    "gulp-newer": "^1.1.0",
+    "gulp-typescript": "^2.12.1",
+    "gulp-sass": "^2.2.0",
+    "gulp-postcss": "^6.1.0",
+
+    "jquery": "~2.2.2",
+    "tether": "~1.2.0",
+    "bootstrap": "4.0.0-alpha.2",
+    "font-awesome": "^4.5.0"
+  },
+
+  "dependencies": {}
+}

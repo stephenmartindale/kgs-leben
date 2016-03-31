@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "noImplicitAny" : true,
+
+        "module": "amd",
+        "out": "../js/ts.js",
+
+        "sourceMap": true,
+        "inlineSourceMap": false
+    },
+
+    "exclude": [
+    ]
+}

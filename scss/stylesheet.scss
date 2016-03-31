@@ -1,0 +1,13 @@
+﻿// Sass Configuration Partial
+@import "variables";
+
+// Dependency Packages
+@import "bootstrap";
+@import "font-awesome";
+
+// KGS Leben Layout
+@import "layout";
+
+// KGS Leben Views
+@import "views/sidebar";
+@import "views/signin";

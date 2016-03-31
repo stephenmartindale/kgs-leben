@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Dashboard Template for Bootstrap</title>
+    <link rel="icon" href="../../favicon.ico" />
+    <link href="/css/stylesheet.css" rel="stylesheet" />
+  </head>
+
+  <body class="kgs-disconnected">
+    <div id="sidebar" class="sidebar"> <!--inactive-->
+        <ul class="nav nav-sidebar">
+            <li class="kgs-room"><a href="#">English Game Room</a></li>
+            <li class="kgs-list"><a href="#">Open Games</a></li>
+            <li class="kgs-list"><a href="#">Active Games</a></li>
+            <li class="kgs-conversation kgs-info"><a href="#">Sue</a></li>
+            <li class="kgs-conversation"><a href="#">Bob</a></li>
+            <li class="kgs-game active"><a href="#">Fred<span class="sr-only"> (current)</span></a></li>
+        </ul>
+    </div>
+    
+    <div class="kgs-chat">
+        <div class="kgs-chat-messages">
+        <div>
+            
+    </div>
+
+    <!-- Main Content -->
+    <div id="main" class="main bg-inverse">
+    </div>
+
+    <!-- Lightbox -->
+    <div id="lightbox">
+        <div class="container">
+            <!-- KGS Sign-in Form -->
+            <div class="jumbotron">
+                <form class="form-signin">
+                    <h2 class="form-signin-heading">Sign in to KGS</h2>
+                    <label for="inputUsername" class="sr-only">KGS username</label>
+                    <input type="text" id="inputUsername" class="form-control" placeholder="KGS username" required autofocus autocomplete="off">
+                    <label for="inputPassword" class="sr-only">KGS password</label>
+                    <input type="password" id="inputPassword" class="form-control" placeholder="KGS password" required autocomplete="off">
+                    <div class="checkbox"><label><input type="checkbox" id="inputRememberMe" value="remember-me" autocomplete="off"> Sign in automatically</label></div>
+                    <p id="inputRememberMeNotice" class="text-muted collapse">For security reasons, this feature will only work if your browser remembers your password and supplies it for use in the future.</p>
+                    <button class="btn btn-lg btn-primary btn-block" type="submit" disabled autocomplete="off">Sign in</button>
+                </form>
+             </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Dependencies -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/tether.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+
+    <!-- Application -->
+    <script src="/js/ts.js"></script>
+    <script>
+        $(function() {
+            $app = new Services.Application();
+            $app.initialise();
+        });
+    </script>
+  </body>
+</html>

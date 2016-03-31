@@ -1,0 +1,41 @@
+﻿// Colors
+//
+// Grayscale and brand colors for use across Bootstrap.
+
+$gray-dark:                 #292f36;
+$gray:                      #797989;
+$gray-light:                #bcbcbc;
+$gray-lighter:              #e5e5e5;
+$gray-lightest:             #ffffff;
+
+$brand-primary:             #292f36;
+$brand-success:             #4ecdc4;
+$brand-info:                #4ecdc4;
+$brand-warning:             #ff6b6b;
+$brand-danger:              #d9534f;
+
+// Body
+//
+// Settings for the `<body>` element.
+
+$body-bg:                    $gray-lightest;
+$body-color:                 $gray-dark;
+
+// Bootstrap Options (4.0.0-alpha.2)
+//
+// Quickly modify global styling by enabling or disabling optional features.
+
+$enable-flex:               false !default;
+$enable-rounded:            true !default;
+$enable-shadows:            false !default;
+$enable-gradients:          false !default;
+$enable-transitions:        false !default;
+$enable-hover-media-query:  false;     // N.B.: If enabled, CSS must be post-processed with https://github.com/twbs/mq4-hover-shim
+$enable-grid-classes:       true !default;
+
+// Z-indices
+//
+// (See also: Bootstrap's Z-index master list in bootstrap/scss/_variables.scss near line 355)
+$zindex-main:               1;
+$zindex-sidebar:            $zindex-main + 100;
+$zindex-lightbox:           2000;
