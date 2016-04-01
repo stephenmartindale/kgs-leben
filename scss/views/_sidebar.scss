@@ -1,9 +1,6 @@
-#sidebar {
-    background-color: $gray-lighter;
-}
-
 .nav-sidebar {
-    margin: 16px 28px 0 -6px;
+    @extend .list-none;
+    margin: 16px 28px 16px -6px;
 }
 
 .nav-sidebar > li > a {
@@ -22,13 +19,13 @@
 
 .nav-sidebar > .active > a,
 .nav-sidebar > .active > a:hover {
-  background-color: $gray-lightest;
-  border-left-color: $brand-warning;
-  font-weight: bold;
+    background-color: $gray-lightest;
+    border-left-color: $brand-warning;
+    font-weight: bold;
 }
 
 .nav-sidebar > li > a:hover {
-  background-color: $gray-lightest;
+    background-color: $gray-lightest;
 }
 
 .nav-sidebar > li > a:before {
@@ -39,16 +36,18 @@
 
 .nav-sidebar > .kgs-info > a,
 .nav-sidebar > .kgs-info > a:hover {
-  border-left-color: $brand-info;
+    border-left-color: $brand-info;
 }
+
 .nav-sidebar > li.kgs-info > a:before {
     color: $brand-info;
 }
 
 .nav-sidebar > .kgs-warning > a,
 .nav-sidebar > .kgs-warning > a:hover {
-  border-left-color: $brand-warning;
+    border-left-color: $brand-warning;
 }
+
 .nav-sidebar > li.kgs-warning > a:before {
     color: $brand-warning;
 }
@@ -56,15 +55,19 @@
 .nav-sidebar > li.kgs-room > a:before {
     content: "\f0c0"; /* fa-users */
 }
+
 .nav-sidebar > li.kgs-list > a:before {
     content: "\f00a"; /* fa-th */
 }
+
 .nav-sidebar > li.kgs-conversation > a:before {
     content: "\f075"; /* fa-comment */
 }
+
 .nav-sidebar > li.kgs-conversation.kgs-info > a:before {
     content: "\f27a"; /* fa-commenting */
 }
+
 .nav-sidebar > li.kgs-game > a:before {
     content: "\f111"; /* fa-circle */
 }

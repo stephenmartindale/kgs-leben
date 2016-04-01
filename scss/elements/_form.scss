@@ -1,0 +1,14 @@
+form * {
+    user-select: none;
+}
+form input[type=text], form input[type=password] {
+    user-select: text;
+    @extend .form-control;
+}
+
+form button {
+    @extend .btn;
+}
+form button[type=submit] {
+    @extend .btn-primary;
+}

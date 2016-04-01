@@ -1,31 +1,24 @@
 ﻿// Colors
 //
-// Grayscale and brand colors for use across Bootstrap.
-
 $gray-dark:                 #292f36;
 $gray:                      #797989;
-$gray-light:                #bcbcbc;
+$gray-light:                lighten($gray, 18%);
 $gray-lighter:              #e5e5e5;
-$gray-lightest:             #ffffff;
+$gray-lightest:             lighten($gray-lighter, 5%);
 
 $brand-primary:             #292f36;
 $brand-success:             #4ecdc4;
-$brand-info:                #4ecdc4;
+$brand-info:                $brand-success;
 $brand-warning:             #ff6b6b;
-$brand-danger:              #d9534f;
+$brand-danger:              darken($brand-warning, 10%);
 
-// Body
-//
-// Settings for the `<body>` element.
-
-$body-bg:                    $gray-lightest;
-$body-color:                 $gray-dark;
+$body-bg:                   $gray-dark;
+$body-color:                $gray-dark;
 
 // Bootstrap Options (4.0.0-alpha.2)
 //
 // Quickly modify global styling by enabling or disabling optional features.
-
-$enable-flex:               false !default;
+$enable-flex:               true;
 $enable-rounded:            true !default;
 $enable-shadows:            false !default;
 $enable-gradients:          false !default;

@@ -6,13 +6,13 @@ namespace Controllers {
         private _inputRememberMeNotice: HTMLParagraphElement;
         private _submitButton: HTMLButtonElement;
 
-        constructor () {
-            var form = $('#lightbox .form-signin');
-            var inputUsername = form.find('#inputUsername');
-            var inputPassword = form.find('#inputPassword');
-            var inputRememberMe = form.find('#inputRememberMe');
-            var inputRememberMeNotice = form.find('#inputRememberMeNotice');
-            var submitButton = form.find('button[type="submit"]');
+        constructor() {
+            var form = $('#sign-in form');
+            var inputUsername = form.find('input[name=username]');
+            var inputPassword = form.find('input[name=password]');
+            var inputRememberMe = form.find('input[name=remember-me]');
+            var inputRememberMeNotice = form.find('div.checkbox p.text-warning');
+            var submitButton = form.find('button[type=submit]');
 
             this._inputUsername = <HTMLInputElement>inputUsername[0];
             this._inputPassword = <HTMLInputElement>inputPassword[0];
@@ -25,7 +25,10 @@ namespace Controllers {
         }
 
         private onRememberMeClick(e: JQueryEventObject) {
-            $(this._inputRememberMeNotice).collapse((this._inputRememberMe.checked)? "show" : "hide");
+            if (this._inputRememberMe.checked)
+                $(this._inputRememberMeNotice).slideDown(160);
+            else
+                $(this._inputRememberMeNotice).slideUp(160);
         }
 
         private onFormSubmit(e: JQueryEventObject) {
@@ -40,7 +43,7 @@ namespace Controllers {
         private beginLogin() {
             if ((!this._inputUsername.checkValidity())
              || (!this._inputPassword.checkValidity())) return;
-            
+
             console.log('login procedure starting...');
             this.disable(true);
 

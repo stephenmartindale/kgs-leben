@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "es5",
-        "noImplicitAny" : true,
+        "noImplicitAny": true,
 
         "module": "amd",
         "out": "../js/ts.js",

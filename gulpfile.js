@@ -4,9 +4,7 @@ inputs = {
         fonts: 'node_modules/font-awesome/fonts/**',
         scripts: [
             'node_modules/jquery/dist/jquery.js',
-            'node_modules/jquery/dist/jquery.min.*',
-            'node_modules/tether/dist/js/tether.*',
-            'node_modules/bootstrap/dist/js/bootstrap.min.js'
+            'node_modules/jquery/dist/jquery.min.*'
         ]
     },
     typescript: {
@@ -16,8 +14,7 @@ inputs = {
     sass: {
         sources: 'scss/**/*.scss',
         include: [
-            'node_modules/bootstrap/scss',
-            'node_modules/font-awesome/scss'
+            'node_modules/bootstrap/scss'
         ]
     }
 };
@@ -45,8 +42,6 @@ var browsers = [
 
 // Gulp: The streaming build system
 var gulp = require('gulp');
-var fs = require('fs');
-var path = require('path');
 var rimraf = require('rimraf');
 var isarray = require('isarray');
 var merge = require('merge-stream');

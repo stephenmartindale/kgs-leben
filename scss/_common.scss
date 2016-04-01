@@ -1,0 +1,33 @@
+.hidden {
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+.block {
+    display: block;
+    box-sizing: border-box;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: auto;
+    height: auto;
+}
+.block-fixed {
+    @extend .block;
+    position: fixed;
+}
+.block-absolute {
+    @extend .block;
+    position: absolute;
+}
+
+.center {
+    margin: 0 auto;
+}
+
+.list-none {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
