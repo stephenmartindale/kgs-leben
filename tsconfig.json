@@ -3,13 +3,15 @@
         "target": "es5",
         "noImplicitAny": true,
 
-        "module": "amd",
-        "out": "../js/ts.js",
+        "module": "commonjs",
+        "out": "ts.js",
 
         "sourceMap": true,
         "inlineSourceMap": false
     },
 
     "exclude": [
+        "node_modules",
+        "dist"
     ]
 }

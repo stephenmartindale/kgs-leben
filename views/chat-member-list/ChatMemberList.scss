@@ -1,0 +1,21 @@
+ul[is="chat-member-list"] {
+    @extend .list-none;
+    @extend .block-absolute;
+    width: 40%;
+    left: auto;
+    white-space: nowrap;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+ul[is="chat-member-list"] li span:nth-child(2) {
+    margin-left: 0.5rem;
+    white-space: nowrap;
+    font-size: small;
+    color: $gray;
+    cursor: default;
+}
+
+ul[is="chat-member-list"] li {
+    margin-left: 0.4rem;
+}

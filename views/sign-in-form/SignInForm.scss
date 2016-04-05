@@ -1,24 +1,24 @@
-#sign-in form {
+sign-in-form form {
     max-width: 360px;
     padding: 30px;
     margin: 0 auto;
 }
 
-#sign-in h2 {
+sign-in-form h2 {
     margin-bottom: 2rem;
     font-size: 2rem;
 }
 
-#sign-in form input[name=username], #sign-in form input[name=password] {
+sign-in-form input[name=username], sign-in-form input[name=password] {
     padding: 10px;
     font-size: 16px;
     margin-bottom: 1px;
 }
 
-#sign-in .checkbox label {
+sign-in-form .checkbox label {
     margin: 0.5rem 0;
 }
 
-#sign-in button[type=submit] {
+sign-in-form button[type=submit] {
     margin: 2rem 0 2rem;
 }

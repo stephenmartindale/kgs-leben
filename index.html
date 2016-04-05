@@ -7,96 +7,34 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
-    <title>Dashboard Template for Bootstrap</title>
+    <title>KGS Leben</title>
     <link rel="icon" href="../../favicon.ico" />
-    <link href="/css/stylesheet.css" rel="stylesheet" />
+    <link href="/stylesheet.css" rel="stylesheet" />
   </head>
 
   <body class="kgs-disconnected">
-    <div id="sidebar" class="sidebar inactive">
-        <ul class="nav nav-sidebar">
-            <li class="kgs-room"><a href="#">English Game Room</a></li>
-            <li class="kgs-list"><a href="#">Open Games</a></li>
-            <li class="kgs-list"><a href="#">Active Games</a></li>
-            <li class="kgs-conversation kgs-info"><a href="#">Sue</a></li>
-            <li class="kgs-conversation"><a href="#">Bob</a></li>
-            <li class="kgs-game active"><a href="#">Fred</a></li>
-        </ul>
-
-        <div class="kgs-chat">
-            <div class="kgs-chat-log">
-                <ul>
-                    <li>
-                        <span>sue</span>
-                        <span title="move 89, today at 16.30">4 minutes ago</span>
-                        <p>This would be a message...</p>
-                        <p>This might be following a line-feed or appended to the block if it arrived from the most recent sender within a certain time limit...</p>
-                    </li>
-                    <li>
-                        <span>sue</span>
-                        <span title="move 89, today at 16.31">3 minutes ago</span>
-                        <p>Hello World</p>
-                    </li>
-                    <li>
-                        <span>bob</span>
-                        <span title="today at 16.32">2 minutes ago</span>
-                        <p>Messages might not be associated with moves so that span might be empty or not present</p>
-                    </li>
-                </ul>
-            </div>
-            <div class="kgs-chat-members">
-                <ul>
-                    <li>
-                        <span>sue</span>
-                        <span>6 kyu</span>
-                    </li>
-                    <li>
-                        <span>bob</span>
-                        <span>2 kyu</span>
-                    </li>
-                    <li>
-                        <span>fred</span>
-                        <span>1 dan</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div id="main">
-    </div>
-
-    <!-- Lightbox -->
-    <div id="lightbox">
-        <div class="container">
-            <!-- KGS Sign-in Form -->
-            <div id="sign-in">
-                <form>
-                    <h2>Sign in to KGS</h2>
-                    <input type="text" name="username" placeholder="KGS username" required autofocus autocomplete="off">
-                    <input type="password" name="password" placeholder="KGS password" required autocomplete="off">
-                    <div class="checkbox">
-                        <label><input type="checkbox" name="remember-me" value="remember-me" autocomplete="off"> Sign in automatically</label>
-                        <p class="text-warning" style="display:none">For security reasons, this feature will only work if your browser remembers your password and supplies it for use in the future.</p>
-                    </div>
-                    <button class="btn-lg btn-block" type="submit" disabled autocomplete="off">Sign in</button>
-                </form>
-             </div>
-        </div>
-    </div>
+    <sidebar-container>
+        <ul is="sidebar-context-list"></ul>
+        <chat-form></chat-form>
+    </sidebar-container>
+    <!--<lightbox-container>
+        <sign-in-form></sign-in-form>
+    </lightbox-container>-->
 
     <!-- JavaScript Dependencies -->
-    <script src="/js/jquery.min.js"></script>
+    <script src="/scripts/webcomponents-lite.min.js"></script>
+    <script src="/scripts/jquery.min.js"></script>
 
     <!-- Application -->
-    <script src="/js/ts.js"></script>
-    <script>
-        $(function() {
-            $app = new Services.Application();
-            $app.initialise();
+    <script src="/ts.js"></script>
 
-            $(window).resize(function() { $('#sidebar .kgs-chat-log li:last-child')[0].scrollIntoView(false); });
+    <!-- Web Component Templates -->
+    <link rel="import" href="templates.html" />
+    <script>
+        window.addEventListener('WebComponentsReady', function () {
+            // imports are loaded and elements have been registered
+            // // $('lightbox-container')[0].hideLightbox().then(() => $('lightbox-container').remove());
+
         });
     </script>
   </body>

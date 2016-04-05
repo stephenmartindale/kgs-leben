@@ -1,5 +1,5 @@
-namespace Services {
-    export class KGSClient {
+namespace KGS {
+    export class JSONClient {
         private static _accessURI: string = "/jsonClient/access";
         private static _disabled: boolean = true;
 
@@ -20,28 +20,28 @@ namespace Services {
             return ((this._username) && (!this._loginDeferred))? true : false;
         }
 
-        public subscribe(callback: (message: KGSMessage) => void) {
+        public subscribe(callback: (message: Downstream.Message) => void) {
             this._messageReceived.add(callback);
         }
 
-        public unsubscribe(callback: (message: KGSMessage) => void) {
+        public unsubscribe(callback: (message: Downstream.Message) => void) {
             this._messageReceived.remove(callback);
         }
 
-        private kgsPOST(data: any): JQueryXHR {
-            if (KGSClient._disabled) throw "KGS Client disabled";
+        private kgsPOST(data: Upstream.Message): JQueryXHR {
+            if (JSONClient._disabled) throw "KGS Client disabled";
             return $.ajax({
                 type: 'POST',
-                url: KGSClient._accessURI,
+                url: JSONClient._accessURI,
                 data: JSON.stringify(data)
             });
         }
 
         private kgsGET(poll: boolean = true) {
-            if (KGSClient._disabled) throw "KGS Client disabled";
+            if (JSONClient._disabled) throw "KGS Client disabled";
             $.ajax({
                 type: 'GET',
-                url: KGSClient._accessURI,
+                url: JSONClient._accessURI,
                 success: (data, textStatus, jqXHR) => this.kgsGETCallback(data, textStatus, jqXHR, null, poll),
                 error: (jqXHR, textStatus, errorThrown) => this.kgsGETCallback(null, textStatus, jqXHR, errorThrown, poll)
             });
@@ -51,7 +51,7 @@ namespace Services {
             switch (jqXHR.status) {
                 case 200:
                     if ((data) && (data.messages)) {
-                        (<KGSResponse>data).messages.forEach(message => {
+                        (<Downstream.Response>data).messages.forEach(message => {
                             console.log("KGS Message received:", message.type);
                             this._messageReceived.fire(message);
                         });
@@ -72,7 +72,7 @@ namespace Services {
             if (this._loginDeferred) this.loginFailed();
         }
 
-        private _loginMessageCallback = (message: KGSMessage) => {
+        private _loginMessageCallback = (message: Downstream.Message) => {
             console.log(this);
 
             switch (message.type) {
@@ -92,7 +92,7 @@ namespace Services {
 
             this.unsubscribe(this._loginMessageCallback);
 
-            var loginDeferred: JQueryDeferred<void> = this._loginDeferred;
+            let loginDeferred: JQueryDeferred<void> = this._loginDeferred;
             this._loginDeferred = null;
             loginDeferred.resolve();
         }
@@ -104,7 +104,7 @@ namespace Services {
 
             this._username = null;
 
-            var loginDeferred: JQueryDeferred<void> = this._loginDeferred;
+            let loginDeferred: JQueryDeferred<void> = this._loginDeferred;
             this._loginDeferred = null;
             loginDeferred.reject();
         }
@@ -115,13 +115,15 @@ namespace Services {
             this._username = username;
             this._loginDeferred = $.Deferred<void>();
 
-            this.kgsPOST({
+            let m: Upstream.LOGIN = {
                 "type": "LOGIN",
                 "name": username,
                 "password": password,
                 "locale": "en_US"
-            }).then((data, textStatus, jqXHR) => { this.subscribe(this._loginMessageCallback); this.kgsGET(true); },
-                    (jqXHR, textStatus) => this.loginFailed());
+            };
+
+            this.kgsPOST(m).then((data, textStatus, jqXHR) => { this.subscribe(this._loginMessageCallback); this.kgsGET(true); },
+                                 (jqXHR, textStatus) => this.loginFailed());
 
             return this._loginDeferred.promise();
         }

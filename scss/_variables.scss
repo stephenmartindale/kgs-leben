@@ -32,3 +32,14 @@ $enable-grid-classes:       true !default;
 $zindex-main:               1;
 $zindex-sidebar:            $zindex-main + 100;
 $zindex-lightbox:           2000;
+
+// Responsive Breakpoints
+//
+$grid-breakpoints: (
+  xs: 0,
+  sm: 544px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1600px
+);

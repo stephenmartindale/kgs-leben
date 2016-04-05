@@ -2,8 +2,8 @@ form * {
     user-select: none;
 }
 form input[type=text], form input[type=password] {
-    user-select: text;
     @extend .form-control;
+    user-select: text;
 }
 
 form button {

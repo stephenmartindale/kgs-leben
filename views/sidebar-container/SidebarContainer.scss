@@ -1,0 +1,25 @@
+sidebar-container .sidebar {
+    @extend .block-fixed;
+    display: flex;
+    flex-direction: column;
+    left: auto;
+    width: 33%;
+    z-index: 2;
+    background-color: $gray-lighter;
+    transition: 100ms ease-out;
+}
+
+@media (max-width: map-get($grid-breakpoints, "lg") - 1px) {
+    sidebar-container .sidebar {
+        width: 330px;
+    }
+    sidebar-container .sidebar.inactive:not(:hover) {
+        right: 48px - 330px;
+    }
+}
+
+@media (min-width: map-get($grid-breakpoints, "xxl")) {
+    sidebar-container .sidebar {
+        width: 528px;
+    }
+}
