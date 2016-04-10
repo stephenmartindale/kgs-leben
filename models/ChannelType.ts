@@ -1,9 +1,9 @@
 namespace Models {
-    export enum ContextClass {
-        Default,
+    export const enum ChannelType {
         Room,
         List,
         Conversation,
-        Game
+        Game,
+        Challenge
     }
 }

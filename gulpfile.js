@@ -91,16 +91,6 @@ var multisource = function(p) {
     else return null;
 }
 
-var buildTypeScript = function(tsconfig, outputPath) {
-    var ts = tsconfig.src()
-                     .pipe(sourcemaps.init())
-                     .pipe(typescript(tsconfig));
-    return merge(
-        ts.dts.pipe(gulp.dest(path.join(outputs.root, "tsd"))),
-        ts.js.pipe(sourcemaps.write(".")).pipe(gulp.dest(outputs.root))
-    );
-}
-
 // Task(s): Clean
 gulp.task('clean:dependencies:fonts', function(callback) {
     rimraf(path.join(outputs.root, outputs.dependencies.fonts), callback);
@@ -154,7 +144,13 @@ gulp.task('build:templates', function() {
 
 // Task(s): Build TypeScript Outputs
 var tsconfig = typescript.createProject(inputs.scripts.project);
-gulp.task('build:scripts', buildTypeScript.bind(null, tsconfig, outputs.scripts));
+gulp.task('build:scripts', function () {
+    var ts = tsconfig.src()
+                     .pipe(sourcemaps.init())
+                     .pipe(typescript(tsconfig));
+
+    return ts.js.pipe(sourcemaps.write(".")).pipe(gulp.dest(outputs.root))
+});
 
 // Task(s): Build Sass Outputs
 gulp.task('build:styles:views', function() {

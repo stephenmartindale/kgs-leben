@@ -1,31 +1,20 @@
 namespace Views {
-    export class ChatMemberList extends Framework.Elements.DataBoundList<Models.UserInfo, HTMLLIElement> {
+    export class ChatMemberList extends Framework.DataBoundList<KGS.User, HTMLLIElement> {
         createdCallback() {
             super.createdCallback();
-
-            this.bind([ { key: "Bobby", name: "Bobby" },
-                        { key: "Fred", name: "Fred" },
-                        { key: "Grunt", name: "Grunt" },
-                        { key: "Loopy", name: "Loopy" },
-                        { key: "Dude", name: "Dude" } ]);
-
-            this.bind([ { key: "Dude", name: "Dude" },
-                        { key: "NEUE", name: "NEUE" },
-                        { key: "Bobby", name: "Bobby" },
-                        { key: "Fred", name: "Fred" },
-                        { key: "Fred", name: "Fred2" },
-                        { key: "GRUNT", name: "Grunt" },
-                        { key: "Loopy", name: "Loopy" } ]);
         }
 
-        protected createChild(datum: Models.UserInfo): HTMLLIElement {
+        public update(users: { [name: string]: KGS.User }, memberNames: string[]) {
+            this.bindDictionary(users, memberNames);
+        }
+
+        protected createChild(key: string, datum: KGS.User): HTMLLIElement {
             let element = document.createElement('li');
-            element.setAttribute("data-kgs-user", datum.name);
-            this.updateChild(datum, element);
+            this.updateChild(key, datum, element);
             return element;
         }
 
-        protected updateChild(datum: Models.UserInfo, element: HTMLLIElement): void {
+        protected updateChild(key: string, datum: KGS.User, element: HTMLLIElement): void {
             element.innerText = datum.name;
         }
     }

@@ -5,37 +5,26 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <!--<meta name="description" content="">-->
+    <!--<meta name="author" content="">-->
     <title>KGS Leben</title>
-    <link rel="icon" href="../../favicon.ico" />
+    <!--<link rel="icon" href="/images/favicon.ico" />-->
     <link href="/stylesheet.css" rel="stylesheet" />
   </head>
 
-  <body class="kgs-disconnected">
-    <sidebar-container>
-        <ul is="sidebar-context-list"></ul>
-        <chat-form></chat-form>
-    </sidebar-container>
-    <!--<lightbox-container>
-        <sign-in-form></sign-in-form>
-    </lightbox-container>-->
+  <body>
+    <div id='sidebar' class="inactive">
+        <ul is="channel-list"></ul>
+        <div>&nbsp;</div>
+    </div>
+    <lightbox-container>
+      <sign-in-form></sign-in-form>
+    </lightbox-container>
 
-    <!-- JavaScript Dependencies -->
     <script src="/scripts/webcomponents-lite.min.js"></script>
     <script src="/scripts/jquery.min.js"></script>
-
-    <!-- Application -->
     <script src="/ts.js"></script>
-
-    <!-- Web Component Templates -->
     <link rel="import" href="templates.html" />
-    <script>
-        window.addEventListener('WebComponentsReady', function () {
-            // imports are loaded and elements have been registered
-            // // $('lightbox-container')[0].hideLightbox().then(() => $('lightbox-container').remove());
-
-        });
-    </script>
+    <script>Controllers.Application.initialise();</script>
   </body>
 </html>

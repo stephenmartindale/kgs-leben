@@ -1,4 +1,4 @@
-sidebar-container .sidebar {
+#sidebar {
     @extend .block-fixed;
     display: flex;
     flex-direction: column;
@@ -10,16 +10,22 @@ sidebar-container .sidebar {
 }
 
 @media (max-width: map-get($grid-breakpoints, "lg") - 1px) {
-    sidebar-container .sidebar {
+    #sidebar {
         width: 330px;
     }
-    sidebar-container .sidebar.inactive:not(:hover) {
+    #sidebar.inactive:not(:hover) {
         right: 48px - 330px;
     }
 }
 
 @media (min-width: map-get($grid-breakpoints, "xxl")) {
-    sidebar-container .sidebar {
+    #sidebar {
         width: 528px;
     }
+}
+
+#sidebar > div {
+    flex: 1 1 auto;
+    position: relative;
+    overflow: hidden;
 }

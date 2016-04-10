@@ -1,21 +1,7 @@
 <template data-component-tag="chat-form" data-component-prototype="ChatForm">
-    <ul class="chat-messages">
-        <li>
-            <span>sue</span>
-            <span title="move 89, today at 16.30">4 minutes ago</span>
-            <p>This would be a message...</p>
-            <p>This might be following a line-feed or appended to the block if it arrived from the most recent sender within a certain time limit...</p>
-        </li>
-        <li>
-            <span>sue</span>
-            <span title="move 89, today at 16.31">3 minutes ago</span>
-            <p>Hello World</p>
-        </li>
-        <li>
-            <span>bob</span>
-            <span title="today at 16.32">2 minutes ago</span>
-            <p>Messages might not be associated with moves so that span might be empty or not present</p>
-        </li>
-    </ul>
-    <ul is="chat-member-list"></ul>
+    <div>
+        <ul is="chat-message-list"></ul>
+        <ul is="chat-member-list"></ul>
+    </div>
+    <form><input type="text" placeholder="send a message..." autocomplete="off"></input></form>
 </template>

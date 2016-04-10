@@ -1,0 +1,38 @@
+ul[is="chat-message-list"] {
+    @extend .list-none;
+    @extend .block-absolute;
+    height: auto;
+    top: auto;
+    max-height: 100%;
+    width: 60%;
+    right: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+ul[is="chat-message-list"] > li > p {
+    margin: 0;
+}
+ul[is="chat-message-list"] > li > p + p {
+    margin-top: 1rem;
+}
+
+ul[is="chat-message-list"] li {
+    padding-left: 0.7rem;
+    padding-bottom: 0.7rem;
+}
+ul[is="chat-message-list"] li span:first-child {
+    white-space: nowrap;
+    font-weight: bold;
+    cursor: pointer;
+}
+ul[is="chat-message-list"] li span:nth-child(2) {
+    margin-left: 0.5rem;
+    white-space: nowrap;
+    font-size: small;
+    color: $gray;
+    cursor: default;
+}
+ul[is="chat-message-list"] li span:nth-child(2) {
+    cursor: help;
+}

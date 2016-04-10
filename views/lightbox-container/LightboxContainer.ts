@@ -2,60 +2,29 @@ namespace Views {
     export class LightboxContainer extends HTMLElement {
         static _template: HTMLTemplateElement;
 
-        private _lightbox: HTMLDivElement;
         private _lightboxContainer: HTMLDivElement;
 
         createdCallback() {
             let children = $(this).children().detach();
             this.appendChild(LightboxContainer._template.content.cloneNode(true));
-
-            this._lightbox = this.querySelector('.lightbox') as HTMLDivElement;
-            this._lightboxContainer = this._lightbox.querySelector('.lightbox-container') as HTMLDivElement;
-
+            this._lightboxContainer = this.firstElementChild as HTMLDivElement;
             $(this._lightboxContainer).append(children);
         }
 
-        attachedCallback() {
-        }
-        detachedCallback() {
-        }
-        attributeChangedCallback(name: string, oldValue: any, newValue: any) {
-        }
+        public static showLightbox(view: HTMLElement) {
+            let lightbox = document.createElement('lightbox-container') as LightboxContainer;
+            lightbox.className = 'hidden';
+            lightbox._lightboxContainer.appendChild(view);
 
-        private transitionAddClass(element: HTMLElement, className: string): JQueryPromise<boolean> {
-            var deferred: JQueryDeferred<boolean> = $.Deferred<boolean>();
-            var target = $(element);
+            document.body.appendChild(lightbox);
 
-            if (target.hasClass(className)) deferred.resolve(false);
-            target.on("transitionend", function(event: JQueryEventObject) {
-                $(this).off(event);
-                deferred.resolve(true);
-            });
-
-            target.addClass(className);
-            return deferred.promise();
+            window.setTimeout(() => $(lightbox).removeClass('hidden'), 20);
         }
 
-        private transitionRemoveClass(element: HTMLElement, className: string): JQueryPromise<boolean> {
-            var deferred: JQueryDeferred<boolean> = $.Deferred<boolean>();
-            var target = $(element);
-
-            if (!target.hasClass(className)) deferred.resolve(false);
-            target.on("transitionend", function(event: JQueryEventObject) {
-                $(this).off(event);
-                deferred.resolve(true);
-            });
-
-            target.removeClass(className);
-            return deferred.promise();
-        }
-
-        public hideLightbox(): JQueryPromise<boolean> {
-            return this.transitionAddClass(this._lightbox, 'hidden');
-        }
-
-        public showLightbox(): JQueryPromise<boolean> {
-            return this.transitionRemoveClass(this._lightbox, 'hidden');
+        public static hideLightbox(view: HTMLElement) {
+            let lightbox = $(view).closest('lightbox-container');
+            lightbox.one('transitionend', () => lightbox.remove());
+            lightbox.addClass('hidden');
         }
     }
 }

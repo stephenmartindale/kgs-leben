@@ -1,47 +1,14 @@
-sidebar-container chat-form {
-    flex: 1 1 auto;
-    position: relative;
-}
-
-chat-form {
-    overflow: hidden;
-}
-
-chat-form ul.chat-messages {
-    @extend .list-none;
+chat-form > div {
     @extend .block-absolute;
-    height: auto;
+    bottom: 3rem;
+}
+
+chat-form > form {
+    @extend .block-absolute;
+    height: 3rem;
     top: auto;
-    max-height: 100%;
-    width: 60%;
-    right: auto;
-    overflow-x: hidden;
-    overflow-y: auto;
 }
-
-chat-form ul.chat-messages > li > p {
-    margin: 0;
-}
-chat-form ul.chat-messages > li > p + p {
-    margin-top: 1rem;
-}
-
-chat-form ul.chat-messages li {
-    padding-left: 0.7rem;
-    padding-bottom: 0.7rem;
-}
-chat-form ul.chat-messages li span:first-child {
-    white-space: nowrap;
-    font-weight: bold;
-    cursor: pointer;
-}
-chat-form ul.chat-messages li span:nth-child(2) {
-    margin-left: 0.5rem;
-    white-space: nowrap;
-    font-size: small;
-    color: $gray;
-    cursor: default;
-}
-chat-form ul.chat-messages li span:nth-child(2) {
-    cursor: help;
+chat-form > form > input[type="text"] {
+    height: 3rem;
+    border-radius: 0;
 }

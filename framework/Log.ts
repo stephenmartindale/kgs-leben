@@ -7,14 +7,22 @@ namespace Framework {
         Warning
     }
 
-    var logOptions: Models.NumericDictionary<boolean> = {};
+    interface LogOptions {
+        [severity: number]: boolean;
+    }
+
+    let logOptions: LogOptions = {};
     logOptions[LogSeverity.Default] = true;
     logOptions[LogSeverity.Info] = true;
     logOptions[LogSeverity.Success] = true;
     logOptions[LogSeverity.Error] = true;
     logOptions[LogSeverity.Warning] = true;
 
-    var logMethods: Models.NumericDictionary<(message?: string, ...optionalParams: any[]) => void> = {};
+    interface LogMethods {
+        [severity: number]: (message?: string, ...optionalParams: any[]) => void;
+    }
+
+    let logMethods: LogMethods = {};
     if (console) {
         logMethods[LogSeverity.Default] = (console.log)? console.log.bind(console) : undefined;
         logMethods[LogSeverity.Info] = (console.info)? console.info.bind(console) : logMethods[LogSeverity.Default];

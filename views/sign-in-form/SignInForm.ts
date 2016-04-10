@@ -1,29 +1,31 @@
 namespace Views {
     export class SignInForm extends HTMLElement {
-        static _template: HTMLTemplateElement;
+        private static _template: HTMLTemplateElement;
 
-        private _initialised: boolean;
         private _defaultDisabled: boolean;
         private _disabled: boolean;
 
         private _form: HTMLFormElement;
+        private _errorNotice: HTMLParagraphElement;
         private _inputUsername: HTMLInputElement;
         private _inputPassword: HTMLInputElement;
         private _inputRememberMe: HTMLInputElement;
         private _inputRememberMeNotice: HTMLParagraphElement;
         private _submitButton: HTMLButtonElement;
 
+        public submitCallback: (form: SignInForm) => void;
+
         createdCallback() {
             this.appendChild(SignInForm._template.content.cloneNode(true));
 
-            this._initialised = false;
             this._defaultDisabled = (this.getAttribute('disabled'))? true : false;
 
             this._form = this.querySelector('form') as HTMLFormElement;
+            this._errorNotice = this._form.querySelector('.error-notice') as HTMLParagraphElement;
             this._inputUsername = this._form.querySelector('input[name="username"]') as HTMLInputElement;
             this._inputPassword = this._form.querySelector('input[name="password"]') as HTMLInputElement;
             this._inputRememberMe = this._form.querySelector('input[name="remember-me"]') as HTMLInputElement;
-            this._inputRememberMeNotice = this._form.querySelector('p.text-warning') as HTMLParagraphElement;
+            this._inputRememberMeNotice = this._form.querySelector('.remember-me-warning') as HTMLParagraphElement;
             this._submitButton = this._form.querySelector('button[type="submit"]') as HTMLButtonElement;
 
             $(this._inputRememberMe).click((e) => this.onRememberMeClick(e));
@@ -31,13 +33,6 @@ namespace Views {
 
             this._disabled = false;
             this.disabled = this._defaultDisabled;
-        }
-
-        attachedCallback() {
-        }
-        detachedCallback() {
-        }
-        attributeChangedCallback(name: string, oldValue: any, newValue: any) {
         }
 
         get defaultDisabled(): boolean {
@@ -48,31 +43,36 @@ namespace Views {
         }
         set disabled(value: boolean) {
             if (value != this._disabled) {
-                $([this._inputUsername, this._inputPassword, this._inputRememberMe]).prop("disabled", value);
-                $(this._submitButton).prop("disabled", (value || !this._initialised));
+                $([this._inputUsername, this._inputPassword, this._inputRememberMe, this._submitButton]).prop("disabled", value);
                 this._disabled = value;
             }
         }
 
-        private onKGSClientReady() {
-            var signInAutomatically = false;
-            if (typeof (Storage) !== "undefined") {
-                var lastUsername = localStorage.getItem("KGSUsername");
-                if (lastUsername) {
-                    if (($(this._inputUsername).val() == lastUsername) && ($(this._inputPassword).val())) {
-                        $(this._inputRememberMe).prop('checked', true);
-                        $(this._inputRememberMeNotice).removeClass('collapse');
-                        signInAutomatically = true;
-                    }
-                }
+        public get username() { return this._inputUsername.value; }
+        public set username(value: string) { this._inputUsername.value = value; }
+
+        public get password() { return this._inputPassword.value; }
+        public set password(value: string) { this._inputPassword.value = value; }
+
+        public get rememberMe() { return this._inputRememberMe.checked; }
+        public set rememberMe(value: boolean) {
+            this._inputRememberMe.checked = value;
+            if (value) $(this._inputRememberMeNotice).show();
+            else $(this._inputRememberMeNotice).hide();
+        }
+
+        public focus() {
+            if ($(this._inputUsername).val()) $(this._inputPassword).focus();
+            else $(this._inputUsername).focus();
+        }
+
+        public set errorNotice(message: string) {
+            if (message) {
+                this._errorNotice.innerText = message;
+                $(this._errorNotice).slideDown(160);
             }
-
-            this._initialised = true;
-
-            if (signInAutomatically) this.beginLogin();
             else {
-                localStorage.removeItem("KGSUsername");
-                if (!this._disabled) $(this._submitButton).prop("disabled", false);
+                $(this._errorNotice).slideUp(160);
             }
         }
 
@@ -84,37 +84,9 @@ namespace Views {
         }
 
         private onFormSubmit(e: JQueryEventObject) {
-            this.beginLogin();
             e.preventDefault();
-        }
-
-        private beginLogin() {
-            if ((!this._inputUsername.checkValidity())
-             || (!this._inputPassword.checkValidity())) return;
-
-            console.log('login procedure starting...');
-            this.disabled = true;
-
-            var username: string = <string>$(this._inputUsername).val();
-            var password: string = <string>$(this._inputPassword).val();
-
-            if ((typeof (Storage) !== "undefined") && (this._inputRememberMe.checked)) {
-                localStorage.setItem("KGSUsername", username);
-            }
-
-            // TODO: Call login here!
-            // $app.client.loginAsync(username, password).done(() => this.loginSucceeded())
-                                                        //  .fail(() => this.loginFailed());
-        }
-
-        private loginSucceeded() {
-            console.log("SignIn Controller: login apparently succeeded");
-            // console.log("Client Connected: ", $app.client.connected);
-        }
-
-        private loginFailed() {
-            console.log("SignIn Controller: login apparently failed");
-            // console.log("Client Connected: ", $app.client.connected);
+            if ((this._disabled) || (!this._inputUsername.checkValidity()) || (!this._inputPassword.checkValidity())) return;
+            if (this.submitCallback) this.submitCallback(this);
         }
     }
 }
