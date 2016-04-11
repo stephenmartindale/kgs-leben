@@ -3,3 +3,4 @@ node_modules
 
 # Artefacts produced by Gulp script
 dist
+gulp/.tmp

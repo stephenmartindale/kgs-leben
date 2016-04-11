@@ -2,6 +2,8 @@
 
 namespace Controllers {
     export class LayoutController extends ControllerBase<Application> {
+        private _mainContainer: HTMLDivElement;
+        private _mainView: HTMLElement;
         private _sidebarContainer: HTMLDivElement;
         private _sidebarView: HTMLElement;
 
@@ -9,7 +11,10 @@ namespace Controllers {
             super(parent);
             $layout = this;
 
+            this._mainContainer = document.querySelector('#main') as HTMLDivElement;
             this._sidebarContainer = document.querySelector('#sidebar > div') as HTMLDivElement;
+
+            this.clearMain();
             this.clearSidebar();
         }
 
@@ -19,6 +24,18 @@ namespace Controllers {
 
         public hideLightbox(view: HTMLElement) {
             Views.LightboxContainer.hideLightbox(view);
+        }
+
+        public showMain(view: HTMLElement) {
+            this.clearMain();
+
+            this._mainView = view;
+            this._mainContainer.appendChild(view);
+        }
+
+        public clearMain() {
+            $(this._mainContainer).children().detach();
+            this._mainView = null;
         }
 
         public showSidebar(view: HTMLElement) {

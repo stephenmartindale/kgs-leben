@@ -1,0 +1,22 @@
+tbody[is="game-table-body"] td {
+    padding: 4px;
+    user-select: none;
+}
+
+tbody[is="game-table-body"] tr:nth-child(odd) {
+   background-color: lighten($gray-dark, 5%);
+}
+
+tbody[is="game-table-body"] tr:hover {
+    background-color: $gray;
+    cursor: pointer;
+}
+
+tbody[is="game-table-body"] td span {
+    margin-right: 0.5rem;
+}
+
+tbody[is="game-table-body"] td span:nth-child(2) {
+    font-size: small;
+    color: $gray-light;
+}

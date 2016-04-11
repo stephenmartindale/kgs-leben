@@ -1,3 +1,12 @@
+#main {
+    @extend .block-fixed;
+    right: 33%;
+    z-index: $zindex-main;
+}
+#main > * {
+    @extend .bg-inverse;
+}
+
 #sidebar {
     @extend .block-fixed;
     display: flex;
@@ -6,10 +15,21 @@
     width: 33%;
     z-index: 2;
     background-color: $gray-lighter;
-    transition: 100ms ease-out;
+}
+#sidebar > div {
+    flex: 1 1 auto;
+    position: relative;
+    overflow: hidden;
+}
+
+#main, #sidebar {
+    transition: right 120ms ease-out;
 }
 
 @media (max-width: map-get($grid-breakpoints, "lg") - 1px) {
+    #main {
+        right: 48px;
+    }
     #sidebar {
         width: 330px;
     }
@@ -19,13 +39,10 @@
 }
 
 @media (min-width: map-get($grid-breakpoints, "xxl")) {
+    #main {
+        right: 528px;
+    }
     #sidebar {
         width: 528px;
     }
-}
-
-#sidebar > div {
-    flex: 1 1 auto;
-    position: relative;
-    overflow: hidden;
 }

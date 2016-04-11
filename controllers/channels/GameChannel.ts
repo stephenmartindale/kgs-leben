@@ -5,6 +5,8 @@ namespace Controllers {
 
         constructor(parent: ChannelController, channelId: number) {
             super(parent, channelId);
+
+            this.initialiseChat();
         }
     }
 }

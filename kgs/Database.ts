@@ -46,20 +46,6 @@ namespace KGS {
             return channel;
         }
 
-        public _receiveChat(digest: KGS.DataDigest, message: KGS.Downstream.CHAT, importance: Models.ChatImportance) {
-            if (!message.user) return;
-            let user = this._updateUser(digest, message.user);
-            let channel = this._requireChannel(message.channelId);
-
-            channel.chats.push({
-                sender: user.name,
-                text: message.text,
-                importance: importance,
-                received: digest.timestamp
-            });
-            digest.touchChannelChat(message.channelId);
-        }
-
         public _updateUser(digest: KGS.DataDigest, user: KGS.User): KGS.User {
             let record = this.users[user.name];
             let touchUser: boolean = false;
@@ -75,22 +61,6 @@ namespace KGS {
 
             if (touchUser) digest.touchUser(user.name);
             return user;
-        }
-
-        public static addUnique<T>(target: T[], value: T): boolean {
-            if (target.lastIndexOf(value) < 0) {
-                target.push(value);
-                return true;
-            }
-            else return false;
-        }
-        public static removeFrom<T>(target: T[], value: T): boolean {
-            let index = target.lastIndexOf(value);
-            if (index < 0) return false;
-            else {
-                target.splice(index, 1);
-                return true;
-            }
         }
     }
 
@@ -119,49 +89,31 @@ namespace KGS {
             for (let i = 0; i < message.rooms.length; ++i) {
                 let room = message.rooms[i];
                 let channel = this._database._createChannel(digest, room.channelId, Models.ChannelType.Room) as Models.RoomChannel;
-
-                let touchChannel: boolean = false;
-                if (channel.name != room.name) { channel.name = room.name; touchChannel = true; }
-                if (channel.private != room.private) { channel.private = room.private; touchChannel = true; }
-                if (channel.tournamentOnly != room.tournOnly) { channel.tournamentOnly = room.tournOnly; touchChannel = true; }
-                if (channel.globalGamesOnly != room.globalGamesOnly) { channel.globalGamesOnly = room.globalGamesOnly; touchChannel = true; }
-                if (touchChannel) digest.touchChannel(room.channelId);
+                if (channel.mergeRoomName(room)) digest.touchChannel(room.channelId);
             }
         }
 
         public ROOM_DESC = (digest: KGS.DataDigest, message: KGS.Downstream.ROOM_DESC) => {
             let channel = this._database._createChannel(digest, message.channelId, Models.ChannelType.Room) as Models.RoomChannel;
 
-            let touchChannel: boolean = false;
-            if (channel.description != message.description) { channel.description = message.description; touchChannel = true; }
-            if (touchChannel) digest.touchChannel(message.channelId);
+            if (channel.mergeRoomDescription(message.description)) digest.touchChannel(message.channelId);
 
-            let touchChannelOwners: boolean = false;
             for (let i = 0; i < message.owners.length; ++i) {
-                let user = this._database._updateUser(digest, message.owners[i]);
-                if (DatabaseInternal.addUnique(channel.owners, user.name)) touchChannelOwners = true;
+                this._database._updateUser(digest, message.owners[i]);
             }
-            if (touchChannelOwners) digest.touchChannelOwners(message.channelId);
 
+            if (channel.syncOwners(message.owners)) digest.touchChannelOwners(message.channelId);
         }
 
         public JOIN = (digest: KGS.DataDigest, message: KGS.Downstream.JOIN) => {
-            let channelType = Models.ChannelType.Room;
-            if ((<Downstream.JOINRoom>message).games) {
-                channelType = Models.ChannelType.Room;
-            }
-            else if (((<Downstream.JOINGame>message).gameSummary) || ((<Downstream.JOINGame>message).sgfEvents)) {
-                channelType = Models.ChannelType.Game;
-            }
-
+            let channelType = Models.Channel.predictChannelType(message);
             let channel = this._database._createChannel(digest, message.channelId, channelType);
 
-            let touchChannelUsers: boolean = false;
             for (let i = 0; i < message.users.length; ++i) {
                 let user = this._database._updateUser(digest, message.users[i]);
-                if (DatabaseInternal.addUnique(channel.users, user.name)) touchChannelUsers = true;
             }
-            if (touchChannelUsers) digest.touchChannelUsers(message.channelId);
+
+            if (channel.mergeUsers(message.users)) digest.touchChannelUsers(message.channelId);
 
             if ((<Downstream.JOINRoom>message).games) {
                 this.GAME_LIST(digest, <Downstream.JOINRoom>message);
@@ -180,13 +132,19 @@ namespace KGS {
         }
 
         public CHAT = (digest: KGS.DataDigest, message: KGS.Downstream.CHAT) => {
-            this._database._receiveChat(digest, message, Models.ChatImportance.Chat);
+            this._database._updateUser(digest, message.user);
+            let channel = this._database._requireChannel(message.channelId);
+            if (channel.appendChat(message, Models.ChatImportance.Chat, digest.timestamp)) digest.touchChannelChat(message.channelId);
         }
         public ANNOUNCE = (digest: KGS.DataDigest, message: KGS.Downstream.ANNOUNCE) => {
-            this._database._receiveChat(digest, message, Models.ChatImportance.Announcement);
+            this._database._updateUser(digest, message.user);
+            let channel = this._database._requireChannel(message.channelId);
+            if (channel.appendChat(message, Models.ChatImportance.Announcement, digest.timestamp)) digest.touchChannelChat(message.channelId);
         }
         public MODERATED_CHAT = (digest: KGS.DataDigest, message: KGS.Downstream.MODERATED_CHAT) => {
-            this._database._receiveChat(digest, message, Models.ChatImportance.Moderated);
+            this._database._updateUser(digest, message.user);
+            let channel = this._database._requireChannel(message.channelId);
+            if (channel.appendChat(message, Models.ChatImportance.Moderated, digest.timestamp)) digest.touchChannelChat(message.channelId);
         }
 
         public USER_UPDATE = (digest: KGS.DataDigest, message: KGS.Downstream.USER_UPDATE) => {
@@ -196,38 +154,42 @@ namespace KGS {
         public USER_ADDED = (digest: KGS.DataDigest, message: KGS.Downstream.USER_ADDED) => {
             let channel = this._database._requireChannel(message.channelId);
             let user = this._database._updateUser(digest, message.user);
-            if (DatabaseInternal.addUnique(channel.users, user.name)) digest.touchChannelUsers(message.channelId);
+            if (Utils.setAdd(channel.users, user.name)) digest.touchChannelUsers(message.channelId);
         }
         public USER_REMOVED = (digest: KGS.DataDigest, message: KGS.Downstream.USER_REMOVED) => {
             let channel = this._database._requireChannel(message.channelId);
             let user = this._database._updateUser(digest, message.user);
-            if (DatabaseInternal.removeFrom(channel.users, user.name)) digest.touchChannelUsers(message.channelId);
+            if (Utils.setRemove(channel.users, user.name)) digest.touchChannelUsers(message.channelId);
         }
 
         public GAME_LIST = (digest: KGS.DataDigest, message: KGS.Downstream.GAME_LIST) => {
             for (let i = 0; i < message.games.length; ++i) {
                 let game = message.games[i];
-                let gameChannel = this._database._createChannel(digest, game.channelId, Models.ChannelType.Game) as Models.GameChannel;
-
                 let parentChannel = this._database._requireChannel(game.roomId) as Models.RoomChannel;
-                if (DatabaseInternal.addUnique(parentChannel.games, game.channelId)) digest.touchChannelGames(parentChannel.channelId);
+                if (parentChannel.addGame(game.channelId)) digest.touchChannelGames(parentChannel.channelId);
 
-                let touchChannel: boolean = false;
-                if (gameChannel.name != game.name) { gameChannel.name = game.name; touchChannel = true; }
-                if (gameChannel.parentChannelId != game.roomId) { gameChannel.parentChannelId = game.roomId; touchChannel = true; }
-                if (gameChannel.gameType != game.gameType) { gameChannel.gameType = game.gameType; touchChannel = true; }
-                if (gameChannel.score != game.score) { gameChannel.score = game.score; touchChannel = true; }
-                if (gameChannel.moveNumber != game.moveNum) { gameChannel.moveNumber = game.moveNum; touchChannel = true; }
-                if (touchChannel) digest.touchChannel(game.channelId);
+                let gameChannel = this._database._createChannel(digest, game.channelId, Models.ChannelType.Game) as Models.GameChannel;
+                if (gameChannel.mergeGameChannel(game)) digest.touchChannel(gameChannel.channelId);
+
+                if (game.players) {
+                    if (game.players.owner) {
+                        this._database._updateUser(digest, game.players.owner);
+
+                        if (gameChannel.syncOwners([game.players.owner])) digest.touchChannelOwners(gameChannel.channelId);
+                    }
+
+                    if (game.players.white) this._database._updateUser(digest, game.players.white);
+                    if (game.players.black) this._database._updateUser(digest, game.players.black);
+                }
             }
         }
 
         public GAME_CONTAINER_REMOVE_GAME = (digest: KGS.DataDigest, message: KGS.Downstream.GAME_CONTAINER_REMOVE_GAME) => {
             let parentChannel = this._database._requireChannel(message.channelId) as Models.RoomChannel;
-            if (DatabaseInternal.removeFrom(parentChannel.games, message.gameId)) digest.touchChannelGames(parentChannel.channelId);
+            if (parentChannel.removeGame(message.gameId)) digest.touchChannelGames(parentChannel.channelId);
 
             if (this._database.joinedChannelIds.indexOf(message.gameId) < 0) {
-                DatabaseInternal.removeFrom(this._database.channelIds, message.gameId);
+                Utils.setRemove(this._database.channelIds, message.gameId);
                 delete this._database.channels[message.gameId];
             }
         }

@@ -30,6 +30,10 @@ namespace KGS {
         export interface LOGOUT extends KGS.Message {
         }
 
+        export const _JOIN_REQUEST: string = "JOIN_REQUEST";
+        export interface JOIN_REQUEST extends KGS.ChannelMessage {
+        }
+
         export const _CHAT: string = "CHAT";
         export const _CHAT_MaxLength: number = 1000;
         export interface CHAT extends KGS.ChannelMessage {

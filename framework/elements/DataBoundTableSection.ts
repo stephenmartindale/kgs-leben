@@ -1,5 +1,5 @@
 namespace Framework {
-    export abstract class DataBoundList<T, E extends HTMLLIElement> extends HTMLUListElement {
+    export abstract class DataBoundTableSection<T, E extends HTMLTableRowElement> extends HTMLTableSectionElement {
         private _mutationObserver: MutationObserver;
         private _initialised: boolean;
         private _keys: string[];

@@ -41,15 +41,17 @@ namespace KGS {
         export interface LOGIN_FAILED_USER_ALREADY_EXISTS extends LOGIN_FAILED {
         }
 
+        export interface RoomName {
+            channelId: number,
+            name: string,
+            private?: boolean,
+            tournOnly?: boolean,
+            globalGamesOnly?: boolean
+        }
+
         export const _ROOM_NAMES: string = "ROOM_NAMES";
         export interface ROOM_NAMES extends Message {
-            rooms: {
-                channelId: number,
-                name: string,
-                private?: boolean,
-                tournOnly?: boolean,
-                globalGamesOnly?: boolean
-            }[],
+            rooms: Downstream.RoomName[]
         }
 
         export const _ROOM_DESC: string = "LOGROOM_DESCOUT";

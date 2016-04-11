@@ -7,6 +7,7 @@ inputs = {
     root: {
         sources: [
             'index.html',
+            'test.html',
             'LICENSE'
         ]
     },

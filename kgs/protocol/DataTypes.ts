@@ -20,7 +20,8 @@ namespace KGS {
     export interface GameUserMap {              // An object mapping roles to user objects, telling who was in the game.
         owner?: User,
         white?: User,
-        black?: User
+        black?: User,
+        challengeCreator?: User,                // TODO: Add support for this user when the game is still a challenge
     }
 
     export interface GameSummary {

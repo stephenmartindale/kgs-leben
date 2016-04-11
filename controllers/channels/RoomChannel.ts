@@ -6,6 +6,7 @@ namespace Controllers {
         constructor(parent: ChannelController, channelId: number) {
             super(parent, channelId);
 
+            this.initialiseGameList();
             this.initialiseChat();
         }
     }
