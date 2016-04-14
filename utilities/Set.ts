@@ -39,4 +39,16 @@ namespace Utils {
             return true;
         }
     }
+
+    export function setEquals<T>(left: T[], right: T[]): boolean {
+        if (left === right) return true;
+        if ((left == null) || (right == null)) return false;
+        if (left.length != right.length) return false;
+
+        for (let j = 0; j < right.length; ++j) {
+            if (left.indexOf(right[j]) < 0) return false;
+        }
+
+        return true;
+    }
 }

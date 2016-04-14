@@ -13,10 +13,12 @@ inputs = {
     },
     dependencies: {
         fonts: 'node_modules/font-awesome/fonts/**',
+        images: 'wgo.js/*.jpg',
         scripts: [
             'node_modules/webcomponents.js/webcomponents-lite.*',
             'node_modules/jquery/dist/jquery.js',
-            'node_modules/jquery/dist/jquery.min.*'
+            'node_modules/jquery/dist/jquery.min.*',
+            'wgo.js/*.js'
         ]
     },
     templates: {
@@ -45,6 +47,7 @@ outputs = {
     root: "dist",
     dependencies: {
         fonts: 'fonts',
+        images: 'images',
         scripts: 'scripts'
     },
     templates: 'templates.html',
@@ -96,10 +99,13 @@ var multisource = function(p) {
 gulp.task('clean:dependencies:fonts', function(callback) {
     rimraf(path.join(outputs.root, outputs.dependencies.fonts), callback);
 });
+gulp.task('clean:dependencies:images', function(callback) {
+    rimraf(path.join(outputs.root, outputs.dependencies.images), callback);
+});
 gulp.task('clean:dependencies:scripts', function(callback) {
     rimraf(path.join(outputs.root, outputs.dependencies.scripts), callback);
 });
-gulp.task('clean:dependencies', ['clean:dependencies:fonts', 'clean:dependencies:scripts']);
+gulp.task('clean:dependencies', ['clean:dependencies:fonts', 'clean:dependencies:images', 'clean:dependencies:scripts']);
 
 gulp.task('clean:templates', function(callback) {
     rimraf(path.join(outputs.root, outputs.templates), callback);
@@ -125,11 +131,15 @@ gulp.task('dependencies:fonts', function() {
     var p = path.join(outputs.root, outputs.dependencies.fonts);
     return multisource(inputs.dependencies.fonts).pipe(gulp.dest(p));
 });
+gulp.task('dependencies:images', function() {
+    var p = path.join(outputs.root, outputs.dependencies.images);
+    return multisource(inputs.dependencies.images).pipe(gulp.dest(p));
+});
 gulp.task('dependencies:scripts', function() {
     var p = path.join(outputs.root, outputs.dependencies.scripts);
     return multisource(inputs.dependencies.scripts).pipe(gulp.dest(p));
 });
-gulp.task('dependencies', ['dependencies:fonts', 'dependencies:scripts']);
+gulp.task('dependencies', ['dependencies:fonts', 'dependencies:images', 'dependencies:scripts']);
 
 // Task(s): Build or Deploy Root Artefacts
 gulp.task('build:root', function() {

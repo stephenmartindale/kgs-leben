@@ -13,6 +13,8 @@ namespace KGS {
 
         public users: { [name: string]: KGS.User } = {};
         public get userNames(): string[] { return Object.keys(this.users); }
+
+        public games: DatabaseDictionary<Models.GameTree> = {};
     }
 
     class DatabaseInternal extends KGS.Database {
@@ -61,6 +63,22 @@ namespace KGS {
 
             if (touchUser) digest.touchUser(user.name);
             return user;
+        }
+
+        public _createGameTree(digest: KGS.DataDigest, channelId: number): Models.GameTree {
+            let gameTree = this.games[channelId];
+            if (!gameTree) {
+                let gameChannel = this._requireChannel(channelId, Models.ChannelType.Game) as Models.GameChannel;
+                if (gameChannel.size) gameTree = new Models.GameTree(gameChannel.size);
+                else gameTree = new Models.GameTree();
+
+                this.games[channelId] = gameTree;
+                digest.touchGameTree(channelId);
+            }
+
+            return gameTree;
+
+            // TODO: Release Game Tree models when leaving a game channel!!
         }
     }
 
@@ -117,6 +135,10 @@ namespace KGS {
 
             if ((<Downstream.JOINRoom>message).games) {
                 this.GAME_LIST(digest, <Downstream.JOINRoom>message);
+            }
+
+            if ((<Downstream.JOINGame>message).sgfEvents) {
+                this.GAME_UPDATE(digest, <Downstream.JOINGame>message);
             }
         }
 
@@ -191,6 +213,14 @@ namespace KGS {
             if (this._database.joinedChannelIds.indexOf(message.gameId) < 0) {
                 Utils.setRemove(this._database.channelIds, message.gameId);
                 delete this._database.channels[message.gameId];
+            }
+        }
+
+        public GAME_UPDATE = (digest: KGS.DataDigest, message: KGS.Downstream.GAME_UPDATE) => {
+            if ((message.sgfEvents) && (message.sgfEvents.length > 0)) {
+                let gameTree = this._database._createGameTree(digest, message.channelId);
+                gameTree.processEvents(...message.sgfEvents);
+                digest.touchGameTree(message.channelId);
             }
         }
     }

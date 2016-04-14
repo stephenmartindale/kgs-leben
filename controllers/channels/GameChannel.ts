@@ -7,6 +7,7 @@ namespace Controllers {
             super(parent, channelId);
 
             this.initialiseChat();
+            this.initialiseBoard();
         }
     }
 }

@@ -21,6 +21,9 @@ namespace KGS {
         public users: { [name: string]: boolean } = {};
         public touchUser(name: string) { this.users[name] = true; }
 
+        public gameTrees: { [channelId: number]: boolean } = {};
+        public touchGameTree(channelId: number) { this.gameTrees[channelId] = true; }
+
         private static hasKeys(obj: any): boolean {
             return ((obj != null) && (Object.keys(obj).length > 0));
         }

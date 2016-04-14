@@ -89,7 +89,7 @@ namespace KGS {
             if ((this._state == JSONClientState.Errored) || (this._state == JSONClientState.Unloading)) return;
             switch (jqXHR.status) {
                 case 200:
-                    if ((data) && (data.messages) && (data.messages.constructor === Array) && ((<Array<any>>data.messages).length > 0)) {
+                    if ((data) && (data.messages) && (Utils.isArray(data.messages)) && ((<Array<any>>data.messages).length > 0)) {
                         let messages = (<KGS.Downstream.Response>data).messages;
                         let digest: KGS.DataDigest = new KGS.DataDigest();
                         for (let q = 0; q < messages.length; ++q) {

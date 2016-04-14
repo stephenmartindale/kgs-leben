@@ -5,6 +5,7 @@ namespace Controllers {
         private _channelId: number;
         private _activated: boolean;
 
+        private _board: Views.GoBoard;
         private _gameList: Views.GameList;
         private _chat: Views.ChatForm;
 
@@ -16,6 +17,7 @@ namespace Controllers {
 
         protected digest(digest: KGS.DataDigest) {
             if (this._activated) {
+                if (digest.gameTrees[this.channelId]) this.updateBoard();
                 if (digest.channelGames[this.channelId]) this.updateGameList();
                 if (digest.channelChat[this.channelId]) this.updateChatMessages();
                 if (digest.channelUsers[this.channelId]) this.updateChatMembers();
@@ -33,7 +35,10 @@ namespace Controllers {
         public activate(): boolean {
             if (this._activated) return false;
 
-            if (this._gameList != null) {
+            if (this._board != null) {
+                this.application.layout.showMain(this._board);
+            }
+            else if (this._gameList != null) {
                 this.application.layout.showMain(this._gameList);
             }
             else {
@@ -49,6 +54,7 @@ namespace Controllers {
 
             this._activated = true;
 
+            this.updateBoard();
             this.updateGameList();
             this.updateChatMessages();
             this.updateChatMembers();
@@ -64,6 +70,29 @@ namespace Controllers {
 
         public get activated(): boolean {
             return this._activated;
+        }
+
+        public get board(): Views.GoBoard {
+            return this._board;
+        }
+
+        protected initialiseBoard() {
+            this._board = document.createElement('go-board') as Views.GoBoard;
+            let gameChannel = this.channel as Models.GameChannel;
+            if (gameChannel.size) {
+                this._board.size = gameChannel.size;
+            }
+        }
+
+        private updateBoard() {
+            if ((!this._activated) || (this._board == null)) return;
+            let gameTree = this.database.games[this._channelId];
+            if (!gameTree) {
+                this._board.clear();
+            }
+            else {
+                this._board.update(gameTree.position);
+            }
         }
 
         public get gameList(): Views.GameList {

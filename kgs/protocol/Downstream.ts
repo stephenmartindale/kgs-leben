@@ -68,9 +68,8 @@ namespace KGS {
         }
         export interface JOINChallenge extends Downstream.JOIN, Downstream.GAME_STATE {
         }
-        export interface JOINGame extends Downstream.JOIN, Downstream.GAME_STATE {
+        export interface JOINGame extends Downstream.JOIN, Downstream.GAME_UPDATE, Downstream.GAME_STATE {
             gameSummary: GameSummary,
-            sgfEvents: any[]
         }
 
         export const _JOIN_COMPLETE: string = "JOIN_COMPLETE";
@@ -138,6 +137,14 @@ namespace KGS {
 
         export const _GAME_STATE: string = "GAME_STATE";
         export interface GAME_STATE extends ChannelMessage, GameFlags {
+        }
+
+        export const _GAME_UPDATE: string = "GAME_UPDATE";
+        export interface GAME_UPDATE extends ChannelMessage {
+            sgfEvents: KGS.SGF.NodeEvent[]
+        }
+        export const _PLAYBACK_DATA: string = "PLAYBACK_DATA";
+        export interface PLAYBACK_DATA extends GAME_UPDATE {
         }
     }
 }
