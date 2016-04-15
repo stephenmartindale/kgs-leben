@@ -2,8 +2,9 @@ namespace Views {
     export class GoBoard extends HTMLElement {
         private _div: HTMLDivElement;
         private _board: WGo.Board;
-        private _size: number;
         private _position: Models.GamePosition;
+
+        public defaultSize: number = 19;
 
         createdCallback() {
             this._div = document.createElement('div');
@@ -12,9 +13,8 @@ namespace Views {
 
         attachedCallback() {
             if (null == this._board) {
-                if (!this._size) this._size = 19;
                 this._board = new WGo.Board(this._div, {
-                    size: this._size,
+                    size: (this._position != null)? this._position.size : this.defaultSize,
                     width: 800,
                     background: '/images/wood.jpg'
                 });
@@ -24,24 +24,17 @@ namespace Views {
         }
 
         public get size(): number {
-            return this._size;
-        }
-        public set size(value: number) {
-            if (!Models.GamePosition.validateSize(value)) throw "Board Size out of range";
-            if (value != this._size) {
-                this._size = value;
-                this._position = null;
-
-                if (this._board) {
-                    this._board.setSize(value);
-                }
-            }
+            if (this._position) return this._position.size;
+            else if (this._board) return this._board.size;
+            else return undefined;
         }
 
         public clear() {
             if (this._board != null) {
                 this._board.removeAllObjects();
             }
+
+            this._position = null;
         }
 
         private updatePosition(oldPosition: Models.GamePosition, position: Models.GamePosition) {
@@ -65,6 +58,7 @@ namespace Views {
                     }
                     else this.updatePosition(this._position, new Models.GamePosition(position));
                 }
+                else this._position = position;
             }
             else {
                 this.clear();

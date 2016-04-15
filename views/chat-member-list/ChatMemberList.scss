@@ -11,9 +11,6 @@ ul[is="chat-member-list"] {
 ul[is="chat-member-list"] li span:nth-child(2) {
     margin-left: 0.5rem;
     white-space: nowrap;
-    font-size: small;
-    color: $gray;
-    cursor: default;
 }
 
 ul[is="chat-member-list"] li {

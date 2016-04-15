@@ -33,6 +33,12 @@ namespace Controllers {
         public get layout() {
             return this._layoutController;
         }
+
+        public reinitialise() {
+            this._channelController.reinitialise();
+            this.layout.clearMain();
+            this.layout.clearSidebar();
+        }
     }
 }
 

@@ -68,6 +68,15 @@ namespace Controllers {
             return true;
         }
 
+        public detach() {
+            if (this._activated) {
+                this.application.layout.clearMain();
+                this.application.layout.clearSidebar();
+            }
+
+            super.detach();
+        }
+
         public get activated(): boolean {
             return this._activated;
         }
@@ -79,9 +88,7 @@ namespace Controllers {
         protected initialiseBoard() {
             this._board = document.createElement('go-board') as Views.GoBoard;
             let gameChannel = this.channel as Models.GameChannel;
-            if (gameChannel.size) {
-                this._board.size = gameChannel.size;
-            }
+            if (gameChannel.size) this._board.defaultSize = gameChannel.size;
         }
 
         private updateBoard() {
@@ -101,11 +108,13 @@ namespace Controllers {
 
         protected initialiseGameList() {
             this._gameList = document.createElement('game-list') as Views.GameList;
+            this._gameList.tableBody.userDataSource = (name) => this.database.users[name];
+            this._gameList.tableBody.selectionCallback = (cid) => this.parent.joinChannel(cid);
         }
 
         private updateGameList() {
             if ((!this._activated) || (this._gameList == null)) return;
-            this._gameList.update(this.database.channels as { [key: string]: Models.GameChannel }, (<Models.RoomChannel>this.channel).games, (cid) => this.parent.joinChannel(cid));
+            this._gameList.tableBody.update(this.database.channels as { [key: string]: Models.GameChannel }, (<Models.RoomChannel>this.channel).games);
         }
 
         public get chat(): Views.ChatForm {

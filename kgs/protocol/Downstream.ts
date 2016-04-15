@@ -76,6 +76,14 @@ namespace KGS {
         export interface JOIN_COMPLETE extends ChannelMessage {
         }
 
+        export const _UNJOIN: string = "UNJOIN";
+        export interface UNJOIN extends ChannelMessage {
+        }
+
+        export const _PRIVATE_KEEP_OUT: string = "PRIVATE_KEEP_OUT";
+        export interface PRIVATE_KEEP_OUT extends ChannelMessage {
+        }
+
         export const _AUTOMATCH_PREFS: string = "AUTOMATCH_PREFS";
         export interface AUTOMATCH_PREFS extends Message {
             maxHandicap?: number,

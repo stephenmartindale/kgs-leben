@@ -2,14 +2,27 @@ namespace Views {
     export class ChatMessageList extends Framework.DataBoundList<Models.Chat, HTMLLIElement> {
         private _updateDateTime: number;
 
+        private _onResize: (e: UIEvent) => void;
+
         createdCallback() {
             super.createdCallback();
+
+            this._onResize = (e: UIEvent) => this.scrollToEnd();
+        }
+
+        attachedCallback() {
+            window.addEventListener("resize", this._onResize);
+        }
+
+        detachedCallback() {
+            window.removeEventListener("resize", this._onResize);
         }
 
         public update(chats: Models.Chat[]) {
             this._updateDateTime = new Date().getTime();
 
             this.bindArray(chats);
+            this.scrollToEnd();
         }
 
         private updateInfoSpan(datum: Models.Chat, span: HTMLSpanElement) {
@@ -39,6 +52,7 @@ namespace Views {
             senderName.innerText = datum.sender;
 
             let messageInfo = document.createElement('span');
+            messageInfo.className = 'secondary';
             this.updateInfoSpan(datum, messageInfo);
 
             let paragraph = document.createElement('p');
@@ -54,6 +68,10 @@ namespace Views {
         protected updateChild(key: string, datum: Models.Chat, element: HTMLLIElement): void {
             let spans = element.getElementsByTagName('span');
             this.updateInfoSpan(datum, spans[1]);
+        }
+
+        private scrollToEnd() {
+            if (this.lastElementChild) (<HTMLElement>this.lastElementChild).scrollIntoView(false);
         }
     }
 }

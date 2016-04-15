@@ -1,4 +1,11 @@
 namespace Models {
+    export const enum GamePhase {
+        Active,
+        Paused,
+        Adjourned,
+        Concluded
+    }
+
     export class GameChannel extends Models.Channel {
         parentChannelId: number;
         gameType: Models.GameType;
@@ -6,6 +13,10 @@ namespace Models {
         size: number;
         score: string;
         moveNumber: number;
+
+        restrictedPrivate: boolean;     // Restricted by the Game Owner
+        restrictedPlus: boolean;        // Restricted to KGS Plus users
+        phase: GamePhase;
 
         playerWhite: string;
         playerBlack: string;
@@ -37,6 +48,18 @@ namespace Models {
             if (this.size != game.size) { this.size = game.size; touch = true; }
             if (this.score != game.score) { this.score = game.score; touch = true; }
             if (this.moveNumber != game.moveNum) { this.moveNumber = game.moveNum; touch = true; }
+
+            let pvt: boolean = (game.private)? true : false;
+            if (this.restrictedPrivate != pvt) { this.restrictedPrivate = pvt; touch = true; }
+
+            let plus: boolean = (game.subscribers)? true : false;
+            if (this.restrictedPlus != plus) { this.restrictedPlus = plus; touch = true; }
+
+            let phase: GamePhase = GamePhase.Active;
+            if (game.paused) phase = GamePhase.Paused;
+            if (game.adjourned) phase = GamePhase.Adjourned;
+            if (game.over) phase = GamePhase.Concluded;
+            if (this.phase != phase) { this.phase = phase; touch = true; }
 
             let playerWhite: string = ((game.players) && (game.players.white))? game.players.white.name : null;
             if (this.playerWhite != playerWhite) { this.playerWhite = playerWhite; touch = true; }

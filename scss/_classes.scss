@@ -26,3 +26,11 @@
     padding: 0;
     list-style: none;
 }
+
+.secondary {
+    font-size: small;
+    color: $gray;
+}
+.bg-inverse .secondary {
+    color: $gray-light;
+}

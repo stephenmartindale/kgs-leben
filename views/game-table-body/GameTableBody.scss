@@ -16,7 +16,28 @@ tbody[is="game-table-body"] td span {
     margin-right: 0.5rem;
 }
 
-tbody[is="game-table-body"] td span:nth-child(2) {
-    font-size: small;
-    color: $gray-light;
+tbody[is="game-table-body"] td.restricted-plus:after, tbody[is="game-table-body"] td.restricted-private:after {
+    font-family: FontAwesome;
+    float: right;
+}
+tbody[is="game-table-body"] td.restricted-plus:after {
+    content: "\f067";
+}
+tbody[is="game-table-body"] td.restricted-private:after {
+    content: "\f023";
+}
+
+tbody[is="game-table-body"] td span.player-white:before, tbody[is="game-table-body"] td span.player-black:before {
+    font-family: FontAwesome;
+    margin-right: 0.4rem;
+}
+tbody[is="game-table-body"] td span.player-white:before {
+    content: "\f111";
+}
+tbody[is="game-table-body"] td span.player-black:before {
+    content: "\f10c";
+}
+
+tbody[is="game-table-body"] td:nth-child(5) {
+    text-align: right;
 }

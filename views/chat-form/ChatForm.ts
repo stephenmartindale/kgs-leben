@@ -10,8 +10,6 @@ namespace Views {
         private _messageList: Views.ChatMessageList;
         private _memberList: Views.ChatMemberList;
 
-        private _onResize: (e: UIEvent) => void;
-
         public submitCallback: (form: ChatForm) => void;
 
         createdCallback() {
@@ -24,24 +22,12 @@ namespace Views {
             this._messageList = this.querySelector("ul[is='chat-message-list']") as Views.ChatMessageList;
             this._memberList = this.querySelector("ul[is='chat-member-list']") as Views.ChatMemberList;
 
-            this._onResize = (e: UIEvent) => this.onResize(e);
+
 
             $(this._form).submit((e) => this.onFormSubmit(e));
 
             this._disabled = false;
             this.disabled = this._defaultDisabled;
-        }
-
-        private onResize(e: UIEvent) {
-            if (this._messageList.lastElementChild) (<HTMLElement>this._messageList.lastElementChild).scrollIntoView(false);
-        }
-
-        attachedCallback() {
-            window.addEventListener("resize", this._onResize);
-        }
-
-        detachedCallback() {
-            window.removeEventListener("resize", this._onResize);
         }
 
         get defaultDisabled(): boolean {

@@ -3,9 +3,6 @@
     right: 33%;
     z-index: $zindex-main;
 }
-#main > * {
-    @extend .bg-inverse;
-}
 
 #sidebar {
     @extend .block-fixed;

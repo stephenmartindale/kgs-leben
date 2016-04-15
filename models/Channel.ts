@@ -2,7 +2,6 @@ namespace Models {
     export abstract class Channel {
         channelId: number;
         channelType: Models.ChannelType;
-        joined: boolean = false;
 
         owners: string[] = [];
         users: string[] = [];

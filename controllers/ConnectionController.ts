@@ -49,6 +49,8 @@ namespace Controllers {
                     localStorage.removeItem("KGSUsername");
             }
 
+            this.application.reinitialise();
+
             let password: string = signInForm.password;
             this.client.loginAsync(username, password).done(() => this.signInSuccess(signInForm)).fail(() => this.signInFailed(signInForm));
         }

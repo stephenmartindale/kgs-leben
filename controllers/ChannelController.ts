@@ -11,18 +11,27 @@ namespace Controllers {
         };
         private _activeChannelId: number;
 
-        private _joiningChannelId: number;
+        private _operationChannelId: number;
 
         constructor(parent: Application) {
             super(parent);
             this._joinedChannelIds = [];
             this._channelControllers = {};
             this._activeChannelId = null;
-            this._joiningChannelId = null;
+            this._operationChannelId = null;
 
             this._channelList = $('ul[is="channel-list"]')[0] as Views.ChannelList;
+            this._channelList.selectionCallback = (channelId: number) => this.activateChannel(channelId);
+            this._channelList.closeCallback = (channelId: number) => this.unjoinChannel(channelId);
+        }
 
-            // TODO: this.application.client.dispatcher.subscribe(() => this.reset(), KGS.Downstream._LOGOUT);
+        public reinitialise() {
+            this._joinedChannelIds = [];
+            this._channelControllers = {};
+            this._activeChannelId = null;
+            this._operationChannelId = null;
+
+            this.detachChildren();
         }
 
         protected digest(digest: KGS.DataDigest) {
@@ -37,9 +46,9 @@ namespace Controllers {
                     let cid = channelIds[i];
                     this._joinedChannelIds.push(cid);
 
-                    if (cid == this._joiningChannelId) {
+                    if (cid == this._operationChannelId) {
                         activateChannelId = cid;
-                        this._joiningChannelId = null;
+                        this._operationChannelId = null;
                     }
 
                     let oldController = detachControllers[cid];
@@ -54,6 +63,10 @@ namespace Controllers {
 
                 let detachChannelIds = Object.keys(detachControllers);
                 for (let j = 0; j < detachChannelIds.length; ++j) {
+                    if (<any>detachChannelIds[j] == this._operationChannelId) {
+                        this._operationChannelId = null;
+                    }
+
                     let controller = detachControllers[detachChannelIds[j]];
                     if (controller) {
                         if (this._activeChannelId == controller.channelId) this._activeChannelId = null;
@@ -72,6 +85,10 @@ namespace Controllers {
                 }
             }
 
+            if ((this._operationChannelId != null) && (digest.joinFailedChannelIds) && (digest.joinFailedChannelIds.indexOf(this._operationChannelId) >= 0)) {
+                this._operationChannelId = null;
+            }
+
             super.digest(digest);
         }
 
@@ -84,7 +101,7 @@ namespace Controllers {
         }
 
         private updateChannelList() {
-            this._channelList.update(this.database.channels, this._joinedChannelIds, this._activeChannelId, (channelId: number) => this.activateChannel(channelId));
+            this._channelList.update(this.database.channels, this._joinedChannelIds, this._activeChannelId);
         }
 
         public get activeChannel(): Controllers.ChannelBase {
@@ -103,18 +120,30 @@ namespace Controllers {
             }
         }
 
-        public get joining(): boolean {
-            return (this._joiningChannelId != null);
+        public get channelOperationInProgress(): boolean {
+            return (this._operationChannelId != null);
         }
 
         public joinChannel(channelId: number) {
-            if (this.joining) throw 'Channel join in progress';
+            if (this.channelOperationInProgress) throw 'Channel operation in progress';
             else if (this._joinedChannelIds.indexOf(channelId) >= 0) this.activateChannel(channelId);
             else {
-                this._joiningChannelId = channelId;
+                this._operationChannelId = channelId;
 
                 this.client.post(<KGS.Upstream.JOIN_REQUEST> {
                     type: KGS.Upstream._JOIN_REQUEST,
+                    channelId: channelId
+                });
+            }
+        }
+
+        public unjoinChannel(channelId: number) {
+            if (this.channelOperationInProgress) throw 'Channel operation in progress';
+            else if (this._joinedChannelIds.indexOf(channelId) >= 0) {
+                this._operationChannelId = channelId;
+
+                this.client.post(<KGS.Upstream.UNJOIN_REQUEST> {
+                    type: KGS.Upstream._UNJOIN_REQUEST,
                     channelId: channelId
                 });
             }

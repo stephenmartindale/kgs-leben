@@ -97,7 +97,6 @@ namespace KGS {
                             if (this.filterMessage(message)) this.dispatchMessage(digest, message);
                         }
 
-                        Framework.log(Framework.LogSeverity.Info, "KGS Digest", digest);
                         this._digestCallback(digest);
                     }
 

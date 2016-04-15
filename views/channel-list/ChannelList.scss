@@ -4,6 +4,7 @@ ul[is="channel-list"] {
 }
 
 ul[is="channel-list"] > li {
+    position: relative;
     padding: 2px 0 2px 6px;
     border-left: 6px solid $gray-light;
     white-space: nowrap;
@@ -59,4 +60,23 @@ ul[is="channel-list"] > li.kgs-conversation.kgs-info:before {
 }
 ul[is="channel-list"] > li.kgs-game:before {
     content: "\f111"; /* fa-circle */
+}
+
+ul[is="channel-list"] span.btn-close {
+    @extend .block-absolute;
+    left: auto;
+    padding: 0 0.5rem 0 0.2rem;
+    opacity: 0;
+    transition: opacity 100ms;
+}
+ul[is="channel-list"] > li:hover span.btn-close {
+    opacity: 1;
+}
+ul[is="channel-list"] span.btn-close:hover {
+    opacity: 1;
+    color: $brand-danger;
+}
+ul[is="channel-list"] span.btn-close:before {
+    font-family: FontAwesome;
+    content: "\f00d";
 }

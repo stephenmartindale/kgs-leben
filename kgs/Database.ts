@@ -6,20 +6,33 @@ namespace KGS {
 
     export class Database {
         public username: string;
-        public joinedChannelIds: number[] = [];
+        public joinedChannelIds: number[];
 
-        public channelIds: number[] = [];
-        public channels: DatabaseDictionary<Models.Channel> = {};
+        public channelIds: number[];
+        public channels: DatabaseDictionary<Models.Channel>;
 
-        public users: { [name: string]: KGS.User } = {};
+        public users: { [name: string]: Models.User };
         public get userNames(): string[] { return Object.keys(this.users); }
 
-        public games: DatabaseDictionary<Models.GameTree> = {};
+        public games: DatabaseDictionary<Models.GameTree>;
     }
 
     class DatabaseInternal extends KGS.Database {
         constructor() {
             super();
+            this.reinitialise();
+        }
+
+        public reinitialise() {
+            this.username = null;
+            this.joinedChannelIds = [];
+
+            this.channelIds = [];
+            this.channels = {};
+
+            this.users = {};
+
+            this.games = {};
         }
 
         public _createChannel(digest: KGS.DataDigest, channelId: number, channelType: Models.ChannelType): Models.Channel {
@@ -48,21 +61,17 @@ namespace KGS {
             return channel;
         }
 
-        public _updateUser(digest: KGS.DataDigest, user: KGS.User): KGS.User {
-            let record = this.users[user.name];
+        public _updateUser(digest: KGS.DataDigest, user: KGS.User): Models.User {
+            let record: Models.User = this.users[user.name];
             let touchUser: boolean = false;
             if (!record) {
-                this.users[user.name] = user;
+                this.users[user.name] = record = new Models.User(user);
                 touchUser = true;
             }
-            else {
-                if (record.name != user.name) { record.name = user.name; touchUser = true; }
-                if (record.flags != user.flags) { record.flags = user.flags; touchUser = true; }
-                if (record.rank != user.rank) { record.rank = user.rank; touchUser = true; }
-            }
+            else touchUser = record.mergeUser(user);
 
             if (touchUser) digest.touchUser(user.name);
-            return user;
+            return record;
         }
 
         public _createGameTree(digest: KGS.DataDigest, channelId: number): Models.GameTree {
@@ -77,8 +86,6 @@ namespace KGS {
             }
 
             return gameTree;
-
-            // TODO: Release Game Tree models when leaving a game channel!!
         }
     }
 
@@ -87,6 +94,7 @@ namespace KGS {
         public database: KGS.Database;
 
         constructor() {
+            $db = this.database = this._database = new DatabaseInternal();
             this.LOGOUT(null, null);
         }
 
@@ -99,7 +107,7 @@ namespace KGS {
         };
 
         public LOGOUT = (digest: KGS.DataDigest, message: KGS.Downstream.LOGOUT) => {
-            $db = this.database = this._database = new DatabaseInternal();
+            this._database.reinitialise();
         };
 
         public ROOM_NAMES = (digest: KGS.DataDigest, message: KGS.Downstream.ROOM_NAMES) => {
@@ -144,12 +152,25 @@ namespace KGS {
 
         public JOIN_COMPLETE = (digest: KGS.DataDigest, message: KGS.Downstream.JOIN_COMPLETE) => {
             let channel = this._database._requireChannel(message.channelId);
-            if (!channel.joined) {
-                channel.joined = true;
-                this._database.joinedChannelIds.push(channel.channelId);
-
+            if (Utils.setAdd(this._database.joinedChannelIds, channel.channelId)) {
                 digest.joinedChannelIds = true;
                 digest.touchChannel(message.channelId);
+            }
+        }
+
+        public UNJOIN = (digest: KGS.DataDigest, message: KGS.Downstream.UNJOIN) => {
+            if (Utils.setRemove(this._database.joinedChannelIds, message.channelId)) {
+                delete this._database.games[message.channelId];
+                digest.joinedChannelIds = true;
+            }
+        }
+
+        public PRIVATE_KEEP_OUT = (digest: KGS.DataDigest, message: KGS.Downstream.PRIVATE_KEEP_OUT) => {
+            if (!digest.joinFailedChannelIds) {
+                digest.joinFailedChannelIds = [message.channelId];
+            }
+            else {
+                digest.joinFailedChannelIds.push(message.channelId);
             }
         }
 

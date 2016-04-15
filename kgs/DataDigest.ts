@@ -4,6 +4,7 @@ namespace KGS {
 
         public username: boolean = false;
         public joinedChannelIds: boolean = false;
+        public joinFailedChannelIds: number[];
 
         public channels: { [channelId: number]: boolean } = {};
         public touchChannel(channelId: number) { this.channels[channelId] = true; }

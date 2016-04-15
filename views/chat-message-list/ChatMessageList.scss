@@ -29,10 +29,5 @@ ul[is="chat-message-list"] li span:first-child {
 ul[is="chat-message-list"] li span:nth-child(2) {
     margin-left: 0.5rem;
     white-space: nowrap;
-    font-size: small;
-    color: $gray;
-    cursor: default;
-}
-ul[is="chat-message-list"] li span:nth-child(2) {
     cursor: help;
 }
