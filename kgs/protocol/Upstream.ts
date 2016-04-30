@@ -54,5 +54,20 @@ namespace KGS {
         export interface GLOBAL_LIST_JOIN_REQUEST {
             list: "CHALLENGES" | "ACTIVES" | "FANS";
         }
+
+        export interface ChallengeResponse extends KGS.ChannelMessage, KGS.UpstreamProposal {
+        }
+        export const _CHALLENGE_SUBMIT: string = "CHALLENGE_SUBMIT";
+        export interface CHALLENGE_SUBMIT extends ChallengeResponse {
+        }
+        export const _CHALLENGE_ACCEPT: string = "CHALLENGE_ACCEPT";
+        export interface CHALLENGE_ACCEPT extends ChallengeResponse {
+        }
+
+        export const _GAME_MOVE: string = "GAME_MOVE";
+        export interface GAME_MOVE extends ChannelMessage {
+            x?: number,
+            y?: number
+        }
     }
 }

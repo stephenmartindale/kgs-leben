@@ -1,17 +1,24 @@
 namespace Views {
-    export class GoBoard extends HTMLElement {
+    export class GoBoard implements Views.View<HTMLDivElement>{
         private _div: HTMLDivElement;
         private _board: WGo.Board;
         private _position: Models.GamePosition;
 
         public defaultSize: number = 19;
 
-        createdCallback() {
+        public playCallback: (x: number, y: number) => void;
+
+        constructor(defaultSize?: number) {
             this._div = document.createElement('div');
-            this.appendChild(this._div);
+            this._div.className = 'go-board';
+            if (defaultSize) this.defaultSize = defaultSize;
         }
 
-        attachedCallback() {
+        public attach(parent: HTMLElement): void {
+            parent.appendChild(this._div);
+        }
+
+        public activate(): void {
             if (null == this._board) {
                 this._board = new WGo.Board(this._div, {
                     size: (this._position != null)? this._position.size : this.defaultSize,
@@ -20,7 +27,13 @@ namespace Views {
                 });
 
                 if (this._position != null) this.updatePosition(null, this._position);
+
+                this._board.addEventListener("click", (x: number, y: number) => {
+                    if (this.playCallback) this.playCallback(x, y);
+                });
             }
+        }
+        public deactivate(): void {
         }
 
         public get size(): number {

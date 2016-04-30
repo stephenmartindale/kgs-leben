@@ -1,10 +1,10 @@
 namespace Views {
-    export class GameTableBody extends Framework.DataBoundTableSection<Models.GameChannel, HTMLTableRowElement> {
+    export class GameTableBody extends Views.DataBoundList<Models.GameChannel, HTMLTableSectionElement, HTMLTableRowElement> {
         public userDataSource: (name: string) => Models.User;
         public selectionCallback: (channelId: number) => void;
 
-        createdCallback() {
-            super.createdCallback();
+        constructor() {
+            super(document.createElement('tbody'));
         }
 
         public update(gameChannels: { [key: string]: Models.GameChannel }, keys: number[]) {

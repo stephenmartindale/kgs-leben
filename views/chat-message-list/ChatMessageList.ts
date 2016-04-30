@@ -1,20 +1,22 @@
 namespace Views {
-    export class ChatMessageList extends Framework.DataBoundList<Models.Chat, HTMLLIElement> {
+    export class ChatMessageList extends Views.DataBoundList<Models.Chat, HTMLUListElement, HTMLLIElement> {
         private _updateDateTime: number;
 
         private _onResize: (e: UIEvent) => void;
 
-        createdCallback() {
-            super.createdCallback();
+        constructor() {
+            super(document.createElement('ul'));
+            this.container.className = 'chat-message-list';
 
             this._onResize = (e: UIEvent) => this.scrollToEnd();
         }
 
-        attachedCallback() {
+        public activate(): void {
             window.addEventListener("resize", this._onResize);
+            super.activate();
         }
-
-        detachedCallback() {
+        public deactivate(): void {
+            super.deactivate();
             window.removeEventListener("resize", this._onResize);
         }
 
@@ -71,7 +73,7 @@ namespace Views {
         }
 
         private scrollToEnd() {
-            if (this.lastElementChild) (<HTMLElement>this.lastElementChild).scrollIntoView(false);
+            if (this.container.lastElementChild) (<HTMLElement>this.container.lastElementChild).scrollIntoView(false);
         }
     }
 }

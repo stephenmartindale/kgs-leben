@@ -1,11 +1,12 @@
 namespace Views {
-    export class ChannelList extends Framework.DataBoundList<Models.Channel, HTMLLIElement> {
+    export class ChannelList extends Views.DataBoundList<Models.Channel, HTMLUListElement, HTMLLIElement> {
         public activeChannelId: number;
         public selectionCallback: (channelId: number) => void;
         public closeCallback: (channelId: number) => void;
 
-        createdCallback() {
-            super.createdCallback();
+        constructor() {
+            super(document.createElement('ul'));
+            this.container.className = 'channel-list';
 
             this.activeChannelId = null;
         }

@@ -13,20 +13,18 @@
   </head>
 
   <body>
-    <div id='sidebar' class="inactive">
-        <ul is="channel-list"></ul>
-        <div></div>
-    </div>
+    <div id='sidebar' class="inactive"></div>
     <div id='main' class="bg-inverse"></div>
-    <lightbox-container>
-      <sign-in-form></sign-in-form>
-    </lightbox-container>
 
-    <script src="/scripts/webcomponents-lite.min.js"></script>
     <script src="/scripts/jquery.min.js"></script>
     <script src="/scripts/wgo.js"></script>
     <script src="/ts.js"></script>
-    <link rel="import" href="templates.html" />
-    <script>Controllers.Application.initialise();</script>
+    <script>
+      $(function() {
+        Views.Templates.initialise('templates.html', function() {
+          Controllers.Application.initialise();
+        });
+      });
+    </script>
   </body>
 </html>

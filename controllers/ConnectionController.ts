@@ -2,34 +2,34 @@
 
 namespace Controllers {
     export class ConnectionController extends ControllerBase<Application> {
+        private _signInForm: Views.SignInForm;
+
         constructor(parent: Application) {
             super(parent);
 
-            this.beginSignIn();
+            this.beginSignIn(null, true);
             window.setTimeout(() => this.attemptAutomaticSignIn(), 80);
         }
 
-        private beginSignIn(errorNotice?: string) {
-            let signInForm = <Views.SignInForm>document.querySelector('sign-in-form');
-            if (!signInForm) {
-                signInForm = <Views.SignInForm>document.createElement('sign-in-form');
-                this.application.layout.showLightbox(signInForm);
+        private beginSignIn(errorNotice?: string, suppressTransitions?: boolean) {
+            if (!this._signInForm) {
+                this._signInForm = new Views.SignInForm();
+                this.application.layout.showLightbox(this._signInForm, suppressTransitions);
             }
 
-            signInForm.errorNotice = errorNotice;
-            signInForm.submitCallback = (form) => this.submitSignIn(form);
-            signInForm.focus();
+            this._signInForm.errorNotice = errorNotice;
+            this._signInForm.submitCallback = (form) => this.submitSignIn();
+            this._signInForm.focus();
         }
 
         private attemptAutomaticSignIn() {
             if (null == Storage) return;
 
-            let signInForm = <Views.SignInForm>document.querySelector('sign-in-form');
-            if (signInForm) {
+            if (this._signInForm) {
                 let lastUsername = localStorage.getItem("KGSUsername");
-                if ((lastUsername) && (signInForm.username == lastUsername) && (signInForm.password)) {
-                    signInForm.rememberMe = true;
-                    this.submitSignIn(signInForm);
+                if ((lastUsername) && (this._signInForm.username == lastUsername) && (this._signInForm.password)) {
+                    this._signInForm.rememberMe = true;
+                    this.submitSignIn();
                     return;
                 }
             }
@@ -37,13 +37,13 @@ namespace Controllers {
             localStorage.removeItem("KGSUsername");
         }
 
-        private submitSignIn(signInForm: Views.SignInForm) {
-            signInForm.disabled = true;
-            signInForm.errorNotice = null;
+        private submitSignIn() {
+            this._signInForm.disabled = true;
+            this._signInForm.errorNotice = null;
 
-            let username: string = signInForm.username;
-            if (typeof (Storage) !== "undefined") {
-                if (signInForm.rememberMe)
+            let username: string = this._signInForm.username;
+            if (Utils.isDefined(Storage)) {
+                if (this._signInForm.rememberMe)
                     localStorage.setItem("KGSUsername", username);
                 else
                     localStorage.removeItem("KGSUsername");
@@ -51,19 +51,19 @@ namespace Controllers {
 
             this.application.reinitialise();
 
-            let password: string = signInForm.password;
-            this.client.loginAsync(username, password).done(() => this.signInSuccess(signInForm)).fail(() => this.signInFailed(signInForm));
+            let password: string = this._signInForm.password;
+            this.client.loginAsync(username, password).done(() => this.signInSuccess()).fail(() => this.signInFailed());
         }
 
-        private signInSuccess(signInForm: Views.SignInForm) {
-            this.application.layout.hideLightbox(signInForm);
+        private signInSuccess() {
+            this.application.layout.hideLightbox();
         }
 
-        private signInFailed(signInForm: Views.SignInForm) {
-            signInForm.errorNotice = "Invalid username or password.";
-            signInForm.password = "";
-            signInForm.disabled = false;
-            signInForm.focus();
+        private signInFailed() {
+            this._signInForm.errorNotice = "Invalid username or password.";
+            this._signInForm.password = "";
+            this._signInForm.disabled = false;
+            this._signInForm.focus();
         }
 
         protected logout(message?: string) {

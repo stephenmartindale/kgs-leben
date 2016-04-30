@@ -5,22 +5,24 @@ namespace Controllers {
         private _channelId: number;
         private _activated: boolean;
 
-        private _board: Views.GoBoard;
-        private _gameList: Views.GameList;
-        private _chat: Views.ChatForm;
+        private _views: { view: Views.View<any>, zone: Controllers.LayoutZone, update: (channelId: number, digest?: KGS.DataDigest) => void }[];
 
         constructor(parent: ChannelController, channelId: number) {
             super(parent);
             this._channelId = channelId;
             this._activated = false;
+            this._views = [];
+        }
+
+        protected registerView(view: Views.View<any>, zone: Controllers.LayoutZone, update: (channelId: number, digest?: KGS.DataDigest) => void) {
+            this._views.push({ view: view, zone: zone, update: update });
         }
 
         protected digest(digest: KGS.DataDigest) {
             if (this._activated) {
-                if (digest.gameTrees[this.channelId]) this.updateBoard();
-                if (digest.channelGames[this.channelId]) this.updateGameList();
-                if (digest.channelChat[this.channelId]) this.updateChatMessages();
-                if (digest.channelUsers[this.channelId]) this.updateChatMembers();
+                for (let j = 0; j < this._views.length; ++j) {
+                    this._views[j].update(this._channelId, digest);
+                }
             }
         }
 
@@ -35,45 +37,27 @@ namespace Controllers {
         public activate(): boolean {
             if (this._activated) return false;
 
-            if (this._board != null) {
-                this.application.layout.showMain(this._board);
-            }
-            else if (this._gameList != null) {
-                this.application.layout.showMain(this._gameList);
-            }
-            else {
-                this.application.layout.clearMain();
-            }
-
-            if (this._chat != null) {
-                this.application.layout.showSidebar(this._chat);
-            }
-            else {
-                this.application.layout.clearSidebar();
+            for (let j = 0; j < this._views.length; ++j) {
+                this.application.layout.showView(this._views[j].view, this._views[j].zone);
+                this._views[j].update(this._channelId);
             }
 
             this._activated = true;
-
-            this.updateBoard();
-            this.updateGameList();
-            this.updateChatMessages();
-            this.updateChatMembers();
-
             return true;
         }
 
         public deactivate(): boolean {
             if (!this._activated) return false;
+
+            this.application.layout.clearMain();
+            this.application.layout.clearSidebar();
+
             this._activated = false;
             return true;
         }
 
         public detach() {
-            if (this._activated) {
-                this.application.layout.clearMain();
-                this.application.layout.clearSidebar();
-            }
-
+            this.deactivate();
             super.detach();
         }
 
@@ -81,58 +65,30 @@ namespace Controllers {
             return this._activated;
         }
 
-        public get board(): Views.GoBoard {
-            return this._board;
-        }
-
-        protected initialiseBoard() {
-            this._board = document.createElement('go-board') as Views.GoBoard;
-            let gameChannel = this.channel as Models.GameChannel;
-            if (gameChannel.size) this._board.defaultSize = gameChannel.size;
-        }
-
-        private updateBoard() {
-            if ((!this._activated) || (this._board == null)) return;
-            let gameTree = this.database.games[this._channelId];
-            if (!gameTree) {
-                this._board.clear();
-            }
-            else {
-                this._board.update(gameTree.position);
-            }
-        }
-
-        public get gameList(): Views.GameList {
-            return this._gameList;
-        }
-
         protected initialiseGameList() {
-            this._gameList = document.createElement('game-list') as Views.GameList;
-            this._gameList.tableBody.userDataSource = (name) => this.database.users[name];
-            this._gameList.tableBody.selectionCallback = (cid) => this.parent.joinChannel(cid);
-        }
+            let gameList = new Views.GameList();
+            gameList.tableBody.userDataSource = (name) => this.database.users[name];
+            gameList.tableBody.selectionCallback = (cid) => this.parent.joinChannel(cid);
 
-        private updateGameList() {
-            if ((!this._activated) || (this._gameList == null)) return;
-            this._gameList.tableBody.update(this.database.channels as { [key: string]: Models.GameChannel }, (<Models.RoomChannel>this.channel).games);
-        }
-
-        public get chat(): Views.ChatForm {
-            return this._chat;
+            this.registerView(gameList, LayoutZone.Main, (channelId: number, digest?: KGS.DataDigest) => {
+                if ((digest == null) || (digest.channelGames[channelId])) {
+                    gameList.tableBody.update(this.database.channels as { [key: string]: Models.GameChannel }, (<Models.RoomChannel>this.channel).games);
+                }
+            });
         }
 
         protected initialiseChat() {
-            this._chat = document.createElement('chat-form') as Views.ChatForm;
-            this._chat.submitCallback = (form) => this.submitChatMessage(form);
-        }
+            let chat = new Views.ChatForm();
+            chat.submitCallback = (form) => this.submitChatMessage(form);
 
-        private updateChatMessages() {
-            if ((!this._activated) || (this._chat == null)) return;
-            this._chat.messageList.update(this.channel.chats);
-        }
-        private updateChatMembers() {
-            if ((!this._activated) || (this._chat == null)) return;
-            this._chat.memberList.update(this.database.users, this.channel.users);
+            this.registerView(chat, LayoutZone.Sidebar, (channelId: number, digest?: KGS.DataDigest) => {
+                if ((digest == null) || (digest.channelChat[channelId])) {
+                    chat.messageList.update(this.channel.chats);
+                }
+                if ((digest == null) || (digest.channelUsers[channelId])) {
+                    chat.memberList.update(this.database.users, this.channel.users);
+                }
+            });
         }
 
         private submitChatMessage(chatForm: Views.ChatForm) {

@@ -18,10 +18,13 @@ namespace KGS {
     }
 
     export interface GameUserMap {              // An object mapping roles to user objects, telling who was in the game.
-        owner?: User,
+
         white?: User,
         black?: User,
+        white_2?: User,
+        black_2?: User,
         challengeCreator?: User,                // TODO: Add support for this user when the game is still a challenge
+        owner?: User
     }
 
     export interface GameSummary {
@@ -36,12 +39,18 @@ namespace KGS {
         inPlay?: boolean        // If set, the game is currently in play.
     }
 
-    export interface GameRules {
+    export interface GameChannelRules {
         size: number,
-        rules: string,
         handicap?: number,
-        komi: number,
-        timeSystem: string
+        komi: number
+    }
+    export interface GameRules extends GameChannelRules {
+        rules: "japanese" | "chinese" | "aga" | "new_zealand",
+        timeSystem: "none" | "absolute" | "byo_yomi" | "canadian",
+        mainTime?: number,
+        byoYomiTime?: number,
+        byoYomiPeriods?: number,
+        byoYomiStones?: number
     }
 
     export interface GameFlags {
@@ -54,36 +63,47 @@ namespace KGS {
         "audio"?: boolean,          // This game includes a live audio track.
         "paused"?: boolean,         // The game is paused. Tournament games are paused when they are first created, to give players time to join before the clocks start.
         "named"?: boolean,          // This game has a name (most games are named after the players involved). In some cases, instead of seeing this flag when it is set, a text field name will appear instead.
-        "saved"?: boolean           // This game has been saved to the KGS archives. Most games are saved automatically, but demonstration and review games must be saved by setting this flag.
+        "saved"?: boolean,          // This game has been saved to the KGS archives. Most games are saved automatically, but demonstration and review games must be saved by setting this flag.
+        "global"?: boolean          // This game may appear on the open or active game lists.
     }
 
     export interface GameProposalPlayer {
-        role: string,
-        handicap?: number,
-        komi?: number
+        role: "white" | "black" | "white_2" | "black_2" | "challengeCreator" | "owner",
+        handicap?: number,          // (only for simultaneous games)
+        komi?: number               // (only for simultaneous games)
     }
-    export interface GameProposalUpstreamPlayer extends GameProposalPlayer {
+    export interface DownstreamProposalPlayer extends GameProposalPlayer {
+        user?: KGS.User
+    }
+    export interface UpstreamProposalPlayer extends GameProposalPlayer {
         name: string
-    }
-    export interface GameProposalDownstreamPlayer extends GameProposalPlayer {
-        user: User
     }
 
     export interface GameProposal extends GameFlags {
         gameType: string,
-        rules: string,
-        nigiri?: boolean,
-        players: (GameProposalUpstreamPlayer[] | GameProposalDownstreamPlayer[])
+        nigiri?: boolean
+    }
+    export interface DownstreamProposal extends GameProposal, GameRules {
+        players: DownstreamProposalPlayer[]
+    }
+    export interface UpstreamProposal extends GameProposal {
+        rules: KGS.GameRules,
+        players: UpstreamProposalPlayer[]
     }
 
-    export interface GameChannel extends GameRules, GameFlags {
+    export interface GameChannelBase extends GameFlags {
         channelId: number,
         gameType: string,
-        initialProposal?: GameProposal,
-        score?: string,
-        moveNum: number,
-        roomId: number,
+        roomId: number
         name?: string,
         players?: GameUserMap
+    }
+    export interface GameChannel extends GameChannelBase, GameChannelRules {
+        score?: string,
+        moveNum: number
+    }
+    export interface ChallengeChannel extends KGS.GameChannelBase {
+        gameType: "challenge",
+        initialProposal: DownstreamProposal,
     }
 }

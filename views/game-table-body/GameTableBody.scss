@@ -1,43 +1,43 @@
-tbody[is="game-table-body"] td {
+div.game-list tbody td {
     padding: 4px;
     user-select: none;
 }
 
-tbody[is="game-table-body"] tr:nth-child(odd) {
+div.game-list tbody tr:nth-child(odd) {
    background-color: lighten($gray-dark, 5%);
 }
 
-tbody[is="game-table-body"] tr:hover {
+div.game-list tbody tr:hover {
     background-color: $gray;
     cursor: pointer;
 }
 
-tbody[is="game-table-body"] td span {
+div.game-list tbody td span {
     margin-right: 0.5rem;
 }
 
-tbody[is="game-table-body"] td.restricted-plus:after, tbody[is="game-table-body"] td.restricted-private:after {
+div.game-list tbody td.restricted-plus:after, div.game-list tbody td.restricted-private:after {
     font-family: FontAwesome;
     float: right;
 }
-tbody[is="game-table-body"] td.restricted-plus:after {
+div.game-list tbody td.restricted-plus:after {
     content: "\f067";
 }
-tbody[is="game-table-body"] td.restricted-private:after {
+div.game-list tbody td.restricted-private:after {
     content: "\f023";
 }
 
-tbody[is="game-table-body"] td span.player-white:before, tbody[is="game-table-body"] td span.player-black:before {
+div.game-list tbody td span.player-white:before, div.game-list tbody td span.player-black:before {
     font-family: FontAwesome;
     margin-right: 0.4rem;
 }
-tbody[is="game-table-body"] td span.player-white:before {
+div.game-list tbody td span.player-white:before {
     content: "\f111";
 }
-tbody[is="game-table-body"] td span.player-black:before {
+div.game-list tbody td span.player-black:before {
     content: "\f10c";
 }
 
-tbody[is="game-table-body"] td:nth-child(5) {
+div.game-list tbody td:nth-child(5) {
     text-align: right;
 }

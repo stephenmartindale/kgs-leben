@@ -60,16 +60,18 @@ namespace KGS {
             owners?: User[]
         }
 
-        export const _JOIN: string = "JOIN";
-        export interface JOIN extends ChannelMessage {
+        export const _ROOM_JOIN: string = "ROOM_JOIN";
+        export interface ROOM_JOIN extends ChannelMessage, Downstream.GAME_LIST {
             users: User[]
         }
-        export interface JOINRoom extends Downstream.JOIN, Downstream.GAME_LIST {
+        export const _GAME_JOIN: string = "GAME_JOIN";
+        export interface GAME_JOIN extends ChannelMessage, Downstream.GAME_UPDATE, Downstream.GAME_STATE {
+            users: User[]
         }
-        export interface JOINChallenge extends Downstream.JOIN, Downstream.GAME_STATE {
-        }
-        export interface JOINGame extends Downstream.JOIN, Downstream.GAME_UPDATE, Downstream.GAME_STATE {
-            gameSummary: GameSummary,
+        export const _CHALLENGE_JOIN: string = "CHALLENGE_JOIN";
+        export interface CHALLENGE_JOIN extends ChannelMessage, Downstream.GAME_STATE {
+            users: User[],
+            gameSummary: GameSummary
         }
 
         export const _JOIN_COMPLETE: string = "JOIN_COMPLETE";
@@ -78,6 +80,9 @@ namespace KGS {
 
         export const _UNJOIN: string = "UNJOIN";
         export interface UNJOIN extends ChannelMessage {
+        }
+        export const _CLOSE: string = "CLOSE";
+        export interface CLOSE extends ChannelMessage {
         }
 
         export const _PRIVATE_KEEP_OUT: string = "PRIVATE_KEEP_OUT";
@@ -135,7 +140,12 @@ namespace KGS {
 
         export const _GAME_LIST: string = "GAME_LIST";
         export interface GAME_LIST extends ChannelMessage {
-            games: GameChannel[]
+            games: (GameChannel | ChallengeChannel)[]
+        }
+
+        export const _GAME_NOTIFY: string = "GAME_NOTIFY";
+        export interface GAME_NOTIFY extends Message {
+            game: GameChannel
         }
 
         export const _GAME_CONTAINER_REMOVE_GAME: string = "GAME_CONTAINER_REMOVE_GAME";
@@ -145,6 +155,10 @@ namespace KGS {
 
         export const _GAME_STATE: string = "GAME_STATE";
         export interface GAME_STATE extends ChannelMessage, GameFlags {
+            actions: {
+                user: KGS.User,
+                action: "MOVE" | "EDIT" | "SCORE" | "CHALLENGE_CREATE" | "CHALLENGE_SETUP" | "CHALLENGE_WAIT" | "CHALLENGE_ACCEPT" | "CHALLENGE_SUBMITTED" | "EDIT_DELAY"
+            }[]
         }
 
         export const _GAME_UPDATE: string = "GAME_UPDATE";
@@ -153,6 +167,15 @@ namespace KGS {
         }
         export const _PLAYBACK_DATA: string = "PLAYBACK_DATA";
         export interface PLAYBACK_DATA extends GAME_UPDATE {
+        }
+
+        export const _CHALLENGE_PROPOSAL: string = "CHALLENGE_PROPOSAL";
+        export interface CHALLENGE_PROPOSAL extends ChannelMessage {
+            proposal: KGS.DownstreamProposal
+        }
+        export const _CHALLENGE_FINAL: string = "CHALLENGE_FINAL";
+        export interface CHALLENGE_FINAL extends CHALLENGE_PROPOSAL {
+            gameChannelId: number
         }
     }
 }

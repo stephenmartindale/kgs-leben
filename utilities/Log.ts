@@ -1,4 +1,4 @@
-namespace Framework {
+namespace Utils {
     export const enum LogSeverity {
         Default,
         Info,
@@ -31,7 +31,7 @@ namespace Framework {
         logMethods[LogSeverity.Error] = (console.error)? console.error.bind(console) : logMethods[LogSeverity.Warning];
     }
 
-    export function log(severity: Framework.LogSeverity, message?: string, ...optionalParams: any[]) {
+    export function log(severity: Utils.LogSeverity, message?: string, ...optionalParams: any[]) {
         if ((logOptions[severity]) && (logMethods[severity])) logMethods[severity](message, ...optionalParams);
     }
 }

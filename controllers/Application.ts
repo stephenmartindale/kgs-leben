@@ -20,14 +20,7 @@ namespace Controllers {
         }
 
         private static initialise() {
-            const webComponentsReady: string = 'WebComponentsReady'; // HTML Imports and Web Components are ready - begin the application
-            let onWebComponentsReady: () => void;
-            onWebComponentsReady = function() {
-                $app = new Controllers.Application();
-                window.removeEventListener(webComponentsReady, onWebComponentsReady);
-            };
-
-            window.addEventListener(webComponentsReady, onWebComponentsReady);
+            $app = new Controllers.Application();
         }
 
         public get layout() {

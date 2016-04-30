@@ -1,8 +1,5 @@
 namespace Views {
-    export class SignInForm extends HTMLElement {
-        private static _template: HTMLTemplateElement;
-
-        private _defaultDisabled: boolean;
+    export class SignInForm implements Views.View<HTMLFormElement> {
         private _disabled: boolean;
 
         private _form: HTMLFormElement;
@@ -15,12 +12,8 @@ namespace Views {
 
         public submitCallback: (form: SignInForm) => void;
 
-        createdCallback() {
-            this.appendChild(SignInForm._template.content.cloneNode(true));
-
-            this._defaultDisabled = (this.getAttribute('disabled'))? true : false;
-
-            this._form = this.querySelector('form') as HTMLFormElement;
+        constructor() {
+            this._form = Views.Templates.cloneTemplate('sign-in-form') as HTMLFormElement;
             this._errorNotice = this._form.querySelector('.error-notice') as HTMLParagraphElement;
             this._inputUsername = this._form.querySelector('input[name="username"]') as HTMLInputElement;
             this._inputPassword = this._form.querySelector('input[name="password"]') as HTMLInputElement;
@@ -32,12 +25,17 @@ namespace Views {
             $(this._form).submit((e) => this.onFormSubmit(e));
 
             this._disabled = false;
-            this.disabled = this._defaultDisabled;
         }
 
-        get defaultDisabled(): boolean {
-            return this._defaultDisabled;
+        public attach(parent: HTMLElement): void {
+            parent.appendChild(this._form);
         }
+
+        public activate(): void {
+        }
+        public deactivate(): void {
+        }
+
         get disabled(): boolean {
             return this._disabled;
         }

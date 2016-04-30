@@ -20,7 +20,7 @@ namespace Controllers {
             this._activeChannelId = null;
             this._operationChannelId = null;
 
-            this._channelList = $('ul[is="channel-list"]')[0] as Views.ChannelList;
+            this._channelList = this.application.layout.channelList;
             this._channelList.selectionCallback = (channelId: number) => this.activateChannel(channelId);
             this._channelList.closeCallback = (channelId: number) => this.unjoinChannel(channelId);
         }
@@ -35,6 +35,10 @@ namespace Controllers {
         }
 
         protected digest(digest: KGS.DataDigest) {
+            if ((this._operationChannelId == null) && (digest.notifyChannelId != null)) {
+                this._operationChannelId = digest.notifyChannelId;
+            }
+
             if (digest.joinedChannelIds) {
                 let detachControllers = this._channelControllers;
                 this._joinedChannelIds = [];
@@ -93,10 +97,19 @@ namespace Controllers {
         }
 
         private initialiseChannelController(channelId: number): Controllers.ChannelBase {
-            switch (this.database.channels[channelId].channelType) {
-                case Models.ChannelType.Room: return new Controllers.RoomChannel(this, channelId);
-                case Models.ChannelType.Game: return new Controllers.GameChannel(this, channelId);
-                default: throw "Channel " + channelId.toString() + " has unknown or unsupported channel type: " + this.database.channels[channelId].channelType.toString();
+            let channel = this.database.channels[channelId];
+            switch (channel.channelType) {
+                case Models.ChannelType.Room:
+                    return new Controllers.RoomChannel(this, channelId);
+
+                case Models.ChannelType.Game:
+                    if ((<Models.GameChannel>channel).gameType == Models.GameType.Challenge)
+                        return new Controllers.ChallengeChannel(this, channelId);
+                    else
+                        return new Controllers.GameChannel(this, channelId);
+
+                default:
+                    throw "Channel " + channelId.toString() + " has unknown or unsupported channel type: " + this.database.channels[channelId].channelType.toString();
             }
         }
 

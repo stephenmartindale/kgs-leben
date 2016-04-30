@@ -36,7 +36,6 @@
         "gulp-sass": "^2.2.0",
         "gulp-postcss": "^6.1.0",
 
-        "webcomponents.js": "0.7.21",
         "jquery": "~2.2.2",
         "bootstrap": "4.0.0-alpha.2",
         "font-awesome": "^4.5.0"

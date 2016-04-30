@@ -1,14 +1,14 @@
-chat-form > div {
+div.chat-form > div {
     @extend .block-absolute;
     bottom: 3rem;
 }
 
-chat-form > form {
+div.chat-form > form {
     @extend .block-absolute;
     height: 3rem;
     top: auto;
 }
-chat-form > form > input[type="text"] {
+div.chat-form > form > input[type="text"] {
     height: 3rem;
     border-radius: 0;
 }

@@ -97,6 +97,15 @@ namespace Models {
             }
         }
 
+        public static estimateHandicap(leftRank: string, rightRank: string) {
+            let leftRating = User.estimateRating(leftRank);
+            let rightRating = User.estimateRating(rightRank);
+            if ((leftRating != null) && (rightRating != null))
+                return ~~(leftRating / 100) - ~~(rightRating / 100);
+            else
+                return 0;
+        }
+
         public static ratingToRank(rating: number): string {
             if (rating >= 3000) {
                 return (~~(rating / 100) - 29).toString() + " dan";

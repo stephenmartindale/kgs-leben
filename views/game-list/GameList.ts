@@ -1,13 +1,30 @@
 namespace Views {
-    export class GameList extends HTMLElement {
-        static _template: HTMLTemplateElement;
+    export class GameList implements Views.View<HTMLDivElement> {
+        private _div: HTMLDivElement;
+        private _table: HTMLTableElement;
 
         public tableBody: Views.GameTableBody;
 
-        createdCallback() {
-            this.appendChild(GameList._template.content.cloneNode(true));
+        constructor() {
+            this._div = document.createElement('div');
+            this._div.className = 'game-list';
 
-            this.tableBody = this.querySelector('tbody') as Views.GameTableBody;
+            this._table = document.createElement('table');
+            this._div.appendChild(this._table);
+
+            this.tableBody = new Views.GameTableBody();
+            this.tableBody.attach(this._table);
+        }
+
+        public attach(parent: HTMLElement): void {
+            parent.appendChild(this._div);
+        }
+
+        public activate(): void {
+            this.tableBody.activate();
+        }
+        public deactivate(): void {
+            this.tableBody.deactivate();
         }
     }
 }

@@ -72,7 +72,7 @@ namespace KGS {
                 this.kgsPOST(data);
             }
             else {
-                Framework.log(Framework.LogSeverity.Error, "Upstream Message Rejected", error, data);
+                Utils.log(Utils.LogSeverity.Error, "Upstream Message Rejected", error, data);
             }
         }
 
@@ -117,7 +117,7 @@ namespace KGS {
 
         private kgsXHRError(method: string, textStatus: string, jqXHR: JQueryXHR, errorThrown: string) {
             this._state = JSONClientState.Errored;
-            Framework.log(Framework.LogSeverity.Error, 'KGS Client ' + method + ' error', textStatus, errorThrown);
+            Utils.log(Utils.LogSeverity.Error, 'KGS Client ' + method + ' error', textStatus, errorThrown);
             if (this._loginDeferred) this.loginFailed();
         }
 
@@ -141,10 +141,10 @@ namespace KGS {
 
         private dispatchMessage(digest: KGS.DataDigest, message: Message) {
             let filter = this._databaseFacade[message.type];
-            if ((filter != null) && (typeof filter === "function")) {
+            if ((filter != null) && (Utils.isFunction(filter))) {
                 filter(digest, message);
             }
-            else Framework.log(Framework.LogSeverity.Info, "KGS Message not recognised:", message.type, message);
+            else Utils.log(Utils.LogSeverity.Info, "KGS Message not recognised:", message.type, message);
         }
 
         private logoutReceived(message?: string): boolean {
@@ -160,7 +160,7 @@ namespace KGS {
                 this._username = null;
 
                 this._logoutCallback(message);
-                Framework.log(Framework.LogSeverity.Info, 'KGS Client LOGOUT', message);
+                Utils.log(Utils.LogSeverity.Info, 'KGS Client LOGOUT', message);
                 return true;
             }
         }
@@ -168,11 +168,11 @@ namespace KGS {
         private loginSuccess() {
             let reject: boolean;
             if (this._state != JSONClientState.Connecting) {
-                Framework.log(Framework.LogSeverity.Error, 'KGS Client LOGIN success received but client was not connecting');
+                Utils.log(Utils.LogSeverity.Error, 'KGS Client LOGIN success received but client was not connecting');
                 reject = true;
             }
             else {
-                Framework.log(Framework.LogSeverity.Success, 'KGS Client LOGIN success');
+                Utils.log(Utils.LogSeverity.Success, 'KGS Client LOGIN success');
                 reject = false;
             }
 
@@ -191,7 +191,7 @@ namespace KGS {
         }
 
         private loginFailed() {
-            Framework.log((this._state == JSONClientState.Connecting)? Framework.LogSeverity.Warning : Framework.LogSeverity.Error, 'KGS Client LOGIN failure');
+            Utils.log((this._state == JSONClientState.Connecting)? Utils.LogSeverity.Warning : Utils.LogSeverity.Error, 'KGS Client LOGIN failure');
 
             this._state = (this._state == JSONClientState.Connecting)? JSONClientState.Disconnected : JSONClientState.Errored;
             this._username = null;

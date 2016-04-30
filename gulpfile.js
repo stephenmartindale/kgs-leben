@@ -15,7 +15,6 @@ inputs = {
         fonts: 'node_modules/font-awesome/fonts/**',
         images: 'wgo.js/*.jpg',
         scripts: [
-            'node_modules/webcomponents.js/webcomponents-lite.*',
             'node_modules/jquery/dist/jquery.js',
             'node_modules/jquery/dist/jquery.min.*',
             'wgo.js/*.js'
@@ -26,7 +25,6 @@ inputs = {
             html: 'views/**/*.html',
             scss: 'views/**/*.scss'
         },
-        footer: "framework/Templates.Footer.html"
     },
     scripts: {
         sources: '**/*.ts',
@@ -146,9 +144,9 @@ gulp.task('build:root', function() {
     multisource(inputs.root.sources).pipe(gulp.dest(outputs.root));
 });
 
-// Task(s): Build Web Component Templates
+// Task(s): Build View Templates
 gulp.task('build:templates', function() {
-    return gulp.src([inputs.templates.sources.html, inputs.templates.footer])
+    return gulp.src([inputs.templates.sources.html])
                .pipe(concat(outputs.templates))
                .pipe(gulp.dest(outputs.root));
 });
@@ -191,7 +189,6 @@ var watch = function() {
     gulp.watch(inputs.root.sources, ['build:root']);
 
     gulp.watch(inputs.templates.sources.html, ['build:templates']);
-    gulp.watch(inputs.templates.footer, ['build:templates']);
 
     gulp.watch(inputs.scripts.sources, ['build:scripts']);
 

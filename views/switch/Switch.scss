@@ -1,0 +1,72 @@
+$switch-height: 1.8em;
+$switch-width: 60px;
+$switch-narrow-width: 25px;
+
+.switch {
+    position: relative;
+    overflow: hidden;
+    font-size: 16px;
+    margin-bottom: 0.2em;
+}
+.switch label {
+    position: relative;
+    float: left;
+    z-index: 2;
+    border: 0;
+    margin: 0;
+    width: $switch-width;
+    line-height: $switch-height;
+    vertical-align: middle;
+    text-align: center;
+    font-weight: bold;
+    font-variant: small-caps;
+    color: $gray-light;
+    cursor: pointer;
+}
+.switch-narrow label {
+    width: $switch-narrow-width;
+}
+.switch label:hover, .switch input:checked + label {
+    color: $gray-lightest;
+}
+.switch input:disabled + label {
+    cursor: not-allowed;
+    color: darken($gray-light, 14%);
+}
+
+.switch input {
+    display: none;
+}
+.switch input:nth-child(3):checked ~ .switch-selection { left: ($switch-width * 1); }
+.switch input:nth-child(5):checked ~ .switch-selection { left: ($switch-width * 2); }
+.switch input:nth-child(7):checked ~ .switch-selection { left: ($switch-width * 3); }
+.switch-narrow input:nth-child(3):checked ~ .switch-selection { left: ($switch-narrow-width * 1); }
+.switch-narrow input:nth-child(5):checked ~ .switch-selection { left: ($switch-narrow-width * 2); }
+.switch-narrow input:nth-child(7):checked ~ .switch-selection { left: ($switch-narrow-width * 3); }
+.switch-narrow input:nth-child(9):checked ~ .switch-selection { left: ($switch-narrow-width * 4); }
+.switch-narrow input:nth-child(11):checked ~ .switch-selection { left: ($switch-narrow-width * 5); }
+.switch-narrow input:nth-child(13):checked ~ .switch-selection { left: ($switch-narrow-width * 6); }
+.switch-narrow input:nth-child(15):checked ~ .switch-selection { left: ($switch-narrow-width * 7); }
+.switch-narrow input:nth-child(17):checked ~ .switch-selection { left: ($switch-narrow-width * 8); }
+.switch-narrow input:nth-child(19):checked ~ .switch-selection { left: ($switch-narrow-width * 9); }
+
+.switch-selection {
+    position: absolute;
+    display: block;
+    z-index: 1;
+    left: 0px;
+    width: $switch-width;
+    height: $switch-height;
+    border-radius: $border-radius;
+    background-color: $gray;
+    background-image: linear-gradient(to bottom left, $gray, darken($gray, 8%));
+    transition: left 0.15s ease-out;
+}
+.switch-narrow .switch-selection {
+    width: $switch-narrow-width;
+}
+.switch input:disabled ~ .switch-selection {
+    border: 2px solid darken($gray, 10%);
+    background-image: none;
+    background-color: transparent;
+}

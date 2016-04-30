@@ -5,6 +5,7 @@ namespace KGS {
         public username: boolean = false;
         public joinedChannelIds: boolean = false;
         public joinFailedChannelIds: number[];
+        public notifyChannelId: number;
 
         public channels: { [channelId: number]: boolean } = {};
         public touchChannel(channelId: number) { this.channels[channelId] = true; }
@@ -24,9 +25,7 @@ namespace KGS {
 
         public gameTrees: { [channelId: number]: boolean } = {};
         public touchGameTree(channelId: number) { this.gameTrees[channelId] = true; }
-
-        private static hasKeys(obj: any): boolean {
-            return ((obj != null) && (Object.keys(obj).length > 0));
-        }
+        public gameActions: { [channelId: number]: boolean } = {};
+        public touchGameActions(channelId: number) { this.gameActions[channelId] = true; }
     }
 }

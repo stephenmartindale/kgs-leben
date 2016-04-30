@@ -60,8 +60,31 @@ namespace Models {
             }
         }
 
+        public get previousPosition(): Models.GamePosition {
+            if (this._activeNodeId != null) {
+                let node = this.nodes[this._activeNodeId];
+                if (node.parent != null) {
+                    return this._positions[node.parent];
+                }
+            }
+
+            return null;
+        }
+
         public get position(): Models.GamePosition {
             return (this._activeNodeId != null)? this._positions[this._activeNodeId] : null;
+        }
+
+        public tryPlay(x: number, y: number): GameMoveError {
+            let position = this.position;
+            if (!position) throw "Moves may not be played without a pre-existing game Position";
+
+            let clone = new Models.GamePosition(position);
+            let previousPosition = this.previousPosition;
+
+            let changes = clone.play(x, y, position.turn, previousPosition);
+            if (Utils.isNumber(changes)) return <number>changes;
+            else return GameMoveError.Success;
         }
 
         public activate(nodeId: number) {
@@ -108,17 +131,31 @@ namespace Models {
                 let properties = node.properties;
                 if (properties) {
                     for (let p = 0; p < properties.length; ++p) {
+                        let pass: boolean = null;
+                        let loc: KGS.SGF.LocationObject = null;
+                        if ((<KGS.SGF.LocationProperty>properties[p]).loc) {
+                            if ((<KGS.SGF.LocationProperty>properties[p]).loc == "PASS") {
+                                pass = true;
+                            }
+                            else if (Utils.isObject((<KGS.SGF.LocationProperty>properties[p]).loc)) {
+                                pass = false;
+                                loc = (<KGS.SGF.LocationProperty>properties[p]).loc as KGS.SGF.LocationObject;
+                            }
+                        }
+
+                        let colour: Models.GameStone = null;
+                        if ((<KGS.SGF.ColourProperty>properties[p]).color) colour = ((<KGS.SGF.ColourProperty>properties[p]).color == "white")? GameStone.White : GameStone.Black;
+
                         switch (properties[p].name) {
                             case KGS.SGF._MOVE:
-                                let move = properties[p] as KGS.SGF.MOVE;
-                                let colour = (move.color == "white")? GameStone.White : GameStone.Black;
-                                if (move.loc == "PASS") {
-                                    position.pass(colour);
-                                }
-                                else {
-                                    let loc = move.loc as number[];
-                                    position.play(loc[0], loc[1], colour);
-                                }
+                                if (pass) position.pass(colour);
+                                else if (loc) position.play(loc.x, loc.y, colour);
+                                else Utils.log(Utils.LogSeverity.Warning, "KGS SGF MOVE property could not be effected");
+                                break;
+
+                            case KGS.SGF._ADDSTONE:
+                                if (loc) position.add(loc.x, loc.y, colour);
+                                else Utils.log(Utils.LogSeverity.Warning, "KGS SGF ADDSTONE property could not be effected");
                                 break;
                         }
                     }
@@ -136,10 +173,10 @@ namespace Models {
             for (let i = 0; i < events.length; ++i) {
                 let event: KGS.SGF.NodeEvent = events[i];
                 let filter = this._facade[event.type];
-                if ((filter != null) && (typeof filter === "function")) {
+                if ((filter != null) && (Utils.isFunction(filter))) {
                     filter(this, event);
                 }
-                else Framework.log(Framework.LogSeverity.Info, "KGS SGF Event not recognised:", event.type, event);
+                else Utils.log(Utils.LogSeverity.Info, "KGS SGF Event not recognised:", event.type, event);
             }
         }
     }
@@ -178,10 +215,14 @@ namespace Models {
                 this._properties.push(property);
         }
 
-        private locationsEqual(left: "PASS" | number[], right: "PASS" | number[]) {
+        private locationsEqual(left: "PASS" | KGS.SGF.LocationObject, right: "PASS" | KGS.SGF.LocationObject) {
             if ((left == null) || (right == null)) return (left == right);
             if (left === right) return true;
-            else if ((Utils.isArray(left)) && (Utils.isArray(right))) return Utils.arrayEquals(left as number[], right as number[]);
+            else if ((Utils.isObject(left)) && (Utils.isObject(right))) {
+                let l = left as KGS.SGF.LocationObject;
+                let r = right as KGS.SGF.LocationObject;
+                return ((l.x == r.x) && (l.y == r.y));
+            }
             return false;
         }
 
@@ -287,8 +328,8 @@ namespace Models {
 
         CHILDREN_REORDERED(tree: GameTree, event: KGS.SGF.CHILDREN_REORDERED) {
             let parent = tree.get(event.nodeId);
-            if (Utils.setEquals(parent.children, event.children)) {
-                parent.children = Utils.arrayClone(event.children);
+            if (Utils.setEquals(parent.children, event.children, Utils.ComparisonFlags.Shallow)) {
+                parent.children = Utils.cloneArray(event.children, true);
             }
             else throw "Game Tree reordering children would alter the child set";
         }

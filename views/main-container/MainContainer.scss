@@ -1,0 +1,7 @@
+.main-container {
+    @extend .block-absolute;
+    z-index: 1;
+}
+.main-container > * {
+    @extend .center;
+}

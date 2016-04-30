@@ -3,7 +3,6 @@ namespace Models {
         Room,
         List,
         Conversation,
-        Game,
-        Challenge
+        Game
     }
 }

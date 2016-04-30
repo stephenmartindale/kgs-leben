@@ -15,17 +15,6 @@ namespace Models {
             this.name = "Channel #" + channelId.toString();
         }
 
-        public static predictChannelType(message: KGS.Downstream.JOIN): Models.ChannelType {
-            if ((<KGS.Downstream.JOINRoom>message).games) {
-                return Models.ChannelType.Room;
-            }
-            else if (((<KGS.Downstream.JOINGame>message).gameSummary) || ((<KGS.Downstream.JOINGame>message).sgfEvents)) {
-                return Models.ChannelType.Game;
-            }
-
-            return Models.ChannelType.Room;
-        }
-
         public static createChannel(channelId: number, channelType: Models.ChannelType): Channel {
             switch (channelType) {
                 case ChannelType.Room: return new RoomChannel(channelId);

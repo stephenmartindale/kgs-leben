@@ -4,12 +4,6 @@ namespace Models {
         White = -1      // WGo.W
     }
 
-    export const enum GameMoveError {
-        InvalidLocation,
-        StonePresent,
-        Suicide
-    }
-
     export interface GamePositionChange {
         x: number;
         y: number;
@@ -30,7 +24,7 @@ namespace Models {
         constructor(original: GamePosition);
         constructor(arg?: number | GamePosition) {
             if (arg == null) arg = 19;
-            if (!Utils.isObject(arg)) {
+            if (!Utils.isObject(arg)) {     // TODO: Use isNumber rather
                 let sz: number = <number>arg;
                 if (GamePosition.validateSize(sz)) {
                     this.size = sz;
@@ -42,7 +36,7 @@ namespace Models {
             }
             else {
                 this.size = (<GamePosition>arg).size;
-                this.schema = Utils.arrayClone((<GamePosition>arg).schema);
+                this.schema = Utils.cloneArray((<GamePosition>arg).schema, true);
                 this.prisoners = {
                     black: (<GamePosition>arg).prisoners.black,
                     white: (<GamePosition>arg).prisoners.white
@@ -163,7 +157,13 @@ namespace Models {
             }
         }
 
-        public play(x: number, y: number, colour?: GameStone): GameMoveError | GamePositionChange[] {
+        public undo(changes: GamePositionChange[]) {
+            for (let j = (changes.length - 1); j >= 0; --j) {
+                this.set(changes[j].x, changes[j].y, (changes[j].remove != null)? changes[j].remove : undefined);
+            }
+        }
+
+        public play(x: number, y: number, colour?: GameStone, previous?: Models.GamePosition): GameMoveError | GamePositionChange[] {
             if (!this.isOnBoard(x, y)) return GameMoveError.InvalidLocation;
             let i = (x * this.size) + y;
             let stone = this.schema[i];
@@ -186,13 +186,32 @@ namespace Models {
             }
 
             changes.push(<GamePositionChange>{ x: x, y: y, add: colour });
-            this.turn = opponent;
-            return changes;
+
+            if ((previous != null) && (GamePosition.equals(this, previous))) {
+                this.undo(changes);
+                return GameMoveError.Ko;
+            }
+            else {
+                this.turn = opponent;
+                return changes;
+            }
         }
 
         public pass(colour?: GameStone) {
             if (colour == null) colour = this.turn;
             this.turn = (colour == GameStone.White)? GameStone.Black : GameStone.White;
+        }
+
+        public add(x: number, y: number, colour: GameStone): boolean {
+            let result = this.play(x, y, colour);
+            if (Utils.isArray(result)) {
+                if ((<GamePositionChange[]>result).length == 1) return true;
+                else {
+                    this.undo(<GamePositionChange[]>result);
+                }
+            }
+
+            return false;
         }
     }
 }

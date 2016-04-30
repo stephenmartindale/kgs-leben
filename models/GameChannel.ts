@@ -1,14 +1,8 @@
 namespace Models {
-    export const enum GamePhase {
-        Active,
-        Paused,
-        Adjourned,
-        Concluded
-    }
-
     export class GameChannel extends Models.Channel {
         parentChannelId: number;
         gameType: Models.GameType;
+        description: string;
 
         size: number;
         score: string;
@@ -17,37 +11,41 @@ namespace Models {
         restrictedPrivate: boolean;     // Restricted by the Game Owner
         restrictedPlus: boolean;        // Restricted to KGS Plus users
         phase: GamePhase;
+        proposal: KGS.DownstreamProposal;
 
         playerWhite: string;
         playerBlack: string;
+        challengeCreator: string;
 
         constructor(channelId: number) {
             super(channelId, ChannelType.Game);
         }
 
-        public mergeGameChannel(game: KGS.GameChannel): boolean {
+        public mergeGameChannel(game: KGS.GameChannel | KGS.ChallengeChannel): boolean {
             let touch: boolean = false;
             if (this.parentChannelId != game.roomId) { this.parentChannelId = game.roomId; touch = true; }
 
-            let gameType: Models.GameType;
-            switch (game.gameType) {
-                case "challenge": gameType = Models.GameType.Challenge; break;
-                case "demonstration": gameType = Models.GameType.Demonstration; break;
-                case "review": gameType = Models.GameType.Review; break;
-                case "rengo_review": gameType = Models.GameType.ReviewRengo; break;
-                case "teaching": gameType = Models.GameType.Teaching; break;
-                case "simul": gameType = Models.GameType.Simultaneous; break;
-                case "rengo": gameType = Models.GameType.Rengo; break;
-                case "free": gameType = Models.GameType.Free; break;
-                case "ranked": gameType = Models.GameType.Ranked; break;
-                case "tournament": gameType = Models.GameType.Tournament; break;
-            }
-
+            let gameType: Models.GameType = GameChannel.getGameType(game.gameType);
             if (this.gameType != gameType) { this.gameType = gameType; touch = true; }
 
-            if (this.size != game.size) { this.size = game.size; touch = true; }
-            if (this.score != game.score) { this.score = game.score; touch = true; }
-            if (this.moveNumber != game.moveNum) { this.moveNumber = game.moveNum; touch = true; }
+            if (this.description != game.name) { this.description = game.name; touch = true; }
+
+            if (gameType != Models.GameType.Challenge) {
+                let g = (<KGS.GameChannel>game);
+                if (this.size != g.size) { this.size = g.size; touch = true; }
+                if (this.score != g.score) { this.score = g.score; touch = true; }
+                if (this.moveNumber != g.moveNum) { this.moveNumber = g.moveNum; touch = true; }
+                if (this.proposal != null) { this.proposal = null; touch = true; }
+            }
+            else {
+                let c = (<KGS.ChallengeChannel>game);
+                let sz = (c.initialProposal)? c.initialProposal.size : null;
+                if (this.size != sz) { this.size = sz; touch = true; }
+                if (this.score != null) { this.score = null; touch = true; }
+                if (this.moveNumber != null) { this.moveNumber = null; touch = true; }
+
+                if (this.mergeProposal(c.initialProposal)) touch = true;
+            }
 
             let pvt: boolean = (game.private)? true : false;
             if (this.restrictedPrivate != pvt) { this.restrictedPrivate = pvt; touch = true; }
@@ -65,28 +63,50 @@ namespace Models {
             if (this.playerWhite != playerWhite) { this.playerWhite = playerWhite; touch = true; }
 
             let playerBlack: string = ((game.players) && (game.players.black))? game.players.black.name : null;
-            if (this.playerBlack != playerWhite) { this.playerBlack = playerBlack; touch = true; }
+            if (this.playerBlack != playerBlack) { this.playerBlack = playerBlack; touch = true; }
+
+            let challengeCreator: string = ((game.players) && (game.players.challengeCreator))? game.players.challengeCreator.name : null;
+            if (this.challengeCreator != challengeCreator) { this.challengeCreator = challengeCreator; touch = true; }
 
             let name: string;
             if ((playerWhite != null) && (playerBlack != null)) {
                 name = playerWhite + " vs. " + playerBlack;
-                if (game.name != null) {
-                    name += "  " + game.name;
-                }
             }
-            else if (game.name != null) {
-                name = game.name;
+            else if (this.challengeCreator != null) {
+                name = "Challenge from " + this.challengeCreator;
             }
-            // else if (this.challengeCreator != null) {
-            //     return this.challengeCreator;
-            // }
             else {
-                name = "Game Channel #" + this.channelId.toString();
+                name = "Game #" + this.channelId.toString();
             }
 
             if (this.name != name) { this.name = name; touch = true; }
 
             return touch;
+        }
+
+        public mergeProposal(proposal: KGS.DownstreamProposal): boolean {
+            if (this.gameType != GameType.Challenge) throw "Game Type is not challenge";
+            if ((null == this.proposal) || (!Utils.valueEquals(this.proposal, proposal, Utils.ComparisonFlags.ArraysAsSets))) {
+                this.proposal = proposal;
+                return true;
+            }
+
+            return false;
+        }
+
+        public static getGameType(s: string): Models.GameType {
+            switch (s) {
+                case "challenge": return Models.GameType.Challenge;
+                case "demonstration": return Models.GameType.Demonstration;
+                case "review": return Models.GameType.Review;
+                case "rengo_review": return Models.GameType.ReviewRengo;
+                case "teaching": return Models.GameType.Teaching;
+                case "simul": return Models.GameType.Simultaneous;
+                case "rengo": return Models.GameType.Rengo;
+                case "free": return Models.GameType.Free;
+                case "ranked": return Models.GameType.Ranked;
+                case "tournament": return Models.GameType.Tournament;
+            }
         }
 
         public get displayType(): string {

@@ -40,13 +40,28 @@ namespace Utils {
         }
     }
 
-    export function setEquals<T>(left: T[], right: T[]): boolean {
+    export function setEquals<T>(left: T[], right: T[], comparisonFlags: ComparisonFlags): boolean {
         if (left === right) return true;
         if ((left == null) || (right == null)) return false;
         if (left.length != right.length) return false;
 
-        for (let j = 0; j < right.length; ++j) {
-            if (left.indexOf(right[j]) < 0) return false;
+        if (comparisonFlags == ComparisonFlags.Shallow) {
+            for (let j = 0; j < right.length; ++j) {
+                if (left.indexOf(right[j]) < 0) return false;
+            }
+        }
+        else {
+            for (let j = 0; j < right.length; ++j) {
+                let found: boolean = false;
+                for (let k = 0; k < left.length; ++k) {
+                    if (valueEquals(left[k], right[j], comparisonFlags)) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) return false;
+            }
         }
 
         return true;

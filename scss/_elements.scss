@@ -12,3 +12,11 @@ form button {
 form button[type=submit] {
     @extend .btn-primary;
 }
+
+#main form {
+    overflow: hidden;
+}
+#main form h2 {
+    font-size: 120%;
+    white-space: nowrap;
+}

@@ -1,0 +1,114 @@
+<section data-view="game-proposal">
+    <form class="game-proposal">
+        <div class="left-column">
+            <h2 id="proposalType">Challenge</h2>
+            <h3>Board Size</h3>
+            <div class="switch">
+                <input type="radio" name="proposalSize" id="proposalSize19" value="19" checked>
+                <label for="proposalSize19">19 × 19</label>
+                <input type="radio" name="proposalSize" id="proposalSize13" value="13">
+                <label for="proposalSize13">13 × 13</label>
+                <input type="radio" name="proposalSize" id="proposalSize9" value="9">
+                <label for="proposalSize9">9 × 9</label>
+                <span class="switch-selection"></span>
+            </div>
+
+            <h3>Options</h3>
+            <div class="switch">
+                <input type="radio" name="proposalOpen" id="proposalOpen" checked>
+                <label for="proposalOpen">open</label>
+                <input type="radio" name="proposalOpen" id="proposalPrivate">
+                <label for="proposalPrivate">private</label>
+                <span class="switch-selection"></span>
+            </div>
+
+            <h3>Rule Set</h3>
+            <div class="switch">
+                <input type="radio" name="proposalRuleSet" id="proposalRulesJapanese" value="japanese" checked>
+                <label for="proposalRulesJapanese">japan</label>
+                <input type="radio" name="proposalRuleSet" id="proposalRulesChinese" value="chinese">
+                <label for="proposalRulesChinese">china</label>
+                <input type="radio" name="proposalRuleSet" id="proposalRulesAGA" value="aga">
+                <label for="proposalRulesAGA">aga</label>
+                <input type="radio" name="proposalRuleSet" id="proposalRulesNewZealand" value="new_zealand">
+                <label for="proposalRulesNewZealand">nz</label>
+                <span class="switch-selection"></span>
+            </div>
+
+            <h3>Time System</h3>
+            <div class="switch">
+                <input type="radio" name="proposalTimeSystem" id="proposalTimeJapanese" value="byo_yomi" checked>
+                <label for="proposalTimeJapanese">japan</label>
+                <input type="radio" name="proposalTimeSystem" id="proposalTimeCanadian" value="canadian">
+                <label for="proposalTimeCanadian">canada</label>
+                <input type="radio" name="proposalTimeSystem" id="proposalTimeAbsolute" value="absolute">
+                <label for="proposalTimeAbsolute">abs</label>
+                <input type="radio" name="proposalTimeSystem" id="proposalTimeNone" value="none">
+                <label for="proposalTimeNone">none</label>
+                <span class="switch-selection"></span>
+            </div>
+
+            <div class="form-group" id="proposalTimeMainGroup">
+                <label for="proposalTimeMain">Main Time:</label>
+                <input type="time" step="1" class="form-control" id="proposalTimeMain" placeholder="Main Time" value="00:30:00" />
+            </div>
+            <div class="form-group" id="proposalTimeByoYomiGroup">
+                <label for="proposalTimeByoYomi">Byo-Yomi:</label>
+                <input type="time" step="1" class="form-control" id="proposalTimeByoYomi" placeholder="Byo-Yomi" value="00:00:30" />
+            </div>
+            <div class="form-group" id="proposalTimePeriodsGroup">
+                <label for="proposalTimePeriods" id="proposalTimePeriodsLabel">Periods:</label>
+                <input type="number" class="form-control" id="proposalTimePeriods" placeholder="Overtime Periods" value="5" />
+            </div>
+        </div>
+        <div class="right-column">
+            <h2 id="proposalDescription">&nbsp;</h2>
+
+            <h3>Challenger</h3>
+            <div id="playerChallenger">
+                <span>A. Challenger</span>
+                <span class="secondary">25d</span>
+            </div>
+
+            <h3>You</h3>
+            <div class="switch">
+                <input type="radio" name="proposalColour" id="proposalColourNigiri" value="nigiri" checked>
+                <label for="proposalColourNigiri">nigiri</label>
+                <input type="radio" name="proposalColour" id="proposalColourBlack" value="black">
+                <label for="proposalColourBlack">black</label>
+                <input type="radio" name="proposalColour" id="proposalColourWhite" value="white">
+                <label for="proposalColourWhite">white</label>
+                <span class="switch-selection"></span>
+            </div>
+
+            <h3>Handicap</h3>
+            <div class="switch switch-narrow">
+                <input type="radio" name="proposalHandicap" id="proposalHandicap0" value="0" checked>
+                <label for="proposalHandicap0">0</label>
+                <input type="radio" name="proposalHandicap" id="proposalHandicap1" value="1">
+                <label for="proposalHandicap1">1</label>
+                <input type="radio" name="proposalHandicap" id="proposalHandicap2" value="2">
+                <label for="proposalHandicap2">2</label>
+                <input type="radio" name="proposalHandicap" id="proposalHandicap3" value="3">
+                <label for="proposalHandicap3">3</label>
+                <input type="radio" name="proposalHandicap" id="proposalHandicap4" value="4">
+                <label for="proposalHandicap4">4</label>
+                <input type="radio" name="proposalHandicap" id="proposalHandicap5" value="5">
+                <label for="proposalHandicap5">5</label>
+                <input type="radio" name="proposalHandicap" id="proposalHandicap6" value="6">
+                <label for="proposalHandicap6">6</label>
+                <input type="radio" name="proposalHandicap" id="proposalHandicap7" value="7">
+                <label for="proposalHandicap7">7</label>
+                <input type="radio" name="proposalHandicap" id="proposalHandicap8" value="8">
+                <label for="proposalHandicap8">8</label>
+                <input type="radio" name="proposalHandicap" id="proposalHandicap9" value="9">
+                <label for="proposalHandicap9">9</label>
+                <span class="switch-selection"></span>
+            </div>
+
+            <h3>Komi</h3>
+            <input type="number" class="form-control" name="proposalKomi" placeholder="Komi" value="6.5" required />
+        </div>
+        <button class="btn-block" type="submit" autocomplete="off">Accept</button>
+    </form>
+</section>

@@ -1,28 +1,47 @@
 namespace Views {
-    export class LightboxContainer extends HTMLElement {
-        static _template: HTMLTemplateElement;
-
+    export class LightboxContainer {
+        private _lightbox: HTMLDivElement;
         private _lightboxContainer: HTMLDivElement;
+        private _view: Views.View<any>;
 
-        createdCallback() {
-            let children = $(this).children().detach();
-            this.appendChild(LightboxContainer._template.content.cloneNode(true));
-            this._lightboxContainer = this.firstElementChild as HTMLDivElement;
-            $(this._lightboxContainer).append(children);
+        constructor(view: Views.View<any>) {
+            this._lightbox = document.createElement('div');
+            this._lightbox.className = 'lightbox';
+
+            this._lightboxContainer = document.createElement('div');
+            this._lightboxContainer.className = 'lightbox-container';
+            this._lightbox.appendChild(this._lightboxContainer);
+
+            this._view = view;
+            this._view.attach(this._lightboxContainer);
         }
 
-        public static showLightbox(view: HTMLElement) {
-            let lightbox = document.createElement('lightbox-container') as LightboxContainer;
-            lightbox.className = 'hidden';
-            lightbox._lightboxContainer.appendChild(view);
+        public static showLightbox(view: Views.View<any>, suppressTransitions?: boolean): LightboxContainer {
+            let lightbox = new LightboxContainer(view);
 
-            document.body.appendChild(lightbox);
+            if (!suppressTransitions) {
+                lightbox._lightbox.classList.add('hidden');
+            }
 
-            window.setTimeout(() => $(lightbox).removeClass('hidden'), 20);
+            document.body.appendChild(lightbox._lightbox);
+
+            if (!suppressTransitions) {
+                window.setTimeout(() => {
+                    lightbox._lightbox.classList.remove('hidden');
+                    lightbox._view.activate();
+                }, 20);
+            }
+            else {
+                lightbox._view.activate();
+            }
+
+            return lightbox;
         }
 
-        public static hideLightbox(view: HTMLElement) {
-            let lightbox = $(view).closest('lightbox-container');
+        public hide() {
+            this._view.deactivate();
+
+            let lightbox = $(this._lightbox);
             lightbox.one('transitionend', () => lightbox.remove());
             lightbox.addClass('hidden');
         }

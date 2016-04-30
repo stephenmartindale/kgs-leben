@@ -1,4 +1,4 @@
-lightbox-container {
+div.lightbox {
     @extend .block-fixed;
     background-color: rgba($gray-dark, 0.85);
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAQElEQVQYlW2OwQ0AMAgCbw7XcMFubj81RVpeGgIcQHK1gJC/+shjtkLNTmpTaZMm05IB76YzfTedaW46k28Opg1VYQ5hW3JdzwAAAABJRU5ErkJggg==);
@@ -7,11 +7,11 @@ lightbox-container {
     opacity: 1;
 }
 
-lightbox-container.hidden {
+div.lightbox.hidden {
     opacity: 0;
 }
 
-lightbox-container > div {
+div.lightbox-container {
     @extend .center;
     @extend .jumbotron;
     @media (min-width: 38em) {

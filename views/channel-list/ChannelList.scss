@@ -1,9 +1,9 @@
-ul[is="channel-list"] {
+ul.channel-list {
     @extend .list-none;
     margin: 16px 28px 16px -6px;
 }
 
-ul[is="channel-list"] > li {
+ul.channel-list > li {
     position: relative;
     padding: 2px 0 2px 6px;
     border-left: 6px solid $gray-light;
@@ -12,71 +12,71 @@ ul[is="channel-list"] > li {
     cursor: pointer;
 }
 
-ul[is="channel-list"] > li:hover {
+ul.channel-list > li:hover {
     border-left-color: $gray;
     background-color: $gray-lightest;
 }
 
-ul[is="channel-list"] > li.active,
-ul[is="channel-list"] > li.active:hover {
+ul.channel-list > li.active,
+ul.channel-list > li.active:hover {
     background-color: $gray-lightest;
     border-left-color: $brand-warning;
     font-weight: bold;
 }
 
-ul[is="channel-list"] > li:before {
+ul.channel-list > li:before {
     content: "\f068";
     font-family: FontAwesome;
     padding-right: 10px;
 }
 
-ul[is="channel-list"] > li.kgs-info,
-ul[is="channel-list"] > li.kgs-info:hover {
+ul.channel-list > li.kgs-info,
+ul.channel-list > li.kgs-info:hover {
     border-left-color: $brand-info;
 }
-ul[is="channel-list"] > li.kgs-info:before {
+ul.channel-list > li.kgs-info:before {
     color: $brand-info;
 }
 
-ul[is="channel-list"] > li.kgs-warning,
-ul[is="channel-list"] > li.kgs-warning:hover {
+ul.channel-list > li.kgs-warning,
+ul.channel-list > li.kgs-warning:hover {
     border-left-color: $brand-warning;
 }
-ul[is="channel-list"] > li.kgs-warning:before {
+ul.channel-list > li.kgs-warning:before {
     color: $brand-warning;
 }
 
-ul[is="channel-list"] > li.kgs-room:before {
+ul.channel-list > li.kgs-room:before {
     content: "\f0c0"; /* fa-users */
 }
-ul[is="channel-list"] > li.kgs-list:before {
+ul.channel-list > li.kgs-list:before {
     content: "\f00a"; /* fa-th */
 }
-ul[is="channel-list"] > li.kgs-conversation:before {
+ul.channel-list > li.kgs-conversation:before {
     content: "\f075"; /* fa-comment */
 }
-ul[is="channel-list"] > li.kgs-conversation.kgs-info:before {
+ul.channel-list > li.kgs-conversation.kgs-info:before {
     content: "\f27a"; /* fa-commenting */
 }
-ul[is="channel-list"] > li.kgs-game:before {
+ul.channel-list > li.kgs-game:before {
     content: "\f111"; /* fa-circle */
 }
 
-ul[is="channel-list"] span.btn-close {
+ul.channel-list span.btn-close {
     @extend .block-absolute;
     left: auto;
     padding: 0 0.5rem 0 0.2rem;
     opacity: 0;
     transition: opacity 100ms;
 }
-ul[is="channel-list"] > li:hover span.btn-close {
+ul.channel-list > li:hover span.btn-close {
     opacity: 1;
 }
-ul[is="channel-list"] span.btn-close:hover {
+ul.channel-list span.btn-close:hover {
     opacity: 1;
     color: $brand-danger;
 }
-ul[is="channel-list"] span.btn-close:before {
+ul.channel-list span.btn-close:before {
     font-family: FontAwesome;
     content: "\f00d";
 }

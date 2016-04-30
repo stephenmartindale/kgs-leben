@@ -1,4 +1,4 @@
-ul[is="chat-member-list"] {
+ul.chat-member-list {
     @extend .list-none;
     @extend .block-absolute;
     width: 40%;
@@ -8,11 +8,11 @@ ul[is="chat-member-list"] {
     overflow-y: auto;
 }
 
-ul[is="chat-member-list"] li span:nth-child(2) {
+ul.chat-member-list li span:nth-child(2) {
     margin-left: 0.5rem;
     white-space: nowrap;
 }
 
-ul[is="chat-member-list"] li {
+ul.chat-member-list li {
     margin-left: 0.4rem;
 }
