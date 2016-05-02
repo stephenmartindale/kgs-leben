@@ -22,8 +22,8 @@ namespace Views {
             if (null == this._board) {
                 this._board = new WGo.Board(this._div, {
                     size: (this._position != null)? this._position.size : this.defaultSize,
-                    width: 800,
-                    background: '/images/wood.jpg'
+                    width: 688,
+                    background: '/img/wood.jpg'
                 });
 
                 if (this._position != null) this.updatePosition(null, this._position);

@@ -62,6 +62,19 @@ $switch-narrow-width: 25px;
     background-image: linear-gradient(to bottom left, $gray, darken($gray, 8%));
     transition: left 0.15s ease-out;
 }
+input.switch-success:checked ~ .switch-selection {
+    background-color: $brand-success;
+    background-image: linear-gradient(to bottom left, $brand-success, darken($brand-success, 8%));
+}
+input.switch-warning:checked ~ .switch-selection {
+    background-color: $brand-warning;
+    background-image: linear-gradient(to bottom left, $brand-warning, darken($brand-warning, 8%));
+}
+input.switch-danger:checked ~ .switch-selection {
+    background-color: $brand-danger;
+    background-image: linear-gradient(to bottom left, $brand-danger, darken($brand-danger, 8%));
+}
+
 .switch-narrow .switch-selection {
     width: $switch-narrow-width;
 }

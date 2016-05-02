@@ -9,5 +9,7 @@ namespace KGS {
         export const DefaultCanadianByoYomi: number = 600;
         export const DefaultCanadianStones: number = 25;
 
+        export const AvatarURIPrefix: string = "http://goserver.gokgs.com/avatars/";
+        export const AvatarURISuffix: string = ".jpg";
     }
 }

@@ -39,7 +39,7 @@ namespace Models {
             }
             else {
                 let c = (<KGS.ChallengeChannel>game);
-                let sz = (c.initialProposal)? c.initialProposal.size : null;
+                let sz = (c.initialProposal)? c.initialProposal.rules.size : null;
                 if (this.size != sz) { this.size = sz; touch = true; }
                 if (this.score != null) { this.score = null; touch = true; }
                 if (this.moveNumber != null) { this.moveNumber = null; touch = true; }

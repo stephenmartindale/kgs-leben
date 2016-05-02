@@ -38,16 +38,17 @@ namespace Views {
             return (dataCount > 0);
         }
 
-        protected bindDictionary(data: { [key: string]: T }, keys?: (number | string)[]) {
+        protected bind(source: (key: string) => T, keys: (number | string)[], moveKeys?: boolean) {
             // Examine incoming data
             let oldKeys: string[] = this._keys;
             let dataMap: { [key: string]: boolean } = {};
             let dataCount: number = 0;
-            if (data != null) {
-                this._keys = (keys == null)? Object.keys(data) : <any>(keys.slice());
+            if (source != null) {
+                this._keys = <any>keys;
+                if (!moveKeys) this._keys = this._keys.slice();
                 for (let i = 0; i < this._keys.length; ++i) {
                     let k: string = this._keys[i];
-                    if (data[k]) {
+                    if (source(k)) {
                         if (dataCount != i) this._keys[dataCount] = k;
                         dataMap[k] = true;
                         ++dataCount;
@@ -82,7 +83,7 @@ namespace Views {
             let created: number = 0;
             for (let i = 0; i < dataCount; ++i) {
                 let k: string = this._keys[i];
-                let datum: T = data[k];
+                let datum: T = source(k);
                 let idx: number = oldIndex[k];
                 if (null == idx) {
                     this.container.insertBefore(this.createChild(k, datum), this.container.children[i]);
@@ -106,6 +107,18 @@ namespace Views {
 
                     this.updateChild(k, datum, child as E);
                 }
+            }
+        }
+
+        protected bindDictionary(data: { [key: string]: T }, keys?: (number | string)[]) {
+            if (data != null) {
+                let moveKeys: boolean = false;
+                if (keys == null) {
+                    keys = Object.keys(data);
+                    moveKeys = true;
+                }
+
+                return this.bind((k: string) => data[k], keys, moveKeys);
             }
         }
 

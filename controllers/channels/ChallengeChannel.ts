@@ -16,23 +16,23 @@ namespace Controllers {
             this.initialiseProposal();
         }
 
-        protected initialiseBoard() {
+        private initialiseBoard() {
             var board = new Views.GoBoard();
             let gameChannel = this.channel as Models.GameChannel;
             if (gameChannel.size) board.defaultSize = gameChannel.size;
 
-            this.registerView(board, LayoutZone.Main, (channelId: number, digest?: KGS.DataDigest) => {});
+            this.registerView(board, LayoutZone.Main, (digest?: KGS.DataDigest) => {});
         }
 
-        protected initialiseProposal() {
+        private initialiseProposal() {
             var proposalForm = new Views.GameProposal();
             proposalForm.gameActions = 0;
             proposalForm.submitCallback = (form) => this.submitProposal(proposalForm);
 
             this.updateProposalForm(proposalForm);
 
-            this.registerView(proposalForm, LayoutZone.Main, (channelId: number, digest?: KGS.DataDigest) => {
-                if ((digest == null) || (digest.channels[channelId]) || (digest.gameActions[channelId])) {
+            this.registerView(proposalForm, LayoutZone.Main, (digest?: KGS.DataDigest) => {
+                if ((digest == null) || (digest.channels[this.channelId]) || (digest.gameActions[this.channelId])) {
                     this.updateProposalForm(proposalForm);
                 }
             });
@@ -43,13 +43,13 @@ namespace Controllers {
             proposalForm.description = (gameChannel.description)? gameChannel.description : "";
             proposalForm.boardSize = gameChannel.size;
             proposalForm.private = (gameChannel.restrictedPrivate || gameChannel.proposal.private);
-            proposalForm.ruleSet = gameChannel.proposal.rules;
+            proposalForm.ruleSet = gameChannel.proposal.rules.rules;
 
-            proposalForm.setTimeSystem(gameChannel.proposal.timeSystem,
-                               gameChannel.proposal.mainTime,
-                               gameChannel.proposal.byoYomiTime,
-                               gameChannel.proposal.byoYomiPeriods,
-                               gameChannel.proposal.byoYomiStones);
+            proposalForm.setTimeSystem(gameChannel.proposal.rules.timeSystem,
+                               gameChannel.proposal.rules.mainTime,
+                               gameChannel.proposal.rules.byoYomiTime,
+                               gameChannel.proposal.rules.byoYomiPeriods,
+                               gameChannel.proposal.rules.byoYomiStones);
 
             let challenger: Models.User = this.database.users[gameChannel.challengeCreator];
             let me: Models.User = this.database.users[this.database.username];
@@ -68,12 +68,12 @@ namespace Controllers {
 
             if (gameChannel.proposal.nigiri) {
                 proposalForm.colour = 'nigiri';
-                proposalForm.komi = (gameChannel.proposal.komi)? gameChannel.proposal.komi : KGS.Constants.DefaultKomi;
+                proposalForm.komi = (gameChannel.proposal.rules.komi)? gameChannel.proposal.rules.komi : KGS.Constants.DefaultKomi;
             }
             else if (player != null) {
-                proposalForm.handicap = gameChannel.proposal.handicap;
+                proposalForm.handicap = gameChannel.proposal.rules.handicap;
                 proposalForm.colour = (player.role == "white")? 'white' : 'black';
-                proposalForm.komi = (gameChannel.proposal.komi)? gameChannel.proposal.komi : KGS.Constants.DefaultKomi;
+                proposalForm.komi = (gameChannel.proposal.rules.komi)? gameChannel.proposal.rules.komi : KGS.Constants.DefaultKomi;
             }
 
             proposalForm.gameActions = this.database.gameActions[this.channelId];
@@ -91,8 +91,8 @@ namespace Controllers {
             if ((actions & Models.GameActions.ChallengeAccept) == Models.GameActions.ChallengeAccept) {
                 messageType = KGS.Upstream._CHALLENGE_ACCEPT;
                 nigiri = gameChannel.proposal.nigiri;
-                handicap = gameChannel.proposal.handicap;
-                komi = gameChannel.proposal.komi;
+                handicap = gameChannel.proposal.rules.handicap;
+                komi = gameChannel.proposal.rules.komi;
                 players = new Array(gameChannel.proposal.players.length);
                 for (let i = 0; i < gameChannel.proposal.players.length; ++i) {
                     players[i] = {
@@ -129,16 +129,16 @@ namespace Controllers {
                 gameType: gameChannel.proposal.gameType,
                 nigiri: nigiri,
                 rules: {
-                    size: gameChannel.proposal.size,
+                    size: gameChannel.proposal.rules.size,
                     handicap: handicap,
                     komi: komi,
 
-                    rules: gameChannel.proposal.rules,
-                    timeSystem: gameChannel.proposal.timeSystem,
-                    mainTime: gameChannel.proposal.mainTime,
-                    byoYomiTime: gameChannel.proposal.byoYomiTime,
-                    byoYomiPeriods: gameChannel.proposal.byoYomiPeriods,
-                    byoYomiStones: gameChannel.proposal.byoYomiStones
+                    rules: gameChannel.proposal.rules.rules,
+                    timeSystem: gameChannel.proposal.rules.timeSystem,
+                    mainTime: gameChannel.proposal.rules.mainTime,
+                    byoYomiTime: gameChannel.proposal.rules.byoYomiTime,
+                    byoYomiPeriods: gameChannel.proposal.rules.byoYomiPeriods,
+                    byoYomiStones: gameChannel.proposal.rules.byoYomiStones
                 },
 
                 players: players,

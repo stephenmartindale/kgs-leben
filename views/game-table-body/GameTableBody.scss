@@ -16,26 +16,8 @@ div.game-list tbody td span {
     margin-right: 0.5rem;
 }
 
-div.game-list tbody td.restricted-plus:after, div.game-list tbody td.restricted-private:after {
-    font-family: FontAwesome;
-    float: right;
-}
-div.game-list tbody td.restricted-plus:after {
-    content: "\f067";
-}
-div.game-list tbody td.restricted-private:after {
-    content: "\f023";
-}
-
-div.game-list tbody td span.player-white:before, div.game-list tbody td span.player-black:before {
-    font-family: FontAwesome;
+div.game-list tbody td span:before {
     margin-right: 0.4rem;
-}
-div.game-list tbody td span.player-white:before {
-    content: "\f111";
-}
-div.game-list tbody td span.player-black:before {
-    content: "\f10c";
 }
 
 div.game-list tbody td:nth-child(5) {

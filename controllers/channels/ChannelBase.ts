@@ -1,68 +1,16 @@
-/// <reference path="../ControllerBase.ts" />
+/// <reference path="../ViewControllerBase.ts" />
 
 namespace Controllers {
-    export abstract class ChannelBase extends ControllerBase<ChannelController> {
-        private _channelId: number;
-        private _activated: boolean;
-
-        private _views: { view: Views.View<any>, zone: Controllers.LayoutZone, update: (channelId: number, digest?: KGS.DataDigest) => void }[];
+    export abstract class ChannelBase extends ViewControllerBase<ChannelController> {
+        public channelId: number;
 
         constructor(parent: ChannelController, channelId: number) {
             super(parent);
-            this._channelId = channelId;
-            this._activated = false;
-            this._views = [];
-        }
-
-        protected registerView(view: Views.View<any>, zone: Controllers.LayoutZone, update: (channelId: number, digest?: KGS.DataDigest) => void) {
-            this._views.push({ view: view, zone: zone, update: update });
-        }
-
-        protected digest(digest: KGS.DataDigest) {
-            if (this._activated) {
-                for (let j = 0; j < this._views.length; ++j) {
-                    this._views[j].update(this._channelId, digest);
-                }
-            }
-        }
-
-        public get channelId(): number {
-            return this._channelId;
+            this.channelId = channelId;
         }
 
         public get channel(): Models.Channel {
-            return this.database.channels[this._channelId];
-        }
-
-        public activate(): boolean {
-            if (this._activated) return false;
-
-            for (let j = 0; j < this._views.length; ++j) {
-                this.application.layout.showView(this._views[j].view, this._views[j].zone);
-                this._views[j].update(this._channelId);
-            }
-
-            this._activated = true;
-            return true;
-        }
-
-        public deactivate(): boolean {
-            if (!this._activated) return false;
-
-            this.application.layout.clearMain();
-            this.application.layout.clearSidebar();
-
-            this._activated = false;
-            return true;
-        }
-
-        public detach() {
-            this.deactivate();
-            super.detach();
-        }
-
-        public get activated(): boolean {
-            return this._activated;
+            return this.database.channels[this.channelId];
         }
 
         protected initialiseGameList() {
@@ -70,8 +18,8 @@ namespace Controllers {
             gameList.tableBody.userDataSource = (name) => this.database.users[name];
             gameList.tableBody.selectionCallback = (cid) => this.parent.joinChannel(cid);
 
-            this.registerView(gameList, LayoutZone.Main, (channelId: number, digest?: KGS.DataDigest) => {
-                if ((digest == null) || (digest.channelGames[channelId])) {
+            this.registerView(gameList, LayoutZone.Main, (digest?: KGS.DataDigest) => {
+                if ((digest == null) || (digest.channelGames[this.channelId])) {
                     gameList.tableBody.update(this.database.channels as { [key: string]: Models.GameChannel }, (<Models.RoomChannel>this.channel).games);
                 }
             });
@@ -81,11 +29,11 @@ namespace Controllers {
             let chat = new Views.ChatForm();
             chat.submitCallback = (form) => this.submitChatMessage(form);
 
-            this.registerView(chat, LayoutZone.Sidebar, (channelId: number, digest?: KGS.DataDigest) => {
-                if ((digest == null) || (digest.channelChat[channelId])) {
+            this.registerView(chat, LayoutZone.Sidebar, (digest?: KGS.DataDigest) => {
+                if ((digest == null) || (digest.channelChat[this.channelId])) {
                     chat.messageList.update(this.channel.chats);
                 }
-                if ((digest == null) || (digest.channelUsers[channelId])) {
+                if ((digest == null) || (digest.channelUsers[this.channelId])) {
                     chat.memberList.update(this.database.users, this.channel.users);
                 }
             });
@@ -96,7 +44,7 @@ namespace Controllers {
             if ((text) && (text.length > 0) && (text.length <= KGS.Upstream._CHAT_MaxLength)) {
                 this.client.post(<KGS.Upstream.CHAT>{
                     type: KGS.Upstream._CHAT,
-                    channelId: this._channelId,
+                    channelId: this.channelId,
                     text:text
                 });
 

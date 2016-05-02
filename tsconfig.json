@@ -3,8 +3,7 @@
         "target": "es5",
         "noImplicitAny": true,
 
-        "module": "commonjs",
-        "out": "ts.js",
+        "out": "leben.js",
 
         "sourceMap": true,
         "inlineSourceMap": false
@@ -12,6 +11,7 @@
 
     "exclude": [
         "node_modules",
+        "gulp/.tmp",
         "dist"
     ]
 }

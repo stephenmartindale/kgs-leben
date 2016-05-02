@@ -68,26 +68,26 @@ namespace KGS {
     }
 
     export interface GameProposalPlayer {
-        role: "white" | "black" | "white_2" | "black_2" | "challengeCreator" | "owner",
-        handicap?: number,          // (only for simultaneous games)
-        komi?: number               // (only for simultaneous games)
+        role: "white" | "black" | "white_2" | "black_2" | "challengeCreator" | "owner";
+        handicap?: number;           // (only for simultaneous games)
+        komi?: number;               // (only for simultaneous games)
     }
     export interface DownstreamProposalPlayer extends GameProposalPlayer {
-        user?: KGS.User
+        user?: KGS.User;
     }
     export interface UpstreamProposalPlayer extends GameProposalPlayer {
-        name: string
+        name: string;
     }
 
     export interface GameProposal extends GameFlags {
-        gameType: string,
-        nigiri?: boolean
+        gameType: string;
+        nigiri?: boolean;
+        rules: KGS.GameRules;
     }
-    export interface DownstreamProposal extends GameProposal, GameRules {
+    export interface DownstreamProposal extends GameProposal {
         players: DownstreamProposalPlayer[]
     }
     export interface UpstreamProposal extends GameProposal {
-        rules: KGS.GameRules,
         players: UpstreamProposalPlayer[]
     }
 

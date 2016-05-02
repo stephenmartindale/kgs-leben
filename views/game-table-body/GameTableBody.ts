@@ -57,9 +57,9 @@ namespace Views {
             typeSpans[0].innerText = datum.displayType;
             typeSpans[1].innerText = datum.displaySubType;
 
-            if (datum.restrictedPlus) domains[0].className = 'restricted-plus';
-            else if (datum.restrictedPrivate) domains[0].className = 'restricted-private';
-            else domains[0].className = '';
+            if (datum.restrictedPlus) typeSpans[1].className = 'secondary fa-plus';
+            else if (datum.restrictedPrivate) typeSpans[1].className = 'secondary fa-lock';
+            else typeSpans[1].className = 'secondary';
 
             let playersSwapped: boolean = false;
             let strongerPlayer: Models.User = (datum.playerWhite != null)? this.userDataSource(datum.playerWhite) : null;
@@ -73,7 +73,7 @@ namespace Views {
 
             let strongerPlayerSpans = domains[1].getElementsByTagName('span');
             if (strongerPlayer) {
-                strongerPlayerSpans[0].className = (!playersSwapped)? 'player-white' : 'player-black';
+                strongerPlayerSpans[0].className = (!playersSwapped)? 'fa-circle' : 'fa-circle-o';
                 strongerPlayerSpans[0].innerText = strongerPlayer.name;
                 strongerPlayerSpans[1].innerText = strongerPlayer.rank;
             }
@@ -85,7 +85,7 @@ namespace Views {
 
             let weakerPlayerSpans = domains[2].getElementsByTagName('span');
             if (weakerPlayer) {
-                weakerPlayerSpans[0].className = (!playersSwapped)? 'player-black' : 'player-white';
+                weakerPlayerSpans[0].className = (!playersSwapped)? 'fa-circle-o' : 'fa-circle';
                 weakerPlayerSpans[0].innerText = weakerPlayer.name;
                 weakerPlayerSpans[1].innerText = weakerPlayer.rank;
             }

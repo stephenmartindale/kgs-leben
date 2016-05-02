@@ -14,16 +14,16 @@ namespace Controllers {
             this.initialiseBoard();
         }
 
-        protected initialiseBoard() {
+        private initialiseBoard() {
             var board = new Views.GoBoard();
             let gameChannel = this.channel as Models.GameChannel;
             if (gameChannel.size) board.defaultSize = gameChannel.size;
 
             board.playCallback = (x, y) => this.tryPlay(board, x, y);
 
-            this.registerView(board, LayoutZone.Main, (channelId: number, digest?: KGS.DataDigest) => {
-                if ((digest == null) || (digest.gameTrees[channelId])) {
-                    let gameTree = this.database.games[channelId];
+            this.registerView(board, LayoutZone.Main, (digest?: KGS.DataDigest) => {
+                if ((digest == null) || (digest.gameTrees[this.channelId])) {
+                    let gameTree = this.database.games[this.channelId];
                     if (!gameTree) {
                         board.clear();
                     }

@@ -1,0 +1,37 @@
+// Minimalist Font-Awesome
+@font-face {
+    font-family: 'FontAwesome';
+    src: url("../fonts/fontawesome-webfont.eot?v=4.5.0");
+    src: url("../fonts/fontawesome-webfont.eot?#iefix&v=4.5.0") format("embedded-opentype"), url("../fonts/fontawesome-webfont.woff2?v=4.5.0") format("woff2"), url("../fonts/fontawesome-webfont.woff?v=4.5.0") format("woff"), url("../fonts/fontawesome-webfont.ttf?v=4.5.0") format("truetype"), url("../fonts/fontawesome-webfont.svg?v=4.5.0#fontawesomeregular") format("svg");
+    font-weight: normal;
+    font-style: normal;
+}
+
+.fa {
+    display: inline-block;
+    font-family: FontAwesome;
+    font-weight: normal;
+    text-decoration: none;
+    user-select: none;
+}
+
+.fa-user:before             { @extend .fa; content: "\f007"; }
+.fa-th:before               { @extend .fa; content: "\f00a"; }
+.fa-times:before            { @extend .fa; content: "\f00d"; }
+.fa-home:before             { @extend .fa; content: "\f015"; font-size: 115%; }
+.fa-lock:before             { @extend .fa; content: "\f023"; }
+.fa-plus:before             { @extend .fa; content: "\f067"; }
+.fa-minus:before            { @extend .fa; content: "\f068"; }
+.fa-asterisk:before         { @extend .fa; content: "\f069"; }
+.fa-comment:before          { @extend .fa; content: "\f075"; }
+.fa-comments:before         { @extend .fa; content: "\f086"; }
+.fa-sign-out:before         { @extend .fa; content: "\f08b"; }
+.fa-trophy:before           { @extend .fa; content: "\f091"; }
+.fa-globe:before            { @extend .fa; content: "\f0ac"; }
+.fa-users:before            { @extend .fa; content: "\f0c0"; }
+.fa-coffee:before           { @extend .fa; content: "\f0f4"; }
+.fa-circle-o:before         { @extend .fa; content: "\f10c"; }
+.fa-circle:before           { @extend .fa; content: "\f111"; }
+.fa-flag-checkered:before   { @extend .fa; content: "\f11e"; }
+.fa-graduation-cap:before   { @extend .fa; content: "\f19d"; }
+.fa-commenting:before       { @extend .fa; content: "\f27a"; }

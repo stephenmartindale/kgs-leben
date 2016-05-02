@@ -9,15 +9,18 @@ namespace Controllers {
             [channelId: string]: Controllers.ChannelBase,
             [channelId: number]: Controllers.ChannelBase
         };
-        private _activeChannelId: number;
+        private _homeController: Controllers.HomeController;
+        private _activeChannel: Controllers.ViewControllerBase<ChannelController>;
 
         private _operationChannelId: number;
 
         constructor(parent: Application) {
             super(parent);
+
             this._joinedChannelIds = [];
             this._channelControllers = {};
-            this._activeChannelId = null;
+            this._homeController = new Controllers.HomeController(this);
+            this._activeChannel = null;
             this._operationChannelId = null;
 
             this._channelList = this.application.layout.channelList;
@@ -27,11 +30,13 @@ namespace Controllers {
 
         public reinitialise() {
             this._joinedChannelIds = [];
-            this._channelControllers = {};
-            this._activeChannelId = null;
+            this._activeChannel = null;
             this._operationChannelId = null;
 
             this.detachChildren();
+
+            this._channelControllers = {};
+            this._homeController = new Controllers.HomeController(this);
         }
 
         protected digest(digest: KGS.DataDigest) {
@@ -39,7 +44,7 @@ namespace Controllers {
                 this._operationChannelId = digest.notifyChannelId;
             }
 
-            if (digest.joinedChannelIds) {
+            if ((digest.joinedChannelIds) || (!this._activeChannel)) {
                 let detachControllers = this._channelControllers;
                 this._joinedChannelIds = [];
                 this._channelControllers = {};
@@ -73,7 +78,7 @@ namespace Controllers {
 
                     let controller = detachControllers[detachChannelIds[j]];
                     if (controller) {
-                        if (this._activeChannelId == controller.channelId) this._activeChannelId = null;
+                        if (this._activeChannel == controller) this._activeChannel = null;
                         controller.detach();
                     }
                 }
@@ -81,8 +86,8 @@ namespace Controllers {
                 if (activateChannelId != null) {
                     this.activateChannel(activateChannelId);
                 }
-                else if ((this._activeChannelId == null) && (this._joinedChannelIds.length > 0)) {
-                    this.activateChannel(this._joinedChannelIds[0]);
+                else if (this._activeChannel == null) {
+                    this.activateChannel((this._joinedChannelIds.length > 0)? this._joinedChannelIds[0] : Controllers.HomeController.channelId);
                 }
                 else {
                     this.updateChannelList();
@@ -114,22 +119,24 @@ namespace Controllers {
         }
 
         private updateChannelList() {
-            this._channelList.update(this.database.channels, this._joinedChannelIds, this._activeChannelId);
-        }
-
-        public get activeChannel(): Controllers.ChannelBase {
-            return (this._activeChannelId != null)? this._channelControllers[this._activeChannelId] : null;
+            this._channelList.update(this.database.channels, this._joinedChannelIds, (this._activeChannel == this._homeController)? Controllers.HomeController.channelId : (<Controllers.ChannelBase>this._activeChannel).channelId);
         }
 
         private activateChannel(channelId: number) {
-            if (this._activeChannelId != channelId) {
-                let controller = this.activeChannel;
-                if (controller != null) controller.deactivate();
+            let activate = (channelId == Controllers.HomeController.channelId)? this._homeController : this._channelControllers[channelId];
 
-                this._activeChannelId = channelId;
+            if (this._activeChannel != activate) {
+                if (this._activeChannel != null) {
+                    this._activeChannel.deactivate();
+                    this._activeChannel = null;
+                }
+
+                this._activeChannel = activate;
                 this.updateChannelList();
 
-                this.activeChannel.activate();
+                if (this._activeChannel != null) {
+                    this._activeChannel.activate();
+                }
             }
         }
 

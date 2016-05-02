@@ -5,6 +5,7 @@
 
     "exclude": [
         "node_modules",
+        "gulp/.tmp",
         "dist"
     ]
 }

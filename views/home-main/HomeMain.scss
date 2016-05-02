@@ -1,0 +1,31 @@
+.home-main .user-info {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    padding: 4rem;
+}
+
+.home-main .user-info div:first-child {
+    width: 170px;
+}
+.home-main .avatar {
+    width: 141px;
+    height: 200px;
+    margin-bottom: 0.5rem;
+    border-radius: $border-radius;
+}
+
+.home-main .user-info p.name {
+    font-size: 120%;
+}
+
+.home-main .user-info div:last-child {
+    flex: 1 1 auto;
+    padding: 0 2rem;
+}
+
+.home-main .user-info .rank-graph {
+    height: 200px;
+    width: 100%;
+    border-radius: $border-radius;
+}
