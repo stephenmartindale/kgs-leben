@@ -15,6 +15,11 @@ $brand-danger:              darken($brand-warning, 10%);
 $body-bg:                   $gray-dark;
 $body-color:                $gray-dark;
 
+// Go Specific Variables
+$go-stone-diameter:         22mm;
+$go-board-size-min:         9;
+$go-board-size-max:         19;
+
 // Bootstrap Options (4.0.0-alpha.2)
 //
 // Quickly modify global styling by enabling or disabling optional features.

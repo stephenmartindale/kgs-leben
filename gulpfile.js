@@ -37,7 +37,7 @@ var outputs = {
 
 // Static Content
 var content = [
-    { source: [ 'index.html', 'test.html', 'LICENSE' ]},
+    { source: [ '*.html', 'LICENSE' ]},
     { source: 'images/**/*', destination: outputs.images },
 
     { source: 'node_modules/font-awesome/fonts/*.*', destination: outputs.fonts },

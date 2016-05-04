@@ -17,9 +17,8 @@ namespace Controllers {
         }
 
         private initialiseBoard() {
-            var board = new Views.GoBoard();
             let gameChannel = this.channel as Models.GameChannel;
-            if (gameChannel.size) board.defaultSize = gameChannel.size;
+            let board = (gameChannel.size)? new Views.GoBoard(gameChannel.size) : new Views.GoBoard();
 
             this.registerView(board, LayoutZone.Main, (digest?: KGS.DataDigest) => {});
         }

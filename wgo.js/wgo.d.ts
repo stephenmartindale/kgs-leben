@@ -18,9 +18,13 @@ declare namespace WGo {
     }
 
     interface Board extends BoardConfig {
+        element: HTMLElement;
+
+        setWidth(width: number): void;
         setSize(size?: number): void;
 
         addEventListener(type: string, callback: (x: number, y: number, e: Event) => void): void;
+        removeEventListener(type: string, callback: Function): boolean;
 
         addObject(obj: BoardObject | BoardObject[]): void;
         removeObject(obj: Coordinates | Coordinates[]): void;
@@ -28,6 +32,6 @@ declare namespace WGo {
     }
     var Board: {
         prototype: Board;
-        new (elem: HTMLDivElement, config: BoardConfig): Board;
+        new (elem: HTMLElement, config: BoardConfig): Board;
     }
 }

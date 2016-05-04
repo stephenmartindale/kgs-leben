@@ -1,19 +1,30 @@
-.block {
-    display: block;
-    box-sizing: border-box;
+.div-fill {
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
     width: auto;
     height: auto;
+    box-sizing: border-box;
 }
 .block-fixed {
-    @extend .block;
+    @extend .div-fill;
+    display: block;
     position: fixed;
 }
 .block-absolute {
-    @extend .block;
+    @extend .div-fill;
+    display: block;
+    position: absolute;
+}
+.flex-fixed {
+    @extend .div-fill;
+    display: flex;
+    position: fixed;
+}
+.flex-absolute {
+    @extend .div-fill;
+    display: flex;
     position: absolute;
 }
 

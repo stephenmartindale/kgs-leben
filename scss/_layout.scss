@@ -5,8 +5,7 @@
 }
 
 #sidebar {
-    @extend .block-fixed;
-    display: flex;
+    @extend .flex-fixed;
     flex-direction: column;
     left: auto;
     width: 33%;

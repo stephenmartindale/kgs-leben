@@ -11,10 +11,11 @@ namespace Views {
             if (!this._div) {
                 this._div = document.createElement('div');
                 this._div.className = 'main-container';
+                parent.appendChild(this._div);
+
                 this._view.attach(this._div);
             }
-
-            parent.appendChild(this._div);
+            else parent.appendChild(this._div);
         }
 
         public activate(): void {
