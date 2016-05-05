@@ -1,0 +1,19 @@
+.lcd-clock {
+    display: inline-block;
+}
+
+.lcd-clock .lcd-clock-separator {
+    @extend .lcd-display;
+}
+
+.lcd-clock .lcd-clock-separator svg {
+    fill: currentColor;
+}
+.lcd-clock.running .lcd-clock-separator svg {
+    fill: inherit;
+    animation: lcd-clock-separator-blink 1s steps(1, start) infinite;
+}
+@keyframes lcd-clock-separator-blink {
+    0% { fill: inherit; }
+    50% { fill: currentColor; }
+}

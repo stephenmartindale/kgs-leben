@@ -15,16 +15,36 @@ namespace Views {
         private _board: WGo.Board;
         private _position: Models.GamePosition;
 
+        public playerAway: Views.GoBoardPlayer;
+        public playerHome: Views.GoBoardPlayer;
+
         public playCallback: (x: number, y: number) => void;
 
         constructor(size?: number) {
             this._size = size || 19;
 
-            this._root = $(Views.Templates.cloneTemplate('go-board'));
-            this._root.addClass("go-" + this._size.toString());
+            let root = document.createElement('div');
+            root.className = "go-board go-" + this._size.toString();
 
-            this._goban = this._root.find('.goban');
-            this._board = new WGo.Board(this._goban[0], { size: this._size, background: '/img/wood.jpg' });
+            let teamAway = document.createElement('div');
+            teamAway.className = "team-away";
+            root.appendChild(teamAway);
+            this.playerAway = new Views.GoBoardPlayer();
+            this.playerAway.attach(teamAway);
+
+            let goban = document.createElement('div');
+            goban.className = "goban";
+            root.appendChild(goban);
+            this._board = new WGo.Board(goban, { size: this._size, background: '/img/wood.jpg' });
+
+            let teamHome = document.createElement('div');
+            teamHome.className = "team-home";
+            root.appendChild(teamHome);
+            this.playerHome = new Views.GoBoardPlayer();
+            this.playerHome.attach(teamHome);
+
+            this._root = $(root);
+            this._goban = $(goban);
         }
 
         public attach(parent: HTMLElement): void {
@@ -37,18 +57,24 @@ namespace Views {
             window.addEventListener("resize", this._onResize);
             this._board.addEventListener("click", this._onBoardClick);
             this._activated = true;
+
+            this.playerHome.activate();
+            this.playerAway.activate();
         }
         public deactivate(): void {
             this._activated = false;
             this._board.removeEventListener("click", this._onBoardClick);
             window.removeEventListener("resize", this._onResize);
+
+            this.playerHome.deactivate();
+            this.playerAway.deactivate();
         }
 
         private optimiseBoard() {
             // Read Style Sheet defaults if necessary
             if (this._maxWidth == null) this._maxWidth = parseFloat(this._goban.css('max-width'));
-            if (this._playerMinWidth == null) this._playerMinWidth = parseFloat(this._root.find('.player').css('min-width'));
-            if (this._playerMinHeight == null) this._playerMinHeight = parseFloat(this._root.find('.player').css('min-height'));
+            if (this._playerMinWidth == null) this._playerMinWidth = parseFloat(this._root.find('.go-board-player').css('min-width'));
+            if (this._playerMinHeight == null) this._playerMinHeight = parseFloat(this._root.find('.go-board-player').css('min-height'));
 
             // Layout calculations
             let landscapeWidth: number = this.calculateBoardWidth(false);

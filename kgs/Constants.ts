@@ -11,5 +11,12 @@ namespace KGS {
 
         export const AvatarURIPrefix: string = "http://goserver.gokgs.com/avatars/";
         export const AvatarURISuffix: string = ".jpg";
+
+        export namespace TimeSystems {
+            export const None: string = "none";
+            export const Absolute: string = "absolute";
+            export const Japanese: string = "byo_yomi";
+            export const Canadian: string = "canadian";
+        }
     }
 }

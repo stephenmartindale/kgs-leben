@@ -1,0 +1,14 @@
+.lcd-display, .lcd-display svg {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+}
+
+.lcd-display svg {
+    height: 3rem;
+    stroke-width: 0;
+}
+
+.lcd-display svg .segment-on {
+    fill: currentColor;
+}

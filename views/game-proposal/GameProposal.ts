@@ -147,10 +147,10 @@ namespace Views {
             let num: number = $(this._form).find('#proposalTimePeriods').val();
 
             switch (this._timeSystem) {
-                case "byo_yomi":
+                case KGS.Constants.TimeSystems.Japanese:
                     return { time: time, periods: num };
 
-                case "canadian":
+                case KGS.Constants.TimeSystems.Canadian:
                     return { time: time, stones: num };
 
                 default: return null;
@@ -158,12 +158,12 @@ namespace Views {
         }
 
         private onTimeSystemChanged() {
-            if (this._timeSystem == "byo_yomi") {
+            if (this._timeSystem == KGS.Constants.TimeSystems.Japanese) {
                 let byoYomi = this.byoYomi;
                 this._japaneseByoYomi = byoYomi.time;
                 this._japanesePeriods = byoYomi.periods;
             }
-            else if (this._timeSystem == "canadian") {
+            else if (this._timeSystem == KGS.Constants.TimeSystems.Canadian) {
                 let byoYomi = this.byoYomi;
                 this._canadianByoYomi = byoYomi.time;
                 this._canadianStones = byoYomi.stones;
@@ -177,7 +177,7 @@ namespace Views {
 
             this._timeSystem = $(this._form).find('input[name="proposalTimeSystem"]:checked').val();
             switch (this._timeSystem) {
-                case "byo_yomi":
+                case KGS.Constants.TimeSystems.Japanese:
                     showMainTime = true;
                     showOvertime = true;
                     overtimeValue = Utils.htmlSecondsToTime(this._japaneseByoYomi);
@@ -185,7 +185,7 @@ namespace Views {
                     periodValue = this._japanesePeriods;
                     break;
 
-                case "canadian":
+                case KGS.Constants.TimeSystems.Canadian:
                     showMainTime = true;
                     showOvertime = true;
                     overtimeValue = Utils.htmlSecondsToTime(this._canadianByoYomi);
@@ -193,7 +193,7 @@ namespace Views {
                     periodValue = this._canadianStones;
                     break;
 
-                case "absolute":
+                case KGS.Constants.TimeSystems.Absolute:
                     showMainTime = true;
                     showOvertime = false;
                     periodCaption = "Stones";

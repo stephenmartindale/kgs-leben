@@ -1,0 +1,17 @@
+.go-clock {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    width: 240px;
+}
+
+.go-clock > .lcd-clock {
+    float: left;
+}
+.go-clock > .lcd-display {
+    float: right;
+}
+.go-clock > .lcd-counter {
+    float: right;
+    margin-right: 7px;
+}

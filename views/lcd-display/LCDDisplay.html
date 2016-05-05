@@ -1,0 +1,21 @@
+<section data-view="lcd-display">
+  <svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+       xmlns:xlink="http://www.w3.org/1999/xlink"
+       viewBox="0 0 57 80">
+    <defs>
+      <polyline id="lcdh" points="11 0, 37 0, 42 5, 37 10, 11 10, 6 5"></polyline>
+      <polyline id="lcdv" points="0 11, 5 6, 10 11, 10 34, 5 39, 0 39"></polyline>
+      <circle id="lcdpt" cx="0" cy="0" r="5"></circle>
+    </defs>
+    <g>
+      <use xlink:href="#lcdh" x="0" y="0"></use>
+      <use xlink:href="#lcdv" x="-48" y="0" transform="scale(-1,1)"></use>
+      <use xlink:href="#lcdv" x="-48" y="-80" transform="scale(-1,-1)"></use>
+      <use xlink:href="#lcdh" x="0" y="70"></use>
+      <use xlink:href="#lcdv" x="0" y="-80" transform="scale(1,-1)"></use>
+      <use xlink:href="#lcdv" x="0" y="0"></use>
+      <use xlink:href="#lcdh" x="0" y="35"></use>
+      <use xlink:href="#lcdpt" x="52" y="75"></use>
+    </g>
+  </svg>
+</section>

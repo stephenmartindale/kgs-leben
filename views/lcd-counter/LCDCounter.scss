@@ -1,0 +1,23 @@
+.lcd-counter div {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    float: right;
+}
+
+.lcd-counter div + div {
+    margin-right: 10px;
+}
+
+.lcd-counter svg {
+    display: block;
+    height: 0.7rem;
+    stroke-width: 0;
+}
+.lcd-counter svg + svg {
+    margin-top: 1px;
+}
+
+.lcd-counter svg .segment-on {
+    fill: currentColor;
+}

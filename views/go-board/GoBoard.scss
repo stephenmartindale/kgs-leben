@@ -20,15 +20,12 @@
     }
 }
 
-.go-board .player {
+.go-board > div > div {
     @extend .block-absolute;
     left: auto;
     bottom: auto;
-    min-width: 200px;
-    min-height: 100px;
-    border: 1px dotted white;
 }
-.go-board.landscape .player.user, .go-board.portrait .player.opponent {
+.go-board.landscape .team-home > div, .go-board.portrait .team-away > div {
     top: auto;
     bottom: 0;
     left: 0;
