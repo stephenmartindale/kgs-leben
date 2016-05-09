@@ -82,25 +82,38 @@ namespace Views {
             return (this._startTime != null);
         }
 
-        public start() {
-            if (this._startTime == null) {
-                this._startTime = performance.now();
-                this._timeoutHandle = window.setTimeout(this._onTimeout, this._resolution);
-                this.update();
+        public start(value?: number, startTime?: number) {
+            if ((value) && (value > 0)) {
+                this._value = value;
             }
+
+            this._startTime = startTime;
+            if ((this._startTime == null) || (this._startTime <= 0)) {
+                this._startTime = performance.now();
+            }
+
+            if (this._timeoutHandle == null) {
+                this._timeoutHandle = window.setTimeout(this._onTimeout, this._resolution);
+            }
+
+            this.update();
         }
 
-        public stop() {
+        public stop(value?: number) {
             if (this._timeoutHandle != null) {
                 window.clearTimeout(this._timeoutHandle);
                 this._timeoutHandle = null;
             }
 
-            if (this._startTime != null) {
-                this._value = this.value;
-                this._startTime = null;
-                this.update();
+            if ((value) && (value > 0)) {
+                this._value = value;
             }
+            else if (this._startTime != null) {
+                this._value = this.value;
+            }
+
+            this._startTime = null;
+            this.update();
         }
 
         private _onTimeout = (e: UIEvent) => {

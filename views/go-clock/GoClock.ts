@@ -5,6 +5,8 @@ namespace Views {
         private _periodNumber: Views.LCDDisplay;
         private _periodCounter: Views.LCDCounter;
 
+        private _maxPeriods: number;
+
         constructor() {
             this._div = document.createElement('div');
             this._div.className = 'go-clock';
@@ -34,52 +36,47 @@ namespace Views {
             this._clock.deactivate();
         }
 
-        public updateRules(rules: KGS.GameRules) {
-            this._clock.value = rules.mainTime;
+        public hide() {
+            this._div.classList.add('hidden');
+        }
+        public show() {
+            this._div.classList.remove('hidden');
+        }
 
-            let periods: number;
-            switch (rules.timeSystem) {
-                case KGS.Constants.TimeSystems.Japanese: periods = rules.byoYomiPeriods; break;
-                case KGS.Constants.TimeSystems.Canadian: periods = rules.byoYomiStones; break;
-                default: periods = 0;
-            }
+        public update(clock: Models.GameClock) {
+            if ((clock) && (clock.timeSystem) && (clock.timeSystem != KGS.Constants.TimeSystems.None)) {
+                if (this._maxPeriods != clock.maxPeriods) {
+                    this._maxPeriods = clock.maxPeriods;
 
-            if ((periods > 0) && (periods <= 30)) {
-                this._periodCounter.setMaximum(periods, (periods <= 15)? 1 : 2);
-                this._periodCounter.value = null;
-                this._periodCounter.show();
+                    if ((this._maxPeriods) && (this._maxPeriods > 0) && (this._maxPeriods <= 30)) {
+                        this._periodCounter.setMaximum(this._maxPeriods, (this._maxPeriods <= 15)? 1 : 2);
+                        this._periodCounter.show();
+                    }
+                    else {
+                        this._periodCounter.hide();
+                    }
+
+                    if ((this._maxPeriods) && (this._maxPeriods > 0)) {
+                        this._periodNumber.show();
+                    }
+                    else {
+                        this._periodNumber.hide();
+                    }
+                }
+
+                let periods = (clock.overtime)? clock.periods : null;
+                this._periodCounter.value = periods;
+                this._periodNumber.value = periods;
+
+                if (clock.running) this._clock.start(clock.time, clock.updated);
+                else this._clock.stop(clock.time);
+
+                this.show();
             }
             else {
-                this._periodCounter.hide();
+                this._clock.stop();
+                this.hide();
             }
-
-            if (periods > 0) {
-                this._periodNumber.value = null;
-                this._periodNumber.show();
-            }
-            else {
-                this._periodNumber.hide();
-            }
-        }
-
-        public set time(seconds: number) {
-            this._clock.value = (seconds >= 0)? seconds : 0;
-        }
-
-        public set periods(periods: number) {
-            periods = (periods >= 0)? periods : 0;
-            this._periodCounter.value = periods;
-            this._periodNumber.value = periods;
-        }
-
-        public get running() {
-            return this._clock.running;
-        }
-        public start() {
-            this._clock.start();
-        }
-        public stop() {
-            this._clock.stop();
         }
     }
 }

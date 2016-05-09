@@ -166,19 +166,6 @@ namespace Models {
                 previousPosition = position;
             }
         }
-
-        public processEvents(...events: KGS.SGF.NodeEvent[]) {
-            if ((events == null) || (events.length <= 0)) return;
-            if (this._facade == null) this._facade = <any>(new GameTreeFacade());
-            for (let i = 0; i < events.length; ++i) {
-                let event: KGS.SGF.NodeEvent = events[i];
-                let filter = this._facade[event.type];
-                if ((filter != null) && (Utils.isFunction(filter))) {
-                    filter(this, event);
-                }
-                else Utils.log(Utils.LogSeverity.Info, "KGS SGF Event not recognised:", event.type, event);
-            }
-        }
     }
 
     export class GameTreeNode {
@@ -285,57 +272,6 @@ namespace Models {
                 return this._properties[i];
             }
             else return undefined;
-        }
-    }
-
-    class GameTreeFacade {
-        PROP_ADDED(tree: GameTree, event: KGS.SGF.PROP_ADDED) {
-            tree.get(event.nodeId).addProperty(event.prop);
-            tree.refreshPosition(event.nodeId);  // TODO: Only call refreshPosition() if the properties are position related.
-                                                 // TODO: If 'adding' to the current active position, no need to refresh - just perform the add
-        }
-        PROP_REMOVED(tree: GameTree, event: KGS.SGF.PROP_REMOVED) {
-            tree.get(event.nodeId).removeProperty(event.prop);
-            tree.refreshPosition(event.nodeId);  // TODO: Only call refreshPosition() if the properties are position related.
-        }
-        PROP_CHANGED(tree: GameTree, event: KGS.SGF.PROP_CHANGED) {
-            tree.get(event.nodeId).setProperty(event.prop);
-            tree.refreshPosition(event.nodeId);  // TODO: Only call refreshPosition() if the properties are position related.
-        }
-
-        PROP_GROUP_ADDED(tree: GameTree, event: KGS.SGF.PROP_GROUP_ADDED) {
-            let node = tree.get(event.nodeId);
-            for (let i = 0; i < event.props.length; ++i) {
-                node.addProperty(event.props[i]);
-            }
-
-            tree.refreshPosition(event.nodeId);  // TODO: Only call refreshPosition() if the properties are position related.
-                                                 // TODO: If 'adding' to the current active position, no need to refresh - just perform the add
-        }
-        PROP_GROUP_REMOVED(tree: GameTree, event: KGS.SGF.PROP_GROUP_REMOVED) {
-            let node = tree.get(event.nodeId);
-            for (let i = 0; i < event.props.length; ++i) {
-                node.removeProperty(event.props[i]);
-            }
-
-            tree.refreshPosition(event.nodeId);  // TODO: Only call refreshPosition() if the properties are position related.
-        }
-
-        CHILD_ADDED(tree: GameTree, event: KGS.SGF.CHILD_ADDED) {
-            let parent = tree.get(event.nodeId);
-            parent.addChild(event.childNodeId);
-        }
-
-        CHILDREN_REORDERED(tree: GameTree, event: KGS.SGF.CHILDREN_REORDERED) {
-            let parent = tree.get(event.nodeId);
-            if (Utils.setEquals(parent.children, event.children, Utils.ComparisonFlags.Shallow)) {
-                parent.children = Utils.cloneArray(event.children, true);
-            }
-            else throw "Game Tree reordering children would alter the child set";
-        }
-
-        ACTIVATED(tree: GameTree, event: KGS.SGF.ACTIVATED) {
-            tree.activate(event.nodeId);
         }
     }
 }

@@ -17,6 +17,8 @@ namespace Models {
         playerBlack: string;
         challengeCreator: string;
 
+        actions: Models.GameActions;
+
         constructor(channelId: number) {
             super(channelId, ChannelType.Game);
         }
@@ -47,17 +49,7 @@ namespace Models {
                 if (this.mergeProposal(c.initialProposal)) touch = true;
             }
 
-            let pvt: boolean = (game.private)? true : false;
-            if (this.restrictedPrivate != pvt) { this.restrictedPrivate = pvt; touch = true; }
-
-            let plus: boolean = (game.subscribers)? true : false;
-            if (this.restrictedPlus != plus) { this.restrictedPlus = plus; touch = true; }
-
-            let phase: GamePhase = GamePhase.Active;
-            if (game.paused) phase = GamePhase.Paused;
-            if (game.adjourned) phase = GamePhase.Adjourned;
-            if (game.over) phase = GamePhase.Concluded;
-            if (this.phase != phase) { this.phase = phase; touch = true; }
+            if (this.mergeFlags(game)) touch = true;
 
             let playerWhite: string = ((game.players) && (game.players.white))? game.players.white.name : null;
             if (this.playerWhite != playerWhite) { this.playerWhite = playerWhite; touch = true; }
@@ -80,6 +72,24 @@ namespace Models {
             }
 
             if (this.name != name) { this.name = name; touch = true; }
+
+            return touch;
+        }
+
+        public mergeFlags(flags: KGS.GameFlags): boolean {
+            let touch: boolean = false;
+
+            let pvt: boolean = (flags.private)? true : false;
+            if (this.restrictedPrivate != pvt) { this.restrictedPrivate = pvt; touch = true; }
+
+            let plus: boolean = (flags.subscribers)? true : false;
+            if (this.restrictedPlus != plus) { this.restrictedPlus = plus; touch = true; }
+
+            let phase: GamePhase = GamePhase.Active;
+            if (flags.paused) phase = GamePhase.Paused;
+            if (flags.adjourned) phase = GamePhase.Adjourned;
+            if (flags.over) phase = GamePhase.Concluded;
+            if (this.phase != phase) { this.phase = phase; touch = true; }
 
             return touch;
         }
@@ -144,6 +154,56 @@ namespace Models {
             if (this.size == null) return "";
             let sz: string = this.size.toString();
             return sz + "×" + sz;
+        }
+
+        public clearActions(): boolean {
+            let touch: boolean = (this.actions)? true : false;
+            this.actions = 0;
+            return touch;
+        }
+
+        public enableAction(action: string | Models.GameActions) {
+            if (!action) return false;
+
+            let a: Models.GameActions = 0;
+            if (Utils.isString(action)) {
+                switch (<string>action) {
+                    case "MOVE": a = Models.GameActions.Move; break;
+                    case "EDIT": a = Models.GameActions.Edit; break;
+                    case "SCORE": a = Models.GameActions.Score; break;
+                    case "CHALLENGE_CREATE": a = Models.GameActions.ChallengeCreate; break;
+                    case "CHALLENGE_SETUP": a = Models.GameActions.ChallengeSetup; break;
+                    case "CHALLENGE_WAIT": a = Models.GameActions.ChallengeWait; break;
+                    case "CHALLENGE_ACCEPT": a = Models.GameActions.ChallengeAccept; break;
+                    case "CHALLENGE_SUBMITTED": a = Models.GameActions.ChallengeSubmitted; break;
+                    case "EDIT_DELAY": a = Models.GameActions.EditDelay; break;
+                    default: throw "Unknown or Unsupported Game Action: '" + action + "'";
+                }
+            }
+            else {
+                a = <Models.GameActions>action;
+            }
+
+            let union = ((this.actions)? this.actions : 0) | a;
+            if (union != this.actions) {
+                this.actions = union;
+                return true;
+            }
+            else return false;
+        }
+
+        public disableAction(action: Models.GameActions) {
+            if (!action) return false;
+            let removed = ((this.actions)? this.actions : 0) & ~action;
+            if (removed != this.actions) {
+                this.actions = removed;
+                return true;
+            }
+            else return false;
+        }
+
+        public hasAction(action: Models.GameActions): boolean {
+            return (this.actions)? ((this.actions & action) == action) : false;
         }
     }
 }

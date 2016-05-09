@@ -13,8 +13,7 @@ namespace KGS {
         public users: { [name: string]: Models.User };
         public get userNames(): string[] { return Object.keys(this.users); }
 
-        public games: DatabaseDictionary<Models.GameTree>;
-        public gameActions: { [channelId: number]: Models.GameActions };
+        public games: DatabaseDictionary<Models.GameState>;
     }
 
     class DatabaseInternal extends KGS.Database {
@@ -28,11 +27,8 @@ namespace KGS {
             this.joinedChannelIds = [];
 
             this.channels = {};
-
             this.users = {};
-
             this.games = {};
-            this.gameActions = {};
         }
 
         public _createChannel(digest: KGS.DataDigest, channelId: number, channelType: Models.ChannelType): Models.Channel {
@@ -98,18 +94,20 @@ namespace KGS {
             }
         }
 
-        public _createGameTree(digest: KGS.DataDigest, channelId: number): Models.GameTree {
-            let gameTree = this.games[channelId];
-            if (!gameTree) {
+        public _createGameState(digest: KGS.DataDigest, channelId: number): Models.GameState {
+            let gameState = this.games[channelId];
+            if (!gameState) {
                 let gameChannel = this._requireChannel(channelId, Models.ChannelType.Game) as Models.GameChannel;
-                if (gameChannel.size) gameTree = new Models.GameTree(gameChannel.size);
-                else gameTree = new Models.GameTree();
+                if (gameChannel.size) gameState = new Models.GameState(gameChannel.size);
+                else gameState = new Models.GameState(digest.perfstamp);
 
-                this.games[channelId] = gameTree;
+                this.games[channelId] = gameState;
                 digest.touchGameTree(channelId);
+                digest.touchGameClocks(channelId);
+                digest.touchGameActions(channelId);
             }
 
-            return gameTree;
+            return gameState;
         }
 
         public _unjoinChannel(digest: KGS.DataDigest, channelId: number, closeChannel: boolean) {
@@ -122,7 +120,6 @@ namespace KGS {
             }
 
             delete this.games[channelId];
-            delete this.gameActions[channelId];
         }
     }
 
@@ -181,6 +178,12 @@ namespace KGS {
             if (channel.mergeUsers(message.users)) digest.touchChannelUsers(message.channelId);
 
             this.GAME_UPDATE(digest, message);
+
+            if (message.clocks) {
+                let gameState = this._database._createGameState(digest, message.channelId);
+                gameState.mergeClockStates(digest.perfstamp, message.clocks.white, message.clocks.black);
+                digest.touchGameClocks(message.channelId);
+            }
         }
 
         public CHALLENGE_JOIN = (digest: KGS.DataDigest, message: KGS.Downstream.CHALLENGE_JOIN) => {
@@ -267,34 +270,30 @@ namespace KGS {
         }
 
         public GAME_STATE = (digest: KGS.DataDigest, message: KGS.Downstream.GAME_STATE) => {
-            let gameActions: Models.GameActions = 0;
+            let gameChannel = this._database._requireChannel(message.channelId, Models.ChannelType.Game) as Models.GameChannel;
+            if (gameChannel.mergeFlags(message)) digest.touchChannel(message.channelId);
+
+            if (message.clocks) {
+                let gameState = this._database._createGameState(digest, message.channelId);
+                gameState.mergeClockStates(digest.perfstamp, message.clocks.white, message.clocks.black);
+                digest.touchGameClocks(message.channelId);
+            }
+
+            let previousGameActions: number = gameChannel.actions;
+            gameChannel.clearActions();
             for (let i = 0; i < message.actions.length; ++i) {
                 let user = this._database._updateUser(digest, message.actions[i].user);
                 if (user.name == this._database.username) {
-                    switch (message.actions[i].action) {
-                        case "MOVE": gameActions |= Models.GameActions.Move; break;
-                        case "EDIT": gameActions |= Models.GameActions.Edit; break;
-                        case "SCORE": gameActions |= Models.GameActions.Score; break;
-                        case "CHALLENGE_CREATE": gameActions |= Models.GameActions.ChallengeCreate; break;
-                        case "CHALLENGE_SETUP": gameActions |= Models.GameActions.ChallengeSetup; break;
-                        case "CHALLENGE_WAIT": gameActions |= Models.GameActions.ChallengeWait; break;
-                        case "CHALLENGE_ACCEPT": gameActions |= Models.GameActions.ChallengeAccept; break;
-                        case "CHALLENGE_SUBMITTED": gameActions |= Models.GameActions.ChallengeSubmitted; break;
-                        case "EDIT_DELAY": gameActions |= Models.GameActions.EditDelay; break;
-                    }
+                    gameChannel.enableAction(message.actions[i].action);
                 }
             }
-
-            if (this._database.gameActions[message.channelId] != gameActions) {
-                this._database.gameActions[message.channelId] = gameActions;
-                digest.touchGameActions(message.channelId);
-            }
+            if (previousGameActions != gameChannel.actions) digest.touchGameActions(message.channelId);
         }
 
         public GAME_UPDATE = (digest: KGS.DataDigest, message: KGS.Downstream.GAME_UPDATE) => {
             if ((message.sgfEvents) && (message.sgfEvents.length > 0)) {
-                let gameTree = this._database._createGameTree(digest, message.channelId);
-                gameTree.processEvents(...message.sgfEvents);
+                let gameState = this._database._createGameState(digest, message.channelId);
+                gameState.processSGFEvents(digest.perfstamp, ...message.sgfEvents);
                 digest.touchGameTree(message.channelId);
             }
         }

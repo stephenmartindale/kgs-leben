@@ -1,6 +1,7 @@
 namespace KGS {
     export class DataDigest {
         public timestamp: Date = new Date();
+        public perfstamp: number = performance.now();
 
         public username: boolean = false;
         public joinedChannelIds: boolean = false;
@@ -25,6 +26,8 @@ namespace KGS {
 
         public gameTrees: { [channelId: number]: boolean } = {};
         public touchGameTree(channelId: number) { this.gameTrees[channelId] = true; }
+        public gameClocks: { [channelId: number]: boolean } = {};
+        public touchGameClocks(channelId: number) { this.gameClocks[channelId] = true; }
         public gameActions: { [channelId: number]: boolean } = {};
         public touchGameActions(channelId: number) { this.gameActions[channelId] = true; }
     }

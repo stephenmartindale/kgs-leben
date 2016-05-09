@@ -75,19 +75,18 @@ namespace Controllers {
                 proposalForm.komi = (gameChannel.proposal.rules.komi)? gameChannel.proposal.rules.komi : KGS.Constants.DefaultKomi;
             }
 
-            proposalForm.gameActions = this.database.gameActions[this.channelId];
+            proposalForm.gameActions = gameChannel.actions;
         }
 
         private submitProposal(proposalForm: Views.GameProposal) {
             let gameChannel = this.channel as Models.GameChannel;
-            let actions: number = this.database.gameActions[this.channelId];
             let messageType: string;
             let nigiri: boolean;
             let handicap: number;
             let komi: number;
             let players: KGS.UpstreamProposalPlayer[];
 
-            if ((actions & Models.GameActions.ChallengeAccept) == Models.GameActions.ChallengeAccept) {
+            if (gameChannel.hasAction(Models.GameActions.ChallengeAccept)) {
                 messageType = KGS.Upstream._CHALLENGE_ACCEPT;
                 nigiri = gameChannel.proposal.nigiri;
                 handicap = gameChannel.proposal.rules.handicap;
@@ -117,9 +116,8 @@ namespace Controllers {
                 ];
             }
 
-            actions |= Models.GameActions.ChallengeSubmitted;
-            this.database.gameActions[this.channelId] = actions;
-            proposalForm.gameActions = actions;
+            gameChannel.enableAction(Models.GameActions.ChallengeSubmitted);
+            proposalForm.gameActions = gameChannel.actions;
 
             let response: KGS.Upstream.ChallengeResponse = {
                 type: messageType,

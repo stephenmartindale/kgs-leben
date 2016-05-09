@@ -16,38 +16,72 @@ namespace Controllers {
 
         private initialiseBoard() {
             let gameChannel = this.channel as Models.GameChannel;
-            let board = (gameChannel.size)? new Views.GoBoard(gameChannel.size) : new Views.GoBoard();
+            let whiteUser = this.database.users[gameChannel.playerWhite];
+            let blackUser = this.database.users[gameChannel.playerBlack];
 
+            let awayUser: Models.User;
+            let homeUser: Models.User;
+            let homeColour: Models.GameStone;
+            if (gameChannel.playerWhite == this.database.username) {
+                homeColour = Models.GameStone.White;
+            }
+            else if (gameChannel.playerBlack == this.database.username) {
+                homeColour = Models.GameStone.Black;
+            }
+            else {
+                awayUser = this.database.users[gameChannel.playerWhite];
+                homeUser = this.database.users[gameChannel.playerBlack];
+                homeColour = Models.GameStone.Black;
+
+                if (Models.User.compare(homeUser, awayUser) > 0) {
+                    let temp = awayUser;
+                    awayUser = homeUser;
+                    homeUser = temp;
+                    homeColour = Models.GameStone.White;
+                }
+            }
+
+            let board = (gameChannel.size)? new Views.GoBoard(gameChannel.size) : new Views.GoBoard();
             board.playCallback = (x, y) => this.tryPlay(board, x, y);
 
             this.registerView(board, LayoutZone.Main, (digest?: KGS.DataDigest) => {
+                let gameState = this.database.games[this.channelId];
                 if ((digest == null) || (digest.gameTrees[this.channelId])) {
-                    let gameTree = this.database.games[this.channelId];
-                    if (!gameTree) {
+                    if ((!gameState) || (!gameState.tree)) {
                         board.clear();
                     }
                     else {
-                        board.update(gameTree.position);
+                        board.update(gameState.tree.position);
+                    }
+                }
+
+                if ((digest == null) || (digest.gameClocks[this.channelId])) {
+                    if (homeColour == Models.GameStone.White) {
+                        board.playerHome.clock.update(gameState.clockWhite);
+                        board.playerAway.clock.update(gameState.clockBlack);
+                    }
+                    else {
+                        board.playerHome.clock.update(gameState.clockBlack);
+                        board.playerAway.clock.update(gameState.clockWhite);
                     }
                 }
             });
         }
 
         private tryPlay(board: Views.GoBoard, x: number, y: number): boolean {
-            let actions = this.database.gameActions[this.channelId];
-            if ((actions & Models.GameActions.Move) != Models.GameActions.Move) {
+            let gameChannel = this.channel as Models.GameChannel;
+            if (!gameChannel.hasAction(Models.GameActions.Move)) {
                 console.log("move action not available");
                 return false;
             }
 
-            let gameTree = this.database.games[this.channelId];
-            if (!gameTree) return;
+            let gameState = this.database.games[this.channelId];
+            if ((!gameState) || (!gameState.tree)) return;
 
-            let r = gameTree.tryPlay(x, y);
+            let r = gameState.tree.tryPlay(x, y);
             switch (r as Models.GameMoveError) {
                 case Models.GameMoveError.Success:
-                    actions &= ~Models.GameActions.Move;
-                    this.database.gameActions[this.channelId] = actions;
+                    gameChannel.disableAction(Models.GameActions.Move);
                     this.client.post(<KGS.Upstream.GAME_MOVE>{
                         type: KGS.Upstream._GAME_MOVE,
                         channelId: this.channelId,

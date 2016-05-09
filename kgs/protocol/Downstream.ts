@@ -153,8 +153,20 @@ namespace KGS {
             gameId: number
         }
 
+        export interface ClockState {
+            paused?: boolean;       // If present, the clock has been paused, e.g. because the player has left the game.
+            running?: boolean;      // If present, the clock is running. A clock is only running when it is the turn of the player who owns this clock.
+            time: number;           // The seconds left in the current period of the clock.
+            periodsLeft?: number;   // Only present for Japanese byo-yomi clocks. The number of periods left on the clock.
+            stonesLeft?: number;    // Only present for Canadian clocks. The number of stones left in the current period.
+        }
+
         export const _GAME_STATE: string = "GAME_STATE";
         export interface GAME_STATE extends ChannelMessage, GameFlags {
+            clocks?: {
+                black?: ClockState,
+                white?: ClockState
+            },
             actions: {
                 user: KGS.User,
                 action: "MOVE" | "EDIT" | "SCORE" | "CHALLENGE_CREATE" | "CHALLENGE_SETUP" | "CHALLENGE_WAIT" | "CHALLENGE_ACCEPT" | "CHALLENGE_SUBMITTED" | "EDIT_DELAY"
