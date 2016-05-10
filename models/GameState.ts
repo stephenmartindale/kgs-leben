@@ -29,8 +29,8 @@ namespace Models {
         }
 
         private sgfSetRules(perfstamp: number, rules: KGS.SGF.RULES) {
-            this.clockWhite.setRules(perfstamp, rules);
-            this.clockBlack.setRules(perfstamp, rules);
+            this.clockWhite.rules = rules;
+            this.clockBlack.rules = rules;
         }
 
         private sgfAffectsPosition(propName: string): boolean {

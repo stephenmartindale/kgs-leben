@@ -15,3 +15,7 @@
     float: right;
     margin-right: 7px;
 }
+
+.go-clock.expired .lcd-clock .lcd-clock-separator svg, .go-clock.expired svg .segment-on {
+    fill: $brand-warning;
+}
