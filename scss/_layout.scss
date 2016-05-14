@@ -9,7 +9,7 @@
     flex-direction: column;
     left: auto;
     width: 33%;
-    z-index: 2;
+    z-index: $zindex-sidebar;
     background-color: $gray-lighter;
 }
 #sidebar > div {

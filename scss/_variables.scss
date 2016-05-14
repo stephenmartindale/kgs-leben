@@ -20,6 +20,12 @@ $go-stone-diameter:         22mm;
 $go-board-size-min:         9;
 $go-board-size-max:         19;
 
+// View Parameters
+$view-go-clock-segment-off: darken($gray-dark, 2%);
+$view-go-clock-segment-on:  $gray-lightest;
+$view-go-clock-width:       240px;
+$view-go-clock-height:      86px;
+
 // Bootstrap Options (4.0.0-alpha.2)
 //
 // Quickly modify global styling by enabling or disabling optional features.

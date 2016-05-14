@@ -48,7 +48,7 @@ namespace Controllers {
 
         public hideLightbox() {
             if (this._lightbox) {
-                this._lightbox.hide();
+                this._lightbox.hideLightbox();
                 this._lightbox = null;
             }
         }

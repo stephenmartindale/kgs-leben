@@ -1,6 +1,6 @@
+/// <reference path="../View.ts" />
 namespace Views {
-    export class ChatForm implements Views.View<HTMLDivElement> {
-        private _div: HTMLDivElement;
+    export class ChatForm extends Views.View<HTMLDivElement> {
         private _messageList: Views.ChatMessageList;
         private _memberList: Views.ChatMemberList;
         private _form: HTMLFormElement;
@@ -9,11 +9,10 @@ namespace Views {
         public submitCallback: (form: ChatForm) => void;
 
         constructor() {
-            this._div = document.createElement('div');
-            this._div.className = 'chat-form';
+            super(Templates.createDiv('chat-form'));
 
             let wrapper = document.createElement('div');
-            this._div.appendChild(wrapper);
+            this.root.appendChild(wrapper);
 
             this._messageList = new Views.ChatMessageList();
             this._messageList.attach(wrapper);
@@ -28,19 +27,18 @@ namespace Views {
             this._inputMessage.autocomplete = 'off';
             this._form.appendChild(this._inputMessage);
 
-            this._div.appendChild(this._form);
+            this.root.appendChild(this._form);
             $(this._form).submit((e) => this.onFormSubmit(e));
-        }
-
-        public attach(parent: HTMLElement): void {
-            parent.appendChild(this._div);
         }
 
         public activate(): void {
             this._messageList.activate();
             this._memberList.activate();
+            super.activate();
         }
+
         public deactivate(): void {
+            super.deactivate();
             this._messageList.deactivate();
             this._memberList.deactivate();
         }

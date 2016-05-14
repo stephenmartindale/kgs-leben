@@ -1,8 +1,8 @@
+/// <reference path="../View.ts" />
 namespace Views {
-    export class SignInForm implements Views.View<HTMLFormElement> {
+    export class SignInForm extends Views.View<HTMLFormElement> {
         private _disabled: boolean;
 
-        private _form: HTMLFormElement;
         private _errorNotice: HTMLParagraphElement;
         private _inputUsername: HTMLInputElement;
         private _inputPassword: HTMLInputElement;
@@ -13,27 +13,19 @@ namespace Views {
         public submitCallback: (form: SignInForm) => void;
 
         constructor() {
-            this._form = Views.Templates.cloneTemplate('sign-in-form') as HTMLFormElement;
-            this._errorNotice = this._form.querySelector('.error-notice') as HTMLParagraphElement;
-            this._inputUsername = this._form.querySelector('input[name="username"]') as HTMLInputElement;
-            this._inputPassword = this._form.querySelector('input[name="password"]') as HTMLInputElement;
-            this._inputRememberMe = this._form.querySelector('input[name="remember-me"]') as HTMLInputElement;
-            this._inputRememberMeNotice = this._form.querySelector('.remember-me-warning') as HTMLParagraphElement;
-            this._submitButton = this._form.querySelector('button[type="submit"]') as HTMLButtonElement;
+            super(Views.Templates.cloneTemplate<HTMLFormElement>('sign-in-form'));
+
+            this._errorNotice = this.root.querySelector('.error-notice') as HTMLParagraphElement;
+            this._inputUsername = this.root.querySelector('input[name="username"]') as HTMLInputElement;
+            this._inputPassword = this.root.querySelector('input[name="password"]') as HTMLInputElement;
+            this._inputRememberMe = this.root.querySelector('input[name="remember-me"]') as HTMLInputElement;
+            this._inputRememberMeNotice = this.root.querySelector('.remember-me-warning') as HTMLParagraphElement;
+            this._submitButton = this.root.querySelector('button[type="submit"]') as HTMLButtonElement;
 
             $(this._inputRememberMe).click((e) => this.onRememberMeClick(e));
-            $(this._form).submit((e) => this.onFormSubmit(e));
+            $(this.root).submit((e) => this.onFormSubmit(e));
 
             this._disabled = false;
-        }
-
-        public attach(parent: HTMLElement): void {
-            parent.appendChild(this._form);
-        }
-
-        public activate(): void {
-        }
-        public deactivate(): void {
         }
 
         get disabled(): boolean {

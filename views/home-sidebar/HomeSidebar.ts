@@ -1,18 +1,8 @@
+/// <reference path="../View.ts" />
 namespace Views {
-    export class HomeSidebar implements Views.View<HTMLDivElement> {
-        private _div: HTMLDivElement;
-
+    export class HomeSidebar extends Views.View<HTMLDivElement> {
         constructor() {
-            this._div = Views.Templates.cloneTemplate('home-sidebar') as HTMLDivElement;
-        }
-
-        public attach(parent: HTMLElement): void {
-            parent.appendChild(this._div);
-        }
-
-        public activate(): void {
-        }
-        public deactivate(): void {
+            super(Views.Templates.cloneTemplate<HTMLDivElement>('home-sidebar'));
         }
     }
 }

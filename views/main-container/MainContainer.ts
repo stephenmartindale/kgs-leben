@@ -1,28 +1,32 @@
+/// <reference path="../View.ts" />
 namespace Views {
-    export class MainContainer implements Views.View<HTMLDivElement> {
-        private _div: HTMLDivElement;
+    export class MainContainer extends Views.View<HTMLDivElement> {
         private _view: Views.View<any>;
+        private _attached: boolean;
 
         constructor(view: Views.View<any>) {
+            super(Templates.createDiv('main-container'));
+
             this._view = view;
         }
 
-        public attach(parent: HTMLElement): void {
-            if (!this._div) {
-                this._div = document.createElement('div');
-                this._div.className = 'main-container';
-                parent.appendChild(this._div);
+        public attach(parent: HTMLElement, insertBefore?: boolean | Element): void {
+            super.attach(parent, insertBefore);
 
-                this._view.attach(this._div);
+            if ((!this._attached) && (this._view != null)) {
+                this._view.attach(this.root);
+                this._attached = true;
             }
-            else parent.appendChild(this._div);
         }
 
         public activate(): void {
-            this._view.activate();
+            if (this._view != null) this._view.activate();
+            super.activate();
         }
+
         public deactivate(): void {
-            this._view.deactivate();
+            super.deactivate();
+            if (this._view != null) this._view.deactivate();
         }
     }
 }

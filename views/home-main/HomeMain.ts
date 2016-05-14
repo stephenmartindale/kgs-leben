@@ -1,27 +1,18 @@
+/// <reference path="../View.ts" />
 namespace Views {
-    export class HomeMain implements Views.View<HTMLDivElement> {
-        private _div: HTMLDivElement;
-
+    export class HomeMain extends Views.View<HTMLDivElement> {
         private _avatar: HTMLImageElement;
         private _username: HTMLSpanElement;
         private _rank: HTMLSpanElement;
 
         constructor() {
-            this._div = Views.Templates.cloneTemplate('home-main') as HTMLDivElement;
+            super(Views.Templates.cloneTemplate<HTMLDivElement>('home-main'));
 
-            this._avatar = this._div.querySelector('img.avatar') as HTMLImageElement;
+            this._avatar = this.root.querySelector('img.avatar') as HTMLImageElement;
 
-            let nameSpans = this._div.querySelectorAll('p.name span');
+            let nameSpans = this.root.querySelectorAll('p.name span');
             this._username = nameSpans[0] as HTMLSpanElement;
             this._rank = nameSpans[1] as HTMLSpanElement;
-        }
-
-        public attach(parent: HTMLElement): void {
-            parent.appendChild(this._div);
-        }
-        public activate(): void {
-        }
-        public deactivate(): void {
         }
 
         public update(user: Models.User) {

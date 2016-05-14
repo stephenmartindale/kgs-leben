@@ -1,12 +1,12 @@
+/// <reference path="../View.ts" />
 namespace Views {
-    export class GoClock implements Views.View<HTMLDivElement> {
-        private _div: HTMLDivElement;
+    export class GoClock extends Views.View<HTMLDivElement> {
         private _clock: Views.LCDClock;
         private _overtimeNumber: Views.LCDDisplay;
         private _overtimeCounter: Views.LCDCounter;
 
         private _data: Models.GameClock;
-        private _rules: KGS.SGF.RULES;
+        private _rules: Models.GameRules;
         private _expired: boolean;
         private _hidden: boolean;
 
@@ -15,21 +15,16 @@ namespace Views {
         private _timeoutHandle: number;
 
         constructor() {
-            this._div = document.createElement('div');
-            this._div.className = 'go-clock';
+            super(Templates.createDiv('go-clock'));
 
             this._clock = new Views.LCDClock();
-            this._clock.attach(this._div);
+            this._clock.attach(this.root);
 
             this._overtimeNumber = new Views.LCDDisplay(2, 0, false, true);
-            this._overtimeNumber.attach(this._div);
+            this._overtimeNumber.attach(this.root);
 
             this._overtimeCounter = new Views.LCDCounter(25);
-            this._overtimeCounter.attach(this._div);
-        }
-
-        public attach(parent: HTMLElement): void {
-            parent.appendChild(this._div);
+            this._overtimeCounter.attach(this.root);
         }
 
         public activate(): void {
@@ -40,8 +35,12 @@ namespace Views {
             if (this._timeoutHandle == null) {
                 this.restoreTimeout();
             }
+
+            super.activate();
         }
         public deactivate(): void {
+            super.deactivate();
+
             this.clearTimeout();
 
             this._overtimeCounter.deactivate();
@@ -63,7 +62,7 @@ namespace Views {
         }
 
         public update(data: Models.GameClock) {
-            if ((data) && (data.rules) && (data.rules.timeSystem) && (data.rules.timeSystem != KGS.Constants.TimeSystems.None)) {
+            if ((data) && (data.rules) && (data.rules.timeSystem != Models.TimeSystem.None)) {
                 // Register a Timeout of the clock is running
                 let clockState = data.now();
                 if (clockState.running) {
@@ -77,22 +76,15 @@ namespace Views {
 
                 if (this._rules != data.rules) {
                     // Show or hide the Overtime Counters
-                    let maxOvertimes: number;
-                    switch (data.rules.timeSystem) {
-                        case KGS.Constants.TimeSystems.Japanese: maxOvertimes = data.rules.byoYomiPeriods; break;
-                        case KGS.Constants.TimeSystems.Canadian: maxOvertimes = data.rules.byoYomiStones; break;
-                        default: maxOvertimes = 0;
-                    }
-
-                    if ((maxOvertimes) && (maxOvertimes > 0) && (maxOvertimes <= 30)) {
-                        this._overtimeCounter.setMaximum(maxOvertimes, (maxOvertimes <= 15)? 1 : 2);
+                    if ((data.rules.byoYomiMaximum) && (data.rules.byoYomiMaximum <= 30)) {
+                        this._overtimeCounter.setMaximum(data.rules.byoYomiMaximum, (data.rules.byoYomiMaximum <= 15)? 1 : 2);
                         this._overtimeCounter.show();
                     }
                     else {
                         this._overtimeCounter.hide();
                     }
 
-                    if ((maxOvertimes) && (maxOvertimes)) {
+                    if (data.rules.byoYomiMaximum) {
                         this._overtimeNumber.show();
                     }
                     else {
@@ -108,7 +100,7 @@ namespace Views {
                     this._clock.update(clockState.time, clockState.running);
 
                     if (this._expired) {
-                        this._div.classList.remove('expired');
+                        this.root.classList.remove('expired');
                         this._expired = false;
                     }
                 }
@@ -118,21 +110,21 @@ namespace Views {
                     this._overtimeNumber.value = overtimeValue;
                     this._clock.update(0, false);
                     if (!this._expired) {
-                        this._div.classList.add('expired');
+                        this.root.classList.add('expired');
                         this._expired = true;
                     }
                 }
 
                 // Show the clock if it was previously hidden
                 if (this._hidden) {
-                    this._div.classList.remove('hidden');
+                    this.root.classList.remove('hidden');
                     this._hidden = false;
                 }
             }
             else {
                 // Clear Timeout and Hide the clock
                 this.clearTimeout();
-                if (!this._hidden) this._div.classList.add('hidden');
+                if (!this._hidden) this.root.classList.add('hidden');
                 this._data = null;
                 this._hidden = true;
             }

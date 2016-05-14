@@ -56,4 +56,13 @@ namespace Utils {
     export function isArray(o: any): boolean {
         return (o.constructor === Array);
     }
+
+    export function isNode(o: any, nodeType?: number): boolean {
+        if ((typeof o !== _object) || ((<Node>o).nodeName === undefined)) return false;
+        return (nodeType == null)? (typeof (<Node>o).nodeType === _number) : ((<Node>o).nodeType === nodeType);
+    }
+
+    export function isElement(o: any): boolean {
+        return isNode(o, 1);
+    }
 }

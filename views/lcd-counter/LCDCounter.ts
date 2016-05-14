@@ -1,41 +1,28 @@
+/// <reference path="../View.ts" />
 namespace Views {
-    export class LCDCounter implements Views.View<HTMLDivElement> {
+    export class LCDCounter extends Views.View<HTMLDivElement> {
         private _dots: number = 5;
         private _maximum: number;
         private _rows: number;
 
-        private _div: HTMLDivElement;
         private _value: number;
 
         constructor(maximum?: number, rows?: number) {
-            this._div = document.createElement('div');
-            this._div.className = 'lcd-counter';
+            super(Templates.createDiv('lcd-counter'));
 
             this.setMaximum(maximum || 10, rows || 2, true);
             this._value = 0;
         }
 
-        public attach(parent: HTMLElement): void {
-            parent.appendChild(this._div);
-        }
-
         public activate(): void {
             this.updateVectors();
-        }
-        public deactivate(): void {
-        }
-
-        public hide() {
-            this._div.classList.add('hidden');
-        }
-        public show() {
-            this._div.classList.remove('hidden');
+            super.activate();
         }
 
         public setMaximum(maximum: number, rows?: number, suppressUpdate?: boolean) {
             rows = (rows != null)? rows : this._rows;
             if ((this._maximum != maximum) || (this._rows != rows)) {
-                $(this._div).empty();
+                $(this.root).empty();
 
                 this._maximum = maximum;
                 this._rows = rows;
@@ -45,7 +32,7 @@ namespace Views {
                 for (let j = 0; j < this._maximum; j += this._dots) {
                     if ((j % rowModulus) == 0) {
                         group = document.createElement('div');
-                        this._div.appendChild(group);
+                        this.root.appendChild(group);
                     }
 
                     group.appendChild(Views.Templates.cloneTemplate('lcd-counter'));
@@ -57,10 +44,10 @@ namespace Views {
 
         private updateVectors() {
             let value: number = (this._value != null)? this._value : 0;
-            let childCount = this._div.childElementCount;
+            let childCount = this.root.childElementCount;
             let offset = 0;
             for (let j = 0; j < childCount; ++j) {
-                let div = this._div.children[j] as HTMLDivElement;
+                let div = this.root.children[j] as HTMLDivElement;
                 let grandchildCount = div.childElementCount;
                 for (let i = 0; i < grandchildCount; ++i) {
                     let svg = div.children[i] as SVGElement;

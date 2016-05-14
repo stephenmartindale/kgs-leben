@@ -1,19 +1,22 @@
-.lcd-clock {
+.lcd-clock, .lcd-clock .lcd-clock-separator {
     display: inline-block;
 }
-
 .lcd-clock .lcd-clock-separator {
-    @extend .lcd-display;
+    position: relative;
+    overflow: hidden;
 }
 
 .lcd-clock .lcd-clock-separator svg {
-    fill: currentColor;
+    height: 3rem;
+    stroke-width: 0;
+    fill: $view-go-clock-segment-on;
 }
+
 .lcd-clock.running .lcd-clock-separator svg {
-    fill: inherit;
+    fill: $view-go-clock-segment-off;
     animation: lcd-clock-separator-blink 1s steps(1, start) infinite;
 }
 @keyframes lcd-clock-separator-blink {
-    0% { fill: inherit; }
-    50% { fill: currentColor; }
+    0% { fill: $view-go-clock-segment-off; }
+    50% { fill: $view-go-clock-segment-on; }
 }

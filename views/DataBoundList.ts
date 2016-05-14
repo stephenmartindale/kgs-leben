@@ -1,32 +1,21 @@
+/// <reference path="View.ts" />
 namespace Views {
-    export abstract class DataBoundList<T, C extends HTMLElement, E extends HTMLElement> implements Views.View<C> {
-        protected container: C;
-
+    export abstract class DataBoundList<T, C extends HTMLElement, E extends HTMLElement> extends Views.View<C> {
         private _initialised: boolean;
         private _keys: string[];
 
         constructor(container: C) {
-            this.container = container;
+            super(container);
             this._initialised = false;
             this._keys = [];
         }
 
-        public attach(parent: HTMLElement): void {
-            parent.appendChild(this.container);
-        }
-
-        public activate(): void {
-        }
-
-        public deactivate(): void {
-        }
-
         private initialise() {
-            if ((!this._initialised) && (this.container.childElementCount > 0)) {
-                Utils.log(Utils.LogSeverity.Warning, "Data Bound List: " + this.container.childElementCount.toString() + " alien element(s) removed");
+            if ((!this._initialised) && (this.root.childElementCount > 0)) {
+                Utils.log(Utils.LogSeverity.Warning, "Data Bound List: " + this.root.childElementCount.toString() + " alien element(s) removed");
             }
 
-            $(this.container).empty();
+            $(this.root).empty();
             this._initialised = true;
         }
 
@@ -74,7 +63,7 @@ namespace Views {
 
                     ++oldCount;
                 }
-                else $(this.container.children[oldCount]).remove();
+                else $(this.root.children[oldCount]).remove();
             }
 
             oldKeys.length = oldCount;
@@ -86,19 +75,19 @@ namespace Views {
                 let datum: T = source(k);
                 let idx: number = oldIndex[k];
                 if (null == idx) {
-                    this.container.insertBefore(this.createChild(k, datum), this.container.children[i]);
+                    this.root.insertBefore(this.createChild(k, datum), this.root.children[i]);
                     ++created;
                 }
                 else {
-                    let child: Element = this.container.children[idx + created];
+                    let child: Element = this.root.children[idx + created];
                     if ((idx + created) > i) {
                         let right: Node = child.nextSibling;
-                        let left: Node = this.container.children[i];
+                        let left: Node = this.root.children[i];
                         let leftKey: string = oldKeys[i - created];
 
-                        this.container.insertBefore(child, left);
+                        this.root.insertBefore(child, left);
                         if ((idx + created) > (i + 1)) {
-                            this.container.insertBefore(left, right);
+                            this.root.insertBefore(left, right);
                         }
 
                         oldKeys[idx] = leftKey;
@@ -131,24 +120,24 @@ namespace Views {
             if (!this.beginBind(dataCount)) return;
 
             // Process data
-            let oldCount: number = Math.min(this._keys.length, this.container.childElementCount);
+            let oldCount: number = Math.min(this._keys.length, this.root.childElementCount);
             for (let i = 0; i < dataCount; ++i) {
                 let k: string = i.toString();
                 let datum: T = data[i];
                 if (i < oldCount) {
-                    let child: Element = this.container.children[i];
+                    let child: Element = this.root.children[i];
                     this.updateChild(k, datum, child as E);
                 }
                 else {
                     let child: Element = this.createChild(k, datum);
-                    this.container.appendChild(child);
+                    this.root.appendChild(child);
                     this._keys[i] = k;
                 }
             }
 
             // Remove old elements
             for (let j = (oldCount - 1); j >= dataCount; --j) {
-                $(this.container.children[j]).remove();
+                $(this.root.children[j]).remove();
             }
 
             // Truncate key array

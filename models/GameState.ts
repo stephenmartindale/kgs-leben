@@ -1,6 +1,7 @@
 namespace Models {
     export class GameState {
         public tree: Models.GameTree;
+        public rules: Models.GameRules;
         public clockWhite: Models.GameClock;
         public clockBlack: Models.GameClock;
 
@@ -28,9 +29,12 @@ namespace Models {
             }
         }
 
-        private sgfSetRules(perfstamp: number, rules: KGS.SGF.RULES) {
-            this.clockWhite.rules = rules;
-            this.clockBlack.rules = rules;
+        private setRules(rules: KGS.SGF.RULES) {
+            if (!this.rules) this.rules = new Models.GameRules(rules);
+            else this.rules.setRules(rules);
+
+            this.clockWhite.rules = this.rules;
+            this.clockBlack.rules = this.rules;
         }
 
         private sgfAffectsPosition(propName: string): boolean {
@@ -41,7 +45,7 @@ namespace Models {
         private sgfPropAdded(perfstamp: number, event: KGS.SGF.PROP_ADDED) {
             let node = this.tree.get(event.nodeId);
             node.addProperty(event.prop);
-            if (event.prop.name == KGS.SGF._RULES) this.sgfSetRules(perfstamp, event.prop as KGS.SGF.RULES);
+            if (event.prop.name == KGS.SGF._RULES) this.setRules(event.prop as KGS.SGF.RULES);
             if (this.sgfAffectsPosition(event.prop.name)) this.tree.refreshPosition(event.nodeId);
         }
         private sgfPropRemoved(perfstamp: number, event: KGS.SGF.PROP_REMOVED) {
@@ -51,7 +55,7 @@ namespace Models {
         private sgfPropChanged(perfstamp: number, event: KGS.SGF.PROP_CHANGED) {
             let node = this.tree.get(event.nodeId);
             node.setProperty(event.prop);
-            if (event.prop.name == KGS.SGF._RULES) this.sgfSetRules(perfstamp, event.prop as KGS.SGF.RULES);
+            if (event.prop.name == KGS.SGF._RULES) this.setRules(event.prop as KGS.SGF.RULES);
             if (this.sgfAffectsPosition(event.prop.name)) this.tree.refreshPosition(event.nodeId);
         }
         private sgfPropGroupAdded(perfstamp: number, event: KGS.SGF.PROP_GROUP_ADDED) {
@@ -59,7 +63,7 @@ namespace Models {
             let refreshPosition: boolean = false;
             for (let i = 0; i < event.props.length; ++i) {
                 node.addProperty(event.props[i]);
-                if (event.props[i].name == KGS.SGF._RULES) this.sgfSetRules(perfstamp, event.props[i] as KGS.SGF.RULES);
+                if (event.props[i].name == KGS.SGF._RULES) this.setRules(event.props[i] as KGS.SGF.RULES);
                 if (this.sgfAffectsPosition(event.props[i].name)) refreshPosition = true;
             }
 

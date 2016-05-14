@@ -48,3 +48,13 @@
 .bg-inverse .secondary {
     color: $gray-light;
 }
+
+.table {
+    display: table;
+}
+.table > * {
+    display: table-row;
+}
+.table > * > * {
+    display: table-cell;
+}

@@ -38,7 +38,7 @@ namespace Views {
             return lightbox;
         }
 
-        public hide() {
+        public hideLightbox() {
             this._view.deactivate();
 
             let lightbox = $(this._lightbox);

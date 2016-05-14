@@ -1,5 +1,7 @@
+/// <reference path="../View.ts" />
 namespace Views {
-    export class GoBoard implements Views.View<HTMLDivElement> {
+    export class GoBoard extends Views.View<HTMLDivElement> {
+        private static _defaultSize: number = 19;
         private _size: number;
         private _maxWidth: number;
         private _playerMinWidth: number;
@@ -7,11 +9,9 @@ namespace Views {
         private _debounceWidth: number = 28;
         private _layoutPortrait: boolean;
 
-        private _parent: HTMLElement;
         private _root: JQuery;
         private _goban: JQuery;
 
-        private _activated: boolean;
         private _board: WGo.Board;
         private _position: Models.GamePosition;
 
@@ -21,53 +21,46 @@ namespace Views {
         public playCallback: (x: number, y: number) => void;
 
         constructor(size?: number) {
-            this._size = size || 19;
-
-            let root = document.createElement('div');
-            root.className = "go-board go-" + this._size.toString();
+            super(Templates.createDiv("go-board go-" + (size || GoBoard._defaultSize).toString()));
+            this._size = (size || GoBoard._defaultSize);
 
             let teamAway = document.createElement('div');
             teamAway.className = "team-away";
-            root.appendChild(teamAway);
-            this.playerAway = new Views.GoBoardPlayer();
+            this.root.appendChild(teamAway);
+            this.playerAway = new Views.GoBoardPlayer(Models.PlayerTeam.Away);
             this.playerAway.attach(teamAway);
 
             let goban = document.createElement('div');
             goban.className = "goban";
-            root.appendChild(goban);
+            this.root.appendChild(goban);
             this._board = new WGo.Board(goban, { size: this._size, background: '/img/wood.jpg' });
 
             let teamHome = document.createElement('div');
             teamHome.className = "team-home";
-            root.appendChild(teamHome);
-            this.playerHome = new Views.GoBoardPlayer();
+            this.root.appendChild(teamHome);
+            this.playerHome = new Views.GoBoardPlayer(Models.PlayerTeam.Home);
             this.playerHome.attach(teamHome);
 
-            this._root = $(root);
+            this._root = $(this.root);
             this._goban = $(goban);
-        }
-
-        public attach(parent: HTMLElement): void {
-            this._parent = parent;
-            parent.appendChild(this._root[0]);
         }
 
         public activate(): void {
             this.optimiseBoard();
             window.addEventListener("resize", this._onResize);
             this._board.addEventListener("click", this._onBoardClick);
-            this._activated = true;
 
             this.playerHome.activate();
             this.playerAway.activate();
+            super.activate();
         }
         public deactivate(): void {
-            this._activated = false;
+            super.deactivate();
             this._board.removeEventListener("click", this._onBoardClick);
             window.removeEventListener("resize", this._onResize);
 
-            this.playerHome.deactivate();
             this.playerAway.deactivate();
+            this.playerHome.deactivate();
         }
 
         private optimiseBoard() {
@@ -115,11 +108,12 @@ namespace Views {
         }
 
         private calculateBoardWidth(portrait: boolean): number {
-            let x = this._parent.offsetWidth;
+            let parent: HTMLElement = this.parent;
+            let x = parent.offsetWidth;
             if (!portrait) x -= 2 * this._playerMinWidth;
             if (x > this._maxWidth) x = this._maxWidth;
 
-            let y = this._parent.offsetHeight;
+            let y = parent.offsetHeight;
             if (portrait) y -= 2 * this._playerMinHeight;
             if (y > this._maxWidth) y = this._maxWidth;
 
@@ -127,11 +121,11 @@ namespace Views {
         }
 
         private _onResize = (e: UIEvent) => {
-            if (this._activated) this.optimiseBoard();
+            this.optimiseBoard();
         }
 
         private _onBoardClick = (x: number, y: number) => {
-            if ((this._activated) && (this.playCallback)) this.playCallback(x, y);
+            if (this.playCallback) this.playCallback(x, y);
         }
 
         public get size() {
@@ -160,7 +154,7 @@ namespace Views {
                 if (this._size != position.size) {
                     this._size = position.size;
                     this._board.setSize(position.size);
-                    if (this._activated) {
+                    if (this.activated) {
                         this.optimiseBoard();
                     }
 

@@ -99,6 +99,12 @@ namespace KGS {
         export const _TIMELEFT: string = "TIMELEFT";
         export interface TIMELEFT extends ColourProperty, FloatProperty {}
 
+        export const _DONESCORING: string = "DONESCORING";
+        export interface DONESCORING extends Property {
+            white: boolean;
+            black: boolean;
+        }
+
         export interface NodeEvent {
             type: string,
             nodeId: number

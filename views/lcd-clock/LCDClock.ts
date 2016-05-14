@@ -1,6 +1,6 @@
+/// <reference path="../View.ts" />
 namespace Views {
-    export class LCDClock implements Views.View<HTMLDivElement> {
-        private _div: HTMLDivElement;
+    export class LCDClock extends Views.View<HTMLDivElement> {
         private _minutes: Views.LCDDisplay;
         private _seconds: Views.LCDDisplay;
 
@@ -8,28 +8,25 @@ namespace Views {
         private _running: boolean;
 
         constructor() {
-            this._div = document.createElement('div');
-            this._div.className = 'lcd-clock';
+            super(Templates.createDiv('lcd-clock'));
 
             this._minutes = new Views.LCDDisplay(2, 0, false, true);
-            this._minutes.attach(this._div);
+            this._minutes.attach(this.root);
 
-            this._div.appendChild(Views.Templates.cloneTemplate('lcd-clock'));
+            this.root.appendChild(Views.Templates.cloneTemplate('lcd-clock'));
 
             this._seconds = new Views.LCDDisplay(2, 0, false, true, true);
-            this._seconds.attach(this._div);
-        }
-
-        public attach(parent: HTMLElement): void {
-            parent.appendChild(this._div);
+            this._seconds.attach(this.root);
         }
 
         public activate(): void {
             this._minutes.activate();
             this._seconds.activate();
+            super.activate();
         }
 
         public deactivate(): void {
+            super.deactivate();
             this._seconds.deactivate();
             this._minutes.deactivate();
         }
@@ -54,8 +51,8 @@ namespace Views {
 
             running = (running)? true : false;
             if (this._running != running) {
-                if (running) this._div.classList.add('running');
-                else this._div.classList.remove('running');
+                if (running) this.root.classList.add('running');
+                else this.root.classList.remove('running');
 
                 this._running = running;
             }

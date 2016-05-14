@@ -25,14 +25,22 @@
     min-height: 0;
     overflow: hidden;
 }
-.go-board > div > div {
+
+.go-board .team-home > div, .go-board .team-away > div {
     @extend .block-absolute;
+    overflow: hidden;
+}
+.go-board.landscape .team-away > div {
     left: auto;
     bottom: auto;
 }
-.go-board.landscape .team-home > div, .go-board.portrait .team-away > div {
+.go-board.landscape .team-home > div {
     top: auto;
-    bottom: 0;
-    left: 0;
     right: auto;
+}
+.go-board.portrait .team-away > div {
+    top: auto;
+}
+.go-board.portrait .team-home > div {
+    bottom: auto;
 }

@@ -2,6 +2,8 @@
 
 namespace Controllers {
     export class GameChannel extends ChannelBase {
+        private _board: Views.GoBoard;
+
         constructor(parent: ChannelController, channelId: number) {
             super(parent, channelId);
 
@@ -16,59 +18,52 @@ namespace Controllers {
 
         private initialiseBoard() {
             let gameChannel = this.channel as Models.GameChannel;
-            let whiteUser = this.database.users[gameChannel.playerWhite];
-            let blackUser = this.database.users[gameChannel.playerBlack];
-
-            let awayUser: Models.User;
-            let homeUser: Models.User;
-            let homeColour: Models.GameStone;
-            if (gameChannel.playerWhite == this.database.username) {
-                homeColour = Models.GameStone.White;
-            }
-            else if (gameChannel.playerBlack == this.database.username) {
-                homeColour = Models.GameStone.Black;
-            }
-            else {
-                awayUser = this.database.users[gameChannel.playerWhite];
-                homeUser = this.database.users[gameChannel.playerBlack];
-                homeColour = Models.GameStone.Black;
-
-                if (Models.User.compare(homeUser, awayUser) > 0) {
-                    let temp = awayUser;
-                    awayUser = homeUser;
-                    homeUser = temp;
-                    homeColour = Models.GameStone.White;
-                }
-            }
-
-            let board = (gameChannel.size)? new Views.GoBoard(gameChannel.size) : new Views.GoBoard();
-            board.playCallback = (x, y) => this.tryPlay(board, x, y);
-
-            this.registerView(board, LayoutZone.Main, (digest?: KGS.DataDigest) => {
-                let gameState = this.database.games[this.channelId];
-                if ((digest == null) || (digest.gameTrees[this.channelId])) {
-                    if ((!gameState) || (!gameState.tree)) {
-                        board.clear();
-                    }
-                    else {
-                        board.update(gameState.tree.position);
-                    }
-                }
-
-                if ((digest == null) || (digest.gameClocks[this.channelId])) {
-                    if (homeColour == Models.GameStone.White) {
-                        board.playerHome.clock.update(gameState.clockWhite);
-                        board.playerAway.clock.update(gameState.clockBlack);
-                    }
-                    else {
-                        board.playerHome.clock.update(gameState.clockBlack);
-                        board.playerAway.clock.update(gameState.clockWhite);
-                    }
-                }
-            });
+            this._board = (gameChannel.size)? new Views.GoBoard(gameChannel.size) : new Views.GoBoard();
+            this._board.playCallback = (x, y) => this.tryPlay(x, y);
+            this.registerView(this._board, LayoutZone.Main, (digest?: KGS.DataDigest) => this.updateBoard(digest));
         }
 
-        private tryPlay(board: Views.GoBoard, x: number, y: number): boolean {
+        private updateBoard(digest?: KGS.DataDigest) {
+            let updateBoard: boolean = ((digest == null) || (digest.gameTrees[this.channelId]));
+            let updatePlayerPanels: boolean = ((updateBoard) || (digest.gameClocks[this.channelId]));
+            if (updatePlayerPanels) {
+                let gameState = this.database.games[this.channelId];
+                let position: Models.GamePosition = ((gameState) && (gameState.tree) && (gameState.tree.position))? gameState.tree.position : null;
+
+                if (updateBoard) {
+                    if (!position) this._board.clear();
+                    else this._board.update(position);
+                }
+
+                let gameChannel = this.channel as Models.GameChannel;
+                let splitKomi = gameState.rules.splitKomi();
+                let home = {
+                    colour: Models.GameStone.Black,
+                    clock: gameState.clockBlack,
+                    prisoners: (position)? position.prisoners.white : 0,
+                    komi: splitKomi.black,
+                    user: this.database.users[gameChannel.playerBlack]
+                };
+                let away = {
+                    colour: Models.GameStone.White,
+                    clock: gameState.clockWhite,
+                    prisoners: (position)? position.prisoners.black : 0,
+                    komi: splitKomi.white,
+                    user: this.database.users[gameChannel.playerWhite]
+                };
+
+                if ((gameChannel.playerWhite == this.database.username) || (Models.User.compare(home.user, away.user) > 0)) {
+                    let temp = away;
+                    away = home;
+                    home = temp;
+                }
+
+                this._board.playerHome.update(home.colour, home.clock, home.prisoners, home.komi, home.user);
+                this._board.playerAway.update(away.colour, away.clock, away.prisoners, away.komi, away.user);
+            }
+        }
+
+        private tryPlay(x: number, y: number): boolean {
             let gameChannel = this.channel as Models.GameChannel;
             if (!gameChannel.hasAction(Models.GameActions.Move)) {
                 console.log("move action not available");

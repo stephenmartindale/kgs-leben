@@ -1,6 +1,95 @@
+$view-go-board-player-padding: 10px;
+
 .go-board-player {
-    min-width: 260px;
-    min-height: 100px;
+    min-width: $view-go-clock-width + (2 * $view-go-board-player-padding);
+    min-height: $view-go-clock-height + (2 * $view-go-board-player-padding);
+}
+
+.go-board .go-board-player .player-info > .hidden,
+.go-board .go-board-player .player-stats > .hidden {
+    display: none;
+}
+
+.go-board .go-board-player .player-info,
+.go-board .go-board-player .player-stats > * {
+    margin: $view-go-board-player-padding;
+}
+
+
+.go-board.landscape .team-away .go-board-player .player-stats > * {
+    float: right;
+    clear: right;
+}
+.go-board.landscape .go-board-player .player-info {
+    clear: both;
+}
+.go-board.landscape .team-home .go-board-player .player-stats .score-info {
+    margin-top: 22px;
+    margin-bottom: 26px;
+}
+.go-board.landscape .team-away .go-board-player .player-stats .score-info {
+    margin-top: 10px;
+    margin-bottom: 26px;
+}
+
+
+.go-board.portrait .team-home .go-board-player .player-stats,
+.go-board.portrait .team-away .go-board-player .player-info {
+    float: right;
+}
+.go-board.portrait .team-away .go-board-player .player-stats,
+.go-board.portrait .team-home .go-board-player .player-info {
+    float: left;
+}
+.go-board.portrait .go-board-player .player-stats > * {
+    float: left;
+}
+.go-board.portrait .go-board-player .player-stats > *:not(.hidden) ~ * {
+    margin-left: 18px;
+}
+
+
+.go-board-player .score-info {
+    @extend .table;
+}
+.go-board-player .score-info > div > span {
+    text-align: right;
+}
+.go-board-player .score-info > div > span:nth-child(1) {
+    padding-right: 0.8rem;
+}
+.go-board-player .score-info > div > span:nth-child(2) {
+    padding-right: 0.2rem;
+    font-size: 160%;
+}
+
+
+.go-board-player .player-info {
+    display: block;
     overflow: hidden;
-    padding: 10px;
+}
+.go-board .team-home .go-board-player .player-info > * {
+    float: left;
+}
+.go-board .team-home .go-board-player .player-info > * + * {
+    margin-left: 0.6rem;
+}
+.go-board .team-away .go-board-player .player-info > * {
+    float: right;
+}
+.go-board .team-away .go-board-player .player-info > * + * {
+    margin-right: 0.6rem;
+}
+.go-board .team-away .go-board-player .player-info * {
+    text-align: right;
+}
+
+.go-board-player .player-info img.stone {
+    height: 30px;
+    width: 30px;
+    margin-top: 7px;
+}
+.go-board-player .player-info img.avatar {
+    height: $view-go-clock-height;
+    border-radius: $border-radius;
 }

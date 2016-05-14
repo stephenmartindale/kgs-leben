@@ -1,8 +1,9 @@
+/// <reference path="../DataBoundList.ts" />
 namespace Views {
     export class ChatMemberList extends Views.DataBoundList<Models.User, HTMLUListElement, HTMLLIElement> {
         constructor() {
             super(document.createElement('ul'));
-            this.container.className = 'chat-member-list';
+            this.root.className = 'chat-member-list';
         }
 
         public update(users: { [name: string]: Models.User }, memberNames: string[]) {

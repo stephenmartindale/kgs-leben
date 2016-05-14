@@ -13,7 +13,7 @@ namespace Models {
         public updated: number;
         public timeSystem: string;
 
-        public rules: KGS.SGF.RULES;
+        public rules: Models.GameRules;
 
         public running: boolean;
         public overtime: boolean;
@@ -34,12 +34,12 @@ namespace Models {
             this.time = clockState.time;
 
             switch (this.rules.timeSystem) {
-                case KGS.Constants.TimeSystems.Japanese:
+                case Models.TimeSystem.Japanese:
                     this.periods = clockState.periodsLeft;
                     if ((this.periods) && (this.periods > 0)) this.overtime = true;
                     break;
 
-                case KGS.Constants.TimeSystems.Canadian:
+                case Models.TimeSystem.Canadian:
                     this.stones = clockState.stonesLeft;
                     if ((this.stones) && (this.stones > 0)) this.overtime = true;
                     break;
@@ -56,7 +56,7 @@ namespace Models {
                     stones: this.stones
                 };
             }
-            else if (this.rules.timeSystem == KGS.Constants.TimeSystems.None) return null;
+            else if (this.rules.timeSystem == Models.TimeSystem.None) return null;
 
             let expired: boolean = (this.time <= 0);
             if (!expired) {
@@ -65,8 +65,8 @@ namespace Models {
                 seconds -= (perfstamp - this.updated) / 1000.0;
                 seconds = Math.round(seconds);
 
-                let japaneseByoYomi: boolean = (this.rules.timeSystem == KGS.Constants.TimeSystems.Japanese);
-                let canadianByoYomi: boolean = (this.rules.timeSystem == KGS.Constants.TimeSystems.Canadian);
+                let japaneseByoYomi: boolean = (this.rules.timeSystem == Models.TimeSystem.Japanese);
+                let canadianByoYomi: boolean = (this.rules.timeSystem == Models.TimeSystem.Canadian);
 
                 let overtime: boolean = (this.overtime)? true : false;
                 let periods: number;
@@ -120,7 +120,7 @@ namespace Models {
                 }
             }
 
-            if (this.rules.timeSystem == KGS.Constants.TimeSystems.Canadian) {
+            if (this.rules.timeSystem == Models.TimeSystem.Canadian) {
                 return { expired: true, stones: (this.stones) ? this.stones : this.rules.byoYomiStones };
             }
             else {

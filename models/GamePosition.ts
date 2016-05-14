@@ -1,9 +1,4 @@
 namespace Models {
-    export const enum GameStone {
-        Black = +1,     // WGo.B
-        White = -1      // WGo.W
-    }
-
     export interface GamePositionChange {
         x: number;
         y: number;
@@ -11,13 +6,15 @@ namespace Models {
         add?: GameStone;
     }
 
+    export interface GamePrisonerCounts {
+        black: number;  // The number of black stones captured by the white player
+        white: number;  // The number of white stones captured by the black player
+    }
+
     export class GamePosition {
         public size: number;
         public schema: GameStone[];
-        public prisoners: {
-            black: number,
-            white: number
-        };
+        public prisoners: GamePrisonerCounts;
         public turn: GameStone;
 
         constructor(size?: number);

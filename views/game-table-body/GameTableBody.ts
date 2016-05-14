@@ -1,3 +1,4 @@
+/// <reference path="../DataBoundList.ts" />
 namespace Views {
     export class GameTableBody extends Views.DataBoundList<Models.GameChannel, HTMLTableSectionElement, HTMLTableRowElement> {
         public userDataSource: (name: string) => Models.User;

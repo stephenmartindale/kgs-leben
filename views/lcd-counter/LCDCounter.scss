@@ -13,11 +13,12 @@
     display: block;
     height: 0.7rem;
     stroke-width: 0;
+    fill: $view-go-clock-segment-off;
 }
 .lcd-counter svg + svg {
     margin-top: 1px;
 }
 
 .lcd-counter svg .segment-on {
-    fill: currentColor;
+    fill: $view-go-clock-segment-on;
 }

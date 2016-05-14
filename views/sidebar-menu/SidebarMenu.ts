@@ -1,5 +1,4 @@
 /// <reference path="../DataBoundList.ts" />
-
 namespace Views {
     export interface SidebarMenuItem {
         id: number,
@@ -14,7 +13,7 @@ namespace Views {
 
         constructor() {
             super(document.createElement('ul'));
-            this.container.className = 'sidebar-menu';
+            this.root.className = 'sidebar-menu';
         }
 
         protected createChild(key: string, datum: SidebarMenuItem): HTMLLIElement {

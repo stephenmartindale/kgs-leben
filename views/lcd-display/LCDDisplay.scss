@@ -2,6 +2,7 @@
     display: inline-block;
     position: relative;
     overflow: hidden;
+    fill: $view-go-clock-segment-off;
 }
 
 .lcd-display svg {
@@ -10,5 +11,5 @@
 }
 
 .lcd-display svg .segment-on {
-    fill: currentColor;
+    fill: $view-go-clock-segment-on;
 }

@@ -1,9 +1,8 @@
+/// <reference path="../View.ts" />
 namespace Views {
-    export class GameProposal implements Views.View<HTMLFormElement> {
+    export class GameProposal extends Views.View<HTMLFormElement> {
         private _disabled: boolean;
         private _gameActions: Models.GameActions;
-
-        private _form: HTMLFormElement;
 
         private _timeSystem: string;
         private _japaneseByoYomi: number;
@@ -17,7 +16,7 @@ namespace Views {
         public submitCallback: (form: GameProposal) => void;
 
         constructor() {
-            this._form = Views.Templates.cloneTemplate('game-proposal') as HTMLFormElement;
+            super(Views.Templates.cloneTemplate<HTMLFormElement>('game-proposal'));
 
             this._onTimeSystemChanged = (event: JQueryInputEventObject) => { if (!$(event.target).prop('disabled')) this.onTimeSystemChanged(); }
             this._onHandicapChanged = (event: JQueryInputEventObject) => { if (!$(event.target).prop('disabled')) this.onHandicapChanged(); }
@@ -30,24 +29,21 @@ namespace Views {
             this._canadianByoYomi = KGS.Constants.DefaultCanadianByoYomi;
             this._canadianStones = KGS.Constants.DefaultCanadianStones;
 
-            $(this._form).submit((e) => this.onFormSubmit(e));
-        }
-
-        public attach(parent: HTMLElement): void {
-            parent.appendChild(this._form);
+            $(this.root).submit((e) => this.onFormSubmit(e));
         }
 
         public activate(): void {
-            $(this._form).find('input[name="proposalTimeSystem"]').on('change', this._onTimeSystemChanged);
-            $(this._form).find('input[name="proposalColour"]').on('change', this._onHandicapChanged);
-            $(this._form).find('input[name="proposalHandicap"]').on('change', this._onHandicapChanged);
-
+            $(this.root).find('input[name="proposalTimeSystem"]').on('change', this._onTimeSystemChanged);
+            $(this.root).find('input[name="proposalColour"]').on('change', this._onHandicapChanged);
+            $(this.root).find('input[name="proposalHandicap"]').on('change', this._onHandicapChanged);
             this.disabledChanged();
+            super.activate();
         }
         public deactivate(): void {
-            $(this._form).find('input[name="proposalTimeSystem"]').off('change', this._onTimeSystemChanged);
-            $(this._form).find('input[name="proposalColour"]').off('change', this._onHandicapChanged);
-            $(this._form).find('input[name="proposalHandicap"]').off('change', this._onHandicapChanged);
+            super.deactivate();
+            $(this.root).find('input[name="proposalTimeSystem"]').off('change', this._onTimeSystemChanged);
+            $(this.root).find('input[name="proposalColour"]').off('change', this._onHandicapChanged);
+            $(this.root).find('input[name="proposalHandicap"]').off('change', this._onHandicapChanged);
         }
 
         get gameActions(): Models.GameActions {
@@ -71,7 +67,7 @@ namespace Views {
         }
 
         private disabledChanged() {
-            let form = $(this._form);
+            let form = $(this.root);
             if ((this._disabled) || ((this._gameActions & Models.GameActions.ChallengeSubmitted) != 0)) {
                 form.find('input').prop('disabled', true);
                 form.find('button').prop('disabled', true);
@@ -104,47 +100,47 @@ namespace Views {
         }
 
         public get description(): string {
-            return $(this._form).find('#proposalDescription').text();
+            return $(this.root).find('#proposalDescription').text();
         }
         public set description(value: string) {
-            $(this._form).find('#proposalDescription').text(value);
+            $(this.root).find('#proposalDescription').text(value);
         }
 
         public get boardSize(): number {
-            switch ($(this._form).find('input[name="proposalSize"]:checked').val()) {
+            switch ($(this.root).find('input[name="proposalSize"]:checked').val()) {
                 case "13": return 13;
                 case "9": return 9;
                 default: return 19;
             }
         }
         public set boardSize(value: number) {
-            $(this._form).find('input[name="proposalSize"]').each((index: number, element: Element) => {
+            $(this.root).find('input[name="proposalSize"]').each((index: number, element: Element) => {
                 let radio = $(element);
                 radio.prop('checked', (radio.val() == value));
             });
         }
 
         public get private(): boolean {
-            return $(this._form).find('#proposalPrivate').prop('checked');
+            return $(this.root).find('#proposalPrivate').prop('checked');
         }
         public set private(value: boolean) {
-            $(this._form).find('#proposalPrivate').prop('checked', value);
-            $(this._form).find('#proposalOpen').prop('checked', !value);
+            $(this.root).find('#proposalPrivate').prop('checked', value);
+            $(this.root).find('#proposalOpen').prop('checked', !value);
         }
 
         public get ruleSet(): string {
-            return $(this._form).find('input[name="proposalRuleSet"]:checked').val();
+            return $(this.root).find('input[name="proposalRuleSet"]:checked').val();
         }
         public set ruleSet(value: string) {
-            $(this._form).find('input[name="proposalRuleSet"]').each((index: number, element: Element) => {
+            $(this.root).find('input[name="proposalRuleSet"]').each((index: number, element: Element) => {
                 let radio = $(element);
                 radio.prop('checked', (radio.val() == value));
             });
         }
 
         public get byoYomi(): { time: number, periods?: number, stones?: number } {
-            let time: number = Utils.htmlTimeToSeconds($(this._form).find('#proposalTimeByoYomi').val());
-            let num: number = $(this._form).find('#proposalTimePeriods').val();
+            let time: number = Utils.htmlTimeToSeconds($(this.root).find('#proposalTimeByoYomi').val());
+            let num: number = $(this.root).find('#proposalTimePeriods').val();
 
             switch (this._timeSystem) {
                 case KGS.Constants.TimeSystems.Japanese:
@@ -175,7 +171,7 @@ namespace Views {
             let periodCaption: string = "";
             let periodValue: number;
 
-            this._timeSystem = $(this._form).find('input[name="proposalTimeSystem"]:checked').val();
+            this._timeSystem = $(this.root).find('input[name="proposalTimeSystem"]:checked').val();
             switch (this._timeSystem) {
                 case KGS.Constants.TimeSystems.Japanese:
                     showMainTime = true;
@@ -201,46 +197,46 @@ namespace Views {
             }
 
             if (showMainTime)
-                $(this._form).find('#proposalTimeMainGroup').removeClass('hidden');
+                $(this.root).find('#proposalTimeMainGroup').removeClass('hidden');
             else
-                $(this._form).find('#proposalTimeMainGroup').addClass('hidden');
+                $(this.root).find('#proposalTimeMainGroup').addClass('hidden');
 
             if (showOvertime) {
-                $(this._form).find('#proposalTimeByoYomiGroup').removeClass('hidden');
-                $(this._form).find('#proposalTimeByoYomi').val(overtimeValue);
+                $(this.root).find('#proposalTimeByoYomiGroup').removeClass('hidden');
+                $(this.root).find('#proposalTimeByoYomi').val(overtimeValue);
 
-                $(this._form).find('#proposalTimePeriodsGroup').removeClass('hidden');
-                $(this._form).find('#proposalTimePeriodsLabel').text(periodCaption + ":");
+                $(this.root).find('#proposalTimePeriodsGroup').removeClass('hidden');
+                $(this.root).find('#proposalTimePeriodsLabel').text(periodCaption + ":");
 
-                let periodsInput = $(this._form).find('#proposalTimePeriods');
+                let periodsInput = $(this.root).find('#proposalTimePeriods');
                 periodsInput.attr('placeholder', periodCaption);
                 periodsInput.val(periodValue);
             }
             else {
-                $(this._form).find('#proposalTimeByoYomiGroup').addClass('hidden');
-                $(this._form).find('#proposalTimePeriodsGroup').addClass('hidden');
+                $(this.root).find('#proposalTimeByoYomiGroup').addClass('hidden');
+                $(this.root).find('#proposalTimePeriodsGroup').addClass('hidden');
             }
         }
 
         public setTimeSystem(timeSystem: string, mainTime?: number, byoYomiTime?: number, byoYomiPeriods?: number, byoYomiStones?: number) {
-            $(this._form).find('input[name="proposalTimeSystem"]').each((index: number, element: Element) => {
+            $(this.root).find('input[name="proposalTimeSystem"]').each((index: number, element: Element) => {
                 let radio = $(element);
                 radio.prop('checked', (radio.val() == timeSystem));
             });
 
             this.onTimeSystemChanged();
 
-            if ((mainTime) && (mainTime >= 0)) $(this._form).find('#proposalTimeMain').val(Utils.htmlSecondsToTime(mainTime));
-            if ((byoYomiTime) && (byoYomiTime >= 0)) $(this._form).find('#proposalTimeByoYomi').val(Utils.htmlSecondsToTime(byoYomiTime));
-            if ((byoYomiPeriods) && (byoYomiPeriods >= 0) && (this._timeSystem == 'byo_yomi')) $(this._form).find('#proposalTimePeriods').val(byoYomiPeriods);
-            else if ((byoYomiStones) && (byoYomiStones >= 0) && (this._timeSystem == 'canadian')) $(this._form).find('#proposalTimePeriods').val(byoYomiStones);
+            if ((mainTime) && (mainTime >= 0)) $(this.root).find('#proposalTimeMain').val(Utils.htmlSecondsToTime(mainTime));
+            if ((byoYomiTime) && (byoYomiTime >= 0)) $(this.root).find('#proposalTimeByoYomi').val(Utils.htmlSecondsToTime(byoYomiTime));
+            if ((byoYomiPeriods) && (byoYomiPeriods >= 0) && (this._timeSystem == 'byo_yomi')) $(this.root).find('#proposalTimePeriods').val(byoYomiPeriods);
+            else if ((byoYomiStones) && (byoYomiStones >= 0) && (this._timeSystem == 'canadian')) $(this.root).find('#proposalTimePeriods').val(byoYomiStones);
         }
 
         public get colour(): string {
-            return $(this._form).find('input[name="proposalColour"]:checked').val();
+            return $(this.root).find('input[name="proposalColour"]:checked').val();
         }
         public set colour(value: string) {
-            $(this._form).find('input[name="proposalColour"]').each((index: number, element: Element) => {
+            $(this.root).find('input[name="proposalColour"]').each((index: number, element: Element) => {
                 let radio = $(element);
                 radio.prop('checked', (radio.val() == value));
             });
@@ -249,7 +245,7 @@ namespace Views {
         }
 
         public get handicap(): number {
-            return $(this._form).find('input[name="proposalHandicap"]:checked').val();
+            return $(this.root).find('input[name="proposalHandicap"]:checked').val();
         }
         public set handicap(value: number) {
             if (value == 0) {
@@ -265,7 +261,7 @@ namespace Views {
 
             if (value > 9) value = 9;
 
-            $(this._form).find('input[name="proposalHandicap"]').each((index: number, element: Element) => {
+            $(this.root).find('input[name="proposalHandicap"]').each((index: number, element: Element) => {
                 let radio = $(element);
                 radio.prop('checked', (radio.val() == value));
             });
@@ -275,13 +271,13 @@ namespace Views {
 
         private onHandicapChanged() {
             if (this.colour == "nigiri") {
-                $(this._form).find('input[name="proposalHandicap"]').each((index: number, element: Element) => {
+                $(this.root).find('input[name="proposalHandicap"]').each((index: number, element: Element) => {
                     let radio = $(element);
                     radio.prop('checked', (radio.val() == 0));
                 });
             }
 
-            let komiInput = $(this._form).find('input[name="proposalKomi"]');
+            let komiInput = $(this.root).find('input[name="proposalKomi"]');
             if (this.handicap != 0) {
                 komiInput.val(KGS.Constants.HandicapKomi);
             }
@@ -293,14 +289,14 @@ namespace Views {
         }
 
         public get komi(): number {
-            return $(this._form).find('input[name="proposalKomi"]').val();
+            return $(this.root).find('input[name="proposalKomi"]').val();
         }
         public set komi(value: number) {
-            $(this._form).find('input[name="proposalKomi"]').val(value);
+            $(this.root).find('input[name="proposalKomi"]').val(value);
         }
 
         public setChallenger(name: string, rank: string) {
-            let challengerSpans = $(this._form).find('#playerChallenger span');
+            let challengerSpans = $(this.root).find('#playerChallenger span');
             challengerSpans[0].innerText = name;
             challengerSpans[1].innerText = rank;
         }

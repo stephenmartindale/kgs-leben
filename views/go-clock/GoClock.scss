@@ -2,7 +2,7 @@
     display: block;
     position: relative;
     overflow: hidden;
-    width: 240px;
+    width: $view-go-clock-width;
 }
 
 .go-clock > .lcd-clock {

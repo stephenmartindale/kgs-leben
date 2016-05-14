@@ -31,13 +31,19 @@ namespace Views {
             });
         }
 
-        export function cloneTemplate(view: string): Node {
+        export function cloneTemplate<T extends Element>(view: string): T {
             if (!_templates) throw "Template framework not initialised";
 
             let template = _templates[view];
             if (!template) throw "Template not found: " + view;
 
-            return template.firstElementChild.cloneNode(true);
+            return <T>template.firstElementChild.cloneNode(true);
+        }
+
+        export function createDiv(className: string): HTMLDivElement {
+            let div = document.createElement('div');
+            div.className = className;
+            return div;
         }
     }
 }

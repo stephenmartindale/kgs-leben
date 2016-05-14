@@ -1,50 +1,37 @@
+/// <reference path="../View.ts" />
 namespace Views {
-    export class LCDDisplay implements Views.View<HTMLDivElement> {
+    export class LCDDisplay extends Views.View<HTMLDivElement> {
         private _precision: number;
         private _scale: number;
         private _signed: boolean;
         private _integer: boolean;
         private _pad: boolean;
 
-        private _div: HTMLDivElement;
         private _value: number;
 
         // Precision is the number of digits in a number.
         // Scale is the number of digits to the right of the decimal point in a number.
         // For example, the number 123.45 has a precision of 5 and a scale of 2.
         constructor(precision?: number, scale?: number, signed?: boolean, integer?: boolean, pad?: boolean) {
+            super(Templates.createDiv('lcd-display'));
+
             this._precision = precision || 8;
             this._scale = (scale != null)? scale : 0;
             this._signed = signed;
             this._integer = integer;
             this._pad = pad;
 
-            this._div = document.createElement('div');
-            this._div.className = 'lcd-display';
-
             let childCount = (this._signed)? this._precision + 1 : this._precision;
             for (let j = 0; j < childCount; ++j) {
-                this._div.appendChild(Views.Templates.cloneTemplate('lcd-display'));
+                this.root.appendChild(Views.Templates.cloneTemplate('lcd-display'));
             }
 
             this._value = 0;
         }
 
-        public attach(parent: HTMLElement): void {
-            parent.appendChild(this._div);
-        }
-
         public activate(): void {
             this.updateVectors();
-        }
-        public deactivate(): void {
-        }
-
-        public hide() {
-            this._div.classList.add('hidden');
-        }
-        public show() {
-            this._div.classList.remove('hidden');
+            super.activate();
         }
 
         private _bitmaps: { [d: number]: number, [c: string]: number } = {
@@ -56,14 +43,14 @@ namespace Views {
 
         private updateVectors() {
             if (this._signed) {
-                this.updateVector(this._div.children[0] as SVGElement, ~(this._bitmaps["-"]), (this._value < 0)? this._bitmaps["-"] : 0);
+                this.updateVector(this.root.children[0] as SVGElement, ~(this._bitmaps["-"]), (this._value < 0)? this._bitmaps["-"] : 0);
             }
 
             let characters = (this._value != null)? Math.abs(this._value).toString() : "";
             let decimalIndex = characters.indexOf('.');
             if (decimalIndex < 0) decimalIndex = characters.length;
 
-            let childCount = this._div.childElementCount;
+            let childCount = this.root.childElementCount;
             let order = this._precision - this._scale - 1;
             for (let j = (!this._signed)? 0 : 1; j < childCount; ++j) {
                 let digitIndex = (order >= 0)? decimalIndex - 1 - order : decimalIndex - order;
@@ -80,7 +67,7 @@ namespace Views {
                     maskOn |= this._bitmaps["."];
                 }
 
-                let svg = this._div.children[j] as SVGElement;
+                let svg = this.root.children[j] as SVGElement;
                 this.updateVector(svg, maskHidden, maskOn);
 
                 --order;

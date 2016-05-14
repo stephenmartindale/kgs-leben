@@ -1,3 +1,4 @@
+/// <reference path="../DataBoundList.ts" />
 namespace Views {
     export class ChatMessageList extends Views.DataBoundList<Models.Chat, HTMLUListElement, HTMLLIElement> {
         private _updateDateTime: number;
@@ -6,7 +7,7 @@ namespace Views {
 
         constructor() {
             super(document.createElement('ul'));
-            this.container.className = 'chat-message-list';
+            this.root.className = 'chat-message-list';
 
             this._onResize = (e: UIEvent) => this.scrollToEnd();
         }
@@ -15,6 +16,7 @@ namespace Views {
             window.addEventListener("resize", this._onResize);
             super.activate();
         }
+
         public deactivate(): void {
             super.deactivate();
             window.removeEventListener("resize", this._onResize);
@@ -73,7 +75,7 @@ namespace Views {
         }
 
         private scrollToEnd() {
-            if (this.container.lastElementChild) (<HTMLElement>this.container.lastElementChild).scrollIntoView(false);
+            if (this.root.lastElementChild) (<HTMLElement>this.root.lastElementChild).scrollIntoView(false);
         }
     }
 }

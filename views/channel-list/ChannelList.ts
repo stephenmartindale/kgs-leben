@@ -1,5 +1,4 @@
 /// <reference path="../sidebar-menu/SidebarMenu.ts" />
-
 namespace Views {
     export class ChannelList extends SidebarMenu {
         constructor() {
