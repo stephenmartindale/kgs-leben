@@ -24,7 +24,8 @@ namespace Controllers {
         }
 
         private updateBoard(digest?: KGS.DataDigest) {
-            let updateBoard: boolean = ((digest == null) || (digest.gameTrees[this.channelId]));
+            let updateOverlay: boolean = ((digest == null) || (digest.channels[this.channelId]));
+            let updateBoard: boolean = ((updateOverlay) || (digest.gameTrees[this.channelId]));
             let updatePlayerPanels: boolean = ((updateBoard) || (digest.gameClocks[this.channelId]));
             if (updatePlayerPanels) {
                 let gameState = this.database.games[this.channelId];
@@ -32,10 +33,20 @@ namespace Controllers {
 
                 if (updateBoard) {
                     if (!position) this._board.clear();
-                    else this._board.update(position);
+                    else this._board.updateBoard(position);
                 }
 
                 let gameChannel = this.channel as Models.GameChannel;
+                let userColour: Models.GameStone;
+                if (gameChannel.playerWhite == this.database.username)
+                    userColour = Models.GameStone.White;
+                else if (gameChannel.playerBlack == this.database.username)
+                    userColour = Models.GameStone.Black;
+
+                if (updateOverlay) {
+                    this._board.updateOverlay(gameChannel, userColour);
+                }
+
                 let splitKomi = gameState.rules.splitKomi();
                 let home = {
                     colour: Models.GameStone.Black,

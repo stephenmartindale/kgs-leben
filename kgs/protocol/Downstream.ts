@@ -162,7 +162,7 @@ namespace KGS {
         }
 
         export const _GAME_STATE: string = "GAME_STATE";
-        export interface GAME_STATE extends ChannelMessage, GameFlags {
+        export interface GAME_STATE extends ChannelMessage, GameFlags, GameScore {
             clocks?: {
                 black?: ClockState,
                 white?: ClockState
@@ -179,6 +179,10 @@ namespace KGS {
         }
         export const _PLAYBACK_DATA: string = "PLAYBACK_DATA";
         export interface PLAYBACK_DATA extends GAME_UPDATE {
+        }
+
+        export const _GAME_OVER: string = "GAME_OVER";
+        export interface GAME_OVER extends ChannelMessage, GameScore {
         }
 
         export const _CHALLENGE_PROPOSAL: string = "CHALLENGE_PROPOSAL";

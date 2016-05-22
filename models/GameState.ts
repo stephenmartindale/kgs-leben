@@ -94,9 +94,9 @@ namespace Models {
             this.tree.activate(event.nodeId);
         }
 
-        public mergeClockStates(perfstamp: number, whiteClock: KGS.Downstream.ClockState, blackClock: KGS.Downstream.ClockState) {
-            if (whiteClock) this.clockWhite.mergeClockState(perfstamp, whiteClock);
-            if (blackClock) this.clockBlack.mergeClockState(perfstamp, blackClock);
+        public mergeClockStates(perfstamp: number, gamePhase: Models.GamePhase, whiteClock: KGS.Downstream.ClockState, blackClock: KGS.Downstream.ClockState) {
+            if (whiteClock) this.clockWhite.mergeClockState(perfstamp, gamePhase, whiteClock);
+            if (blackClock) this.clockBlack.mergeClockState(perfstamp, gamePhase, blackClock);
         }
     }
 }

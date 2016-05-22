@@ -9,7 +9,7 @@ namespace Views {
         private _debounceWidth: number = 28;
         private _layoutPortrait: boolean;
 
-        private _root: JQuery;
+        private _flexRoot: JQuery;
         private _goban: JQuery;
 
         private _board: WGo.Board;
@@ -20,29 +20,32 @@ namespace Views {
 
         public playCallback: (x: number, y: number) => void;
 
-        constructor(size?: number) {
-            super(Templates.createDiv("go-board go-" + (size || GoBoard._defaultSize).toString()));
-            this._size = (size || GoBoard._defaultSize);
+        private _resultOverlay: HTMLDivElement;
+        private _resultHeading: HTMLHeadingElement;
 
-            let teamAway = document.createElement('div');
-            teamAway.className = "team-away";
-            this.root.appendChild(teamAway);
+        constructor(size?: number) {
+            super(Templates.cloneTemplate<HTMLDivElement>('go-board'));
+
+            this._size = (size || GoBoard._defaultSize);
+            this.root.classList.add('go-' + this._size.toString());
+
+            let flexRoot = this.root.querySelector('.flex-absolute');
+            this._flexRoot = $(flexRoot);
+
+            let teamAway = flexRoot.querySelector('.team-away') as HTMLElement;
             this.playerAway = new Views.GoBoardPlayer(Models.PlayerTeam.Away);
             this.playerAway.attach(teamAway);
 
-            let goban = document.createElement('div');
-            goban.className = "goban";
-            this.root.appendChild(goban);
+            let goban = flexRoot.querySelector('.goban') as HTMLElement;
+            this._goban = $(goban);
             this._board = new WGo.Board(goban, { size: this._size, background: '/img/wood.jpg' });
 
-            let teamHome = document.createElement('div');
-            teamHome.className = "team-home";
-            this.root.appendChild(teamHome);
+            let teamHome = flexRoot.querySelector('.team-home') as HTMLElement;
             this.playerHome = new Views.GoBoardPlayer(Models.PlayerTeam.Home);
             this.playerHome.attach(teamHome);
 
-            this._root = $(this.root);
-            this._goban = $(goban);
+            this._resultOverlay = this.root.querySelector('.result-overlay') as HTMLDivElement;
+            this._resultHeading = this._resultOverlay.querySelector('h3') as HTMLHeadingElement;
         }
 
         public activate(): void {
@@ -66,8 +69,8 @@ namespace Views {
         private optimiseBoard() {
             // Read Style Sheet defaults if necessary
             if (this._maxWidth == null) this._maxWidth = parseFloat(this._goban.css('max-width'));
-            if (this._playerMinWidth == null) this._playerMinWidth = parseFloat(this._root.find('.go-board-player').css('min-width'));
-            if (this._playerMinHeight == null) this._playerMinHeight = parseFloat(this._root.find('.go-board-player').css('min-height'));
+            if (this._playerMinWidth == null) this._playerMinWidth = parseFloat(this._flexRoot.find('.go-board-player').css('min-width'));
+            if (this._playerMinHeight == null) this._playerMinHeight = parseFloat(this._flexRoot.find('.go-board-player').css('min-height'));
 
             // Layout calculations
             let landscapeWidth: number = this.calculateBoardWidth(false);
@@ -89,18 +92,18 @@ namespace Views {
             if (this._layoutPortrait) {
                 // Portrait
                 boardWidth = portraitWidth;
-                this._root.addClass('portrait');
-                this._root.removeClass('landscape');
-                this._root.css('height', "");
-                this._root.css('width', boardWidth);
+                this.root.classList.add('portrait');
+                this.root.classList.remove('landscape');
+                this._flexRoot.css('height', "");
+                this._flexRoot.css('width', boardWidth);
             }
             else {
                 // Landscape
                 boardWidth = landscapeWidth;
-                this._root.removeClass('portrait');
-                this._root.addClass('landscape');
-                this._root.css('height', boardWidth);
-                this._root.css('width', "");
+                this.root.classList.remove('portrait');
+                this.root.classList.add('landscape');
+                this._flexRoot.css('height', boardWidth);
+                this._flexRoot.css('width', "");
             }
 
             this._goban.css('flex-basis', boardWidth);
@@ -137,7 +140,7 @@ namespace Views {
             this._position = null;
         }
 
-        private updatePosition(oldPosition: Models.GamePosition, position: Models.GamePosition) {
+        private updateBoardPosition(oldPosition: Models.GamePosition, position: Models.GamePosition) {
             let changes = position.diff(oldPosition);
             for (let i = 0; i < changes.length; ++i) {
                 if (changes[i].add != null)
@@ -149,7 +152,7 @@ namespace Views {
             this._position = position;
         }
 
-        public update(position: Models.GamePosition) {
+        public updateBoard(position: Models.GamePosition) {
             if (position != null) {
                 if (this._size != position.size) {
                     this._size = position.size;
@@ -158,11 +161,35 @@ namespace Views {
                         this.optimiseBoard();
                     }
 
-                    this.updatePosition(null, position);
+                    this.updateBoardPosition(null, position);
                 }
-                else this.updatePosition(this._position, new Models.GamePosition(position));
+                else this.updateBoardPosition(this._position, new Models.GamePosition(position));
             }
             else this.clear();
+        }
+
+        public updateOverlay(gameChannel: Models.GameChannel, userColour: Models.GameStone) {
+            if (gameChannel.phase == Models.GamePhase.Active) {
+                this._resultOverlay.classList.add('hidden');
+            }
+            else {
+                this._resultOverlay.classList.remove('hidden');
+                let headline: string;
+
+                switch (gameChannel.phase) {
+                    case Models.GamePhase.Adjourned: headline = "Adjourned"; break;
+                    case Models.GamePhase.Paused: headline = "Paused"; break;
+                    default:
+                        if (gameChannel.result)
+                            headline = gameChannel.result.getHeadline(userColour, gameChannel.playerWhite, gameChannel.playerBlack);
+                        else
+                            headline = "unknown result";
+
+                        break;
+                }
+
+                this._resultHeading.innerText = headline;
+            }
         }
     }
 }

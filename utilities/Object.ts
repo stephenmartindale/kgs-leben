@@ -38,8 +38,9 @@ namespace Utils {
                 let k = rightKeys[j];
                 if ((leftKeys.indexOf(k) < 0) || (!valueEquals<any>((<any>left)[k], (<any>right)[k], comparisonFlags))) return false;
             }
-        }
 
-        return false;
+            return true;
+        }
+        else return false;
     }
 }

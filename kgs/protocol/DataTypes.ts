@@ -27,16 +27,24 @@ namespace KGS {
         owner?: User
     }
 
-    export interface GameSummary {
-        size: number,           // The size of the board from this game.
-        timestamp: string,      // The time stamp of when this game was started. This is also used as a serverwide ID for the game; no two games will ever have the same timestamp, and the time stamp is used to refer to the game summary.
-        gameType: string,       // One of demonstration, review, rengo_review, teaching, simul, rengo, free, ranked, or tournament.
-        score?: string,         // The result of the game. Not present if the game hasn't ended yet.
-        revision?: number,      // The revision is used when downloading an SGF file.
+    export interface GameScore {
+        // The result of the game. Not present if the game hasn't ended yet.
+        /* Scores may be a floating point number, or a string. Numbers indicate the
+           score difference (positive a black win, negative a white win). Strings
+           may be UNKNOWN, UNFINISHED, NO_RESULT, B+RESIGN, W+RESIGN, B+FORFEIT,
+           W+FORFEIT, B+TIME, or W+TIME. */
+        score?: string | number;
+    }
+
+    export interface GameSummary extends GameScore {
+        size: number,              // The size of the board from this game.
+        timestamp: string,         // The time stamp of when this game was started. This is also used as a serverwide ID for the game; no two games will ever have the same timestamp, and the time stamp is used to refer to the game summary.
+        gameType: string,          // One of demonstration, review, rengo_review, teaching, simul, rengo, free, ranked, or tournament.
+        revision?: number,         // The revision is used when downloading an SGF file.
         players?: GameUserMap,
-        tag?: any,              // Only present in tag archives. The tag associated with the game summary.
-        private?: boolean,      // If set, this is a private game.
-        inPlay?: boolean        // If set, the game is currently in play.
+        tag?: any,                 // Only present in tag archives. The tag associated with the game summary.
+        private?: boolean,         // If set, this is a private game.
+        inPlay?: boolean           // If set, the game is currently in play.
     }
 
     export interface GameChannelRules {
@@ -98,8 +106,7 @@ namespace KGS {
         name?: string,
         players?: GameUserMap
     }
-    export interface GameChannel extends GameChannelBase, GameChannelRules {
-        score?: string,
+    export interface GameChannel extends GameChannelBase, GameChannelRules, GameScore {
         moveNum: number
     }
     export interface ChallengeChannel extends KGS.GameChannelBase {

@@ -172,7 +172,7 @@ namespace KGS {
         }
 
         public GAME_JOIN = (digest: KGS.DataDigest, message: KGS.Downstream.GAME_JOIN) => {
-            let channel = this._database._createChannel(digest, message.channelId, Models.ChannelType.Game);
+            let channel = this._database._createChannel(digest, message.channelId, Models.ChannelType.Game) as Models.GameChannel;
 
             this._database._updateUsers(digest, message.users);
             if (channel.mergeUsers(message.users)) digest.touchChannelUsers(message.channelId);
@@ -181,7 +181,7 @@ namespace KGS {
 
             if (message.clocks) {
                 let gameState = this._database._createGameState(digest, message.channelId);
-                gameState.mergeClockStates(digest.perfstamp, message.clocks.white, message.clocks.black);
+                gameState.mergeClockStates(digest.perfstamp, channel.phase, message.clocks.white, message.clocks.black);
                 digest.touchGameClocks(message.channelId);
             }
         }
@@ -275,7 +275,7 @@ namespace KGS {
 
             if (message.clocks) {
                 let gameState = this._database._createGameState(digest, message.channelId);
-                gameState.mergeClockStates(digest.perfstamp, message.clocks.white, message.clocks.black);
+                gameState.mergeClockStates(digest.perfstamp, gameChannel.phase, message.clocks.white, message.clocks.black);
                 digest.touchGameClocks(message.channelId);
             }
 
@@ -296,6 +296,19 @@ namespace KGS {
                 gameState.processSGFEvents(digest.perfstamp, ...message.sgfEvents);
                 digest.touchGameTree(message.channelId);
             }
+        }
+
+        public GAME_OVER = (digest: KGS.DataDigest, message: KGS.Downstream.GAME_OVER) => {
+            let touchChannel: boolean = false;
+            let gameChannel = this._database._requireChannel(message.channelId, Models.ChannelType.Game) as Models.GameChannel;
+            if (gameChannel.phase != Models.GamePhase.Concluded) {
+                gameChannel.phase = Models.GamePhase.Concluded;
+                touchChannel = true;
+            }
+
+            if (gameChannel.mergeScore(message.score)) touchChannel = true;
+
+            if (touchChannel) digest.touchChannel(message.channelId);
         }
 
         public CHALLENGE_PROPOSAL = (digest: KGS.DataDigest, message: KGS.Downstream.CHALLENGE_PROPOSAL) => {

@@ -113,7 +113,7 @@ namespace Views {
             }
             else if (datum.phase == Models.GamePhase.Concluded) {
                 gamePhaseSpans[0].innerText = "";
-                gamePhaseSpans[1].innerText = (datum.score != null)? datum.score : "";
+                gamePhaseSpans[1].innerText = (datum.result != null)? datum.result.getShortFormat() : "";
             }
             else {
                 gamePhaseSpans[0].innerText = "";

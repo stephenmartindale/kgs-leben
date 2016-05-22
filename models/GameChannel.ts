@@ -5,13 +5,14 @@ namespace Models {
         description: string;
 
         size: number;
-        score: string;
         moveNumber: number;
 
         restrictedPrivate: boolean;     // Restricted by the Game Owner
         restrictedPlus: boolean;        // Restricted to KGS Plus users
         phase: GamePhase;
         proposal: KGS.DownstreamProposal;
+
+        result: Models.GameResult;
 
         playerWhite: string;
         playerBlack: string;
@@ -32,10 +33,12 @@ namespace Models {
 
             if (this.description != game.name) { this.description = game.name; touch = true; }
 
+            let score: string | number;
             if (gameType != Models.GameType.Challenge) {
                 let g = (<KGS.GameChannel>game);
+                score = g.score;
+
                 if (this.size != g.size) { this.size = g.size; touch = true; }
-                if (this.score != g.score) { this.score = g.score; touch = true; }
                 if (this.moveNumber != g.moveNum) { this.moveNumber = g.moveNum; touch = true; }
                 if (this.proposal != null) { this.proposal = null; touch = true; }
             }
@@ -43,12 +46,11 @@ namespace Models {
                 let c = (<KGS.ChallengeChannel>game);
                 let sz = (c.initialProposal)? c.initialProposal.rules.size : null;
                 if (this.size != sz) { this.size = sz; touch = true; }
-                if (this.score != null) { this.score = null; touch = true; }
                 if (this.moveNumber != null) { this.moveNumber = null; touch = true; }
-
                 if (this.mergeProposal(c.initialProposal)) touch = true;
             }
 
+            if (this.mergeScore(score)) touch = true;
             if (this.mergeFlags(game)) touch = true;
 
             let playerWhite: string = ((game.players) && (game.players.white))? game.players.white.name : null;
@@ -72,6 +74,28 @@ namespace Models {
             }
 
             if (this.name != name) { this.name = name; touch = true; }
+
+            return touch;
+        }
+
+        public mergeScore(score: string | number): boolean {
+            let touch: boolean = false;
+            if (GameResult.isKnownResult(score)) {
+                if (this.result == null) {
+                    this.result = new Models.GameResult();
+                    touch = true;
+                }
+
+                if (this.result.mergeScore(score)) {
+                    touch = true;
+                }
+            }
+            else {
+                if (this.result != null) {
+                    this.result = null;
+                    touch = true;
+                }
+            }
 
             return touch;
         }
