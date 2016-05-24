@@ -69,5 +69,8 @@ namespace KGS {
             x?: number,
             y?: number
         }
+        export const _GAME_RESIGN: string = "GAME_RESIGN";
+        export interface GAME_RESIGN extends ChannelMessage {
+        }
     }
 }

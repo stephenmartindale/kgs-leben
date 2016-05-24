@@ -14,6 +14,10 @@ namespace Views {
         private _komiBase: HTMLSpanElement;
         private _komiHalf: HTMLSpanElement;
 
+        private _buttonsDiv: HTMLDivElement;
+        private _buttonPass: Views.SafetyButton;
+        private _buttonResign: Views.SafetyButton;
+
         constructor(playerTeam: Models.PlayerTeam) {
             super(Views.Templates.cloneTemplate<HTMLDivElement>('go-board-player'));
 
@@ -24,6 +28,15 @@ namespace Views {
 
             if (playerTeam == Models.PlayerTeam.Home) {
                 this._clock.attach(playerStats, false);
+
+                this._buttonsDiv = Templates.createDiv('player-buttons hidden');
+                playerStats.insertBefore(this._buttonsDiv, playerStats.firstElementChild);
+
+                this._buttonPass = new Views.SafetyButton("pass", false);
+                this._buttonPass.attach(this._buttonsDiv);
+
+                this._buttonResign = new Views.SafetyButton("resign", true);
+                this._buttonResign.attach(this._buttonsDiv);
             }
             else {
                 this.root.insertBefore(playerStats, playerInfo);
@@ -52,7 +65,7 @@ namespace Views {
             this._clock.deactivate();
         }
 
-        public update(colour: Models.GameStone, clock: Models.GameClock, prisoners: number, komi: { base: number, half?: boolean }, user: Models.User) {
+        public update(colour: Models.GameStone, clock: Models.GameClock, prisoners: number, komi: { base: number, half?: boolean }, user: Models.User, showButtons?: boolean, passCallback?: Function, resignCallback?: Function) {
             // Player Colour
             if (colour == Models.GameStone.White) {
                 this._userStone.src = 'img/stone-white.png';
@@ -100,6 +113,22 @@ namespace Views {
                 this._userAvatar.title = "";
                 this._userName.innerHTML = "&nbsp;";
                 this._userRank.innerHTML = "&nbsp;";
+            }
+
+            // Player Buttons
+            if (this._buttonsDiv) {
+                if (showButtons) {
+                    this._buttonsDiv.classList.remove('hidden');
+                    if (this._buttonPass) {
+                        this._buttonPass.callback = passCallback;
+                        this._buttonPass.disabled = (passCallback == null);
+                    }
+                    if (this._buttonResign) {
+                        this._buttonResign.callback = resignCallback;
+                        this._buttonResign.disabled = (resignCallback == null);
+                    }
+                }
+                else this._buttonsDiv.classList.add('hidden');
             }
         }
     }

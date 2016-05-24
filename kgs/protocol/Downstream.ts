@@ -185,6 +185,10 @@ namespace KGS {
         export interface GAME_OVER extends ChannelMessage, GameScore {
         }
 
+        export const _GAME_TIME_EXPIRED: string = "GAME_TIME_EXPIRED";
+        export interface GAME_TIME_EXPIRED extends ChannelMessage {
+        }
+
         export const _CHALLENGE_PROPOSAL: string = "CHALLENGE_PROPOSAL";
         export interface CHALLENGE_PROPOSAL extends ChannelMessage {
             proposal: KGS.DownstreamProposal

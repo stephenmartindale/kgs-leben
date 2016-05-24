@@ -100,7 +100,7 @@ namespace Models {
 
             if (byLine) {
                 if (userColour != null)
-                    return ((this.victor == userColour)? "Victory" : "Defeat") + byLine;
+                    return ((this.victor == userColour)? "victory" : "defeat") + byLine;
                 else
                     return ((this.victor == Models.GameStone.White)? (whiteName || "White") : (blackName || "Black")) + " won" + byLine;
             }

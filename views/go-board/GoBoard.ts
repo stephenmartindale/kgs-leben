@@ -173,21 +173,29 @@ namespace Views {
                 this._resultOverlay.classList.add('hidden');
             }
             else {
-                this._resultOverlay.classList.remove('hidden');
+                let className = 'result-overlay';
                 let headline: string;
 
                 switch (gameChannel.phase) {
                     case Models.GamePhase.Adjourned: headline = "Adjourned"; break;
                     case Models.GamePhase.Paused: headline = "Paused"; break;
                     default:
-                        if (gameChannel.result)
+                        if (gameChannel.result) {
                             headline = gameChannel.result.getHeadline(userColour, gameChannel.playerWhite, gameChannel.playerBlack);
-                        else
-                            headline = "unknown result";
-
+                            if ((userColour != null) && (gameChannel.result.victor != null)) {
+                                if (gameChannel.result.victor == userColour) {
+                                    className += ' victory';
+                                }
+                                else {
+                                    className += ' defeat';
+                                }
+                            }
+                        }
+                        else headline = "unknown result";
                         break;
                 }
 
+                this._resultOverlay.className = className;
                 this._resultHeading.innerText = headline;
             }
         }

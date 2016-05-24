@@ -134,6 +134,10 @@ namespace KGS {
 
                 case KGS.Downstream._LOGOUT:
                     return this.logoutReceived();
+
+                case KGS.Downstream._GAME_TIME_EXPIRED:
+                    this.kgsPOST(message);
+                    return false;
             }
 
             return true;

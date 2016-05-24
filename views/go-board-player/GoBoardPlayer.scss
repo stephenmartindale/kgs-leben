@@ -93,3 +93,17 @@ $view-go-board-player-padding: 10px;
     height: $view-go-clock-height;
     border-radius: $border-radius;
 }
+
+.go-board-player .player-buttons {
+    display: block;
+    overflow: hidden;
+}
+.go-board-player .player-buttons.hidden {
+    display: none;
+}
+.go-board-player .player-buttons .safety-button + .safety-button {
+    margin-top: 3px;
+}
+.go-board-player .player-buttons .safety-button .primary {
+    width: 70px;
+}
