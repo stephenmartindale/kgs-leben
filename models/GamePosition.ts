@@ -1,9 +1,19 @@
 namespace Models {
+    const _moveNumberMask: number  = 0x0000ffff;
+    const _stoneMask: number       = GameMarks.WhiteStone | GameMarks.BlackStone;
+    const _marksMask: number       = 0x7fffffff & ~(_moveNumberMask | _stoneMask);
+
     export interface GamePositionChange {
         x: number;
         y: number;
-        remove?: GameStone;
-        add?: GameStone;
+        unset: number;
+        set: number;
+        move: number;
+    }
+
+    interface GamePositionChangeInternal {
+        idx: number;
+        old: number;
     }
 
     export interface GamePrisonerCounts {
@@ -13,7 +23,7 @@ namespace Models {
 
     export class GamePosition {
         public size: number;
-        public schema: GameStone[];
+        public schema: number[];
         public prisoners: GamePrisonerCounts;
         public turn: GameStone;
 
@@ -21,7 +31,7 @@ namespace Models {
         constructor(original: GamePosition);
         constructor(arg?: number | GamePosition) {
             if (arg == null) arg = 19;
-            if (!Utils.isObject(arg)) {     // TODO: Use isNumber rather
+            if (Utils.isNumber(arg)) {
                 let sz: number = <number>arg;
                 if (GamePosition.validateSize(sz)) {
                     this.size = sz;
@@ -46,21 +56,41 @@ namespace Models {
             return ((size) && (size >= 2) && (size <= 38));
         }
 
-        public isOnBoard(x: number, y: number): boolean {
-            return ((x >= 0) && (y >= 0) && (x < this.size) && (y < this.size));
+        private getIndex(x: number, y: number): number {
+            return ((x >= 0) && (y >= 0) && (x < this.size) && (y < this.size))? ((x * this.size) + y) : -1;
         }
 
-        public get(x: number, y: number): GameStone {
-            if (!this.isOnBoard(x, y)) return undefined;
-            return this.schema[x * this.size + y];
+        private static getStoneColour(bits: number) {
+            return (bits == null)? null
+                 : ((bits & GameMarks.WhiteStone) == GameMarks.WhiteStone)? Models.GameStone.White
+                 : ((bits & GameMarks.BlackStone) == GameMarks.BlackStone)? Models.GameStone.Black
+                 : null;
         }
+        private setBits(idx: number, bits: number, mask: number, add?: boolean): GamePositionChangeInternal {
+            let old = this.schema[idx];
+            if (old == null) old = 0;
 
-        private set(x: number, y: number, stone?: GameStone) {
-            let i = (x * this.size) + y;
-            if (stone == null)
-                delete this.schema[i];
-            else
-                this.schema[i] = stone;
+            let value = ((add)? old : (old & ~mask))
+                      | ((bits != null)? (bits & mask) : 0);
+
+            if (value == 0) {
+                delete this.schema[idx];
+            }
+            else {
+                this.schema[idx] = value;
+            }
+
+            return { idx: idx, old: old };
+        }
+        private revertAll(changes: GamePositionChangeInternal[]) {
+            for (let j = (changes.length - 1); j >= 0; --j) {
+                if (changes[j].old == 0) {
+                    delete this.schema[changes[j].idx];
+                }
+                else {
+                    this.schema[changes[j].idx] = changes[j].old;
+                }
+            }
         }
 
         public static equals(left: GamePosition, right: GamePosition): boolean {
@@ -71,8 +101,8 @@ namespace Models {
             let sz = left.size;
             for (let x = 0; x < sz; ++x) {
                 for (let y = 0; y < sz; ++y) {
-                    let i = (x * sz) + y;
-                    if (left.schema[i] != right.schema[i]) return false;
+                    let idx = (x * sz) + y;
+                    if (left.schema[idx] != right.schema[idx]) return false;
                 }
             }
 
@@ -88,12 +118,17 @@ namespace Models {
             for (let x = 0; x < sz; ++x) {
                 for (let y = 0; y < sz; ++y) {
                     let i = (x * sz) + y;
-                    let oldStone = (old != null)? old.schema[i] : null;
-                    if (oldStone != this.schema[i]) {
-                        let change: GamePositionChange = { x: x, y: y };
-                        if (oldStone != null) change.remove = oldStone;
-                        if (this.schema[i] != null) change.add = this.schema[i];
-                        changes.push(change);
+                    let oldBits = (old != null)? old.schema[i] : null;
+                    if (oldBits != this.schema[i]) {
+                        if (oldBits == null) oldBits = 0;
+                        let newBits: number = (this.schema[i] != null)? this.schema[i] : 0;
+                        changes.push({
+                            x: x,
+                            y: y,
+                            unset: (oldBits & ~newBits),
+                            set: (newBits & ~oldBits),
+                            move: (newBits & _moveNumberMask)
+                        });
                     }
                 }
             }
@@ -101,24 +136,26 @@ namespace Models {
             return changes;
         }
 
-        private removeGroup(x: number, y: number, changes: GamePositionChange[], colour?: GameStone): boolean {
-            let stone = this.get(x, y);
-            if (stone != null) {
-                if ((colour == null) || (stone === colour)) {
-                    this.set(x, y, undefined);
-                    switch (stone) {
-                        case GameStone.Black: this.prisoners.black += 1; break;
-                        case GameStone.White: this.prisoners.white += 1; break;
+        private removeGroup(x: number, y: number, changes: GamePositionChangeInternal[], colour?: GameStone): boolean {
+            let idx = this.getIndex(x, y);
+            if (idx >= 0) {
+                let stone = GamePosition.getStoneColour(this.schema[idx]);
+                if (stone != null) {
+                    if ((colour == null) || (stone === colour)) {
+                        switch (stone) {
+                            case GameStone.Black: this.prisoners.black += 1; break;
+                            case GameStone.White: this.prisoners.white += 1; break;
+                        }
+
+                        changes.push(this.setBits(idx, 0, _stoneMask));
+
+                        this.removeGroup(x, y - 1, changes, stone);
+                        this.removeGroup(x + 1, y, changes, stone);
+                        this.removeGroup(x, y + 1, changes, stone);
+                        this.removeGroup(x - 1, y, changes, stone);
+
+                        return true;
                     }
-
-                    changes.push(<GamePositionChange>{ x: x, y: y, remove: stone });
-
-                    this.removeGroup(x, y - 1, changes, stone);
-                    this.removeGroup(x + 1, y, changes, stone);
-                    this.removeGroup(x, y + 1, changes, stone);
-                    this.removeGroup(x - 1, y, changes, stone);
-
-                    return true;
                 }
             }
 
@@ -126,24 +163,27 @@ namespace Models {
         }
 
         private hasLiberties(x: number, y: number, colour: GameStone, tested?: { [idx: number]: boolean }): boolean {
-            if (!this.isOnBoard(x, y)) return false;
-            let i = (x * this.size) + y;
-            let stone = this.schema[i];
+            let idx = this.getIndex(x, y);
+            if (idx < 0) return false;
+            let stone = GamePosition.getStoneColour(this.schema[idx]);
             if (stone == null) return true;
             else if (stone !== colour) return false;
 
             if (tested == null) tested = {};
-            else if (tested[i]) return false;
+            else if (tested[idx]) return false;
 
-            tested[i] = true;
+            tested[idx] = true;
             return this.hasLiberties(x, y - 1, stone, tested)
                 || this.hasLiberties(x + 1, y, stone, tested)
                 || this.hasLiberties(x, y + 1, stone, tested)
                 || this.hasLiberties(x - 1, y, stone, tested);
         }
 
-        private tryCapture(x: number, y: number, changes: GamePositionChange[], colour?: GameStone): boolean {
-            let stone = this.get(x, y);
+        private tryCapture(x: number, y: number, changes: GamePositionChangeInternal[], colour?: GameStone): boolean {
+            let idx = this.getIndex(x, y);
+            if (idx < 0) return false;
+
+            let stone = GamePosition.getStoneColour(this.schema[idx]);
             if (stone == null) return false;
             else if ((colour != null) && (stone !== colour)) return false;
 
@@ -154,38 +194,40 @@ namespace Models {
             }
         }
 
-        public undo(changes: GamePositionChange[]) {
-            for (let j = (changes.length - 1); j >= 0; --j) {
-                this.set(changes[j].x, changes[j].y, (changes[j].remove != null)? changes[j].remove : undefined);
-            }
-        }
-
-        public play(x: number, y: number, colour?: GameStone, previous?: Models.GamePosition): GameMoveError | GamePositionChange[] {
-            if (!this.isOnBoard(x, y)) return GameMoveError.InvalidLocation;
-            let i = (x * this.size) + y;
-            let stone = this.schema[i];
+        private tryPlay(x: number, y: number, colour?: GameStone, previous?: Models.GamePosition): GameMoveError | GamePositionChangeInternal[] {
+            let idx = this.getIndex(x, y);
+            if (idx < 0) return GameMoveError.InvalidLocation;
+            let stone = GamePosition.getStoneColour(this.schema[idx]);
 
             if (stone != null) return GameMoveError.StonePresent;
 
             if (colour == null) colour = this.turn;
-            this.set(x, y, colour);
+            let opponent: GameStone;
+            let moveChange: GamePositionChangeInternal;
+            if (colour == GameStone.White) {
+                opponent = GameStone.Black;
+                moveChange = this.setBits(idx, GameMarks.WhiteStone, _stoneMask);
+            }
+            else {
+                opponent = GameStone.White;
+                moveChange = this.setBits(idx, GameMarks.BlackStone, _stoneMask);
+            }
 
-            let opponent: GameStone = (colour == GameStone.White)? GameStone.Black : GameStone.White;
-            let changes: GamePositionChange[] = [];
+            let changes: GamePositionChangeInternal[] = [];
             this.tryCapture(x, y - 1, changes, opponent);
             this.tryCapture(x + 1, y, changes, opponent);
             this.tryCapture(x, y + 1, changes, opponent);
             this.tryCapture(x - 1, y, changes, opponent);
 
             if ((changes.length == 0) && (!this.hasLiberties(x, y, colour))) {
-                this.set(x, y, undefined);
+                this.setBits(idx, 0, _stoneMask);
                 return GameMoveError.Suicide;
             }
 
-            changes.push(<GamePositionChange>{ x: x, y: y, add: colour });
+            changes.push(moveChange);
 
             if ((previous != null) && (GamePosition.equals(this, previous))) {
-                this.undo(changes);
+                this.revertAll(changes);
                 return GameMoveError.Ko;
             }
             else {
@@ -194,21 +236,43 @@ namespace Models {
             }
         }
 
+        public play(x: number, y: number, colour?: GameStone, previous?: Models.GamePosition): GameMoveError {
+            let result = this.tryPlay(x, y, colour, previous);
+            if (Utils.isArray(result)) {
+                return GameMoveError.Success;
+            }
+            else {
+                return <GameMoveError>result;
+            }
+        }
+
         public pass(colour?: GameStone) {
             if (colour == null) colour = this.turn;
             this.turn = (colour == GameStone.White)? GameStone.Black : GameStone.White;
         }
 
-        public add(x: number, y: number, colour: GameStone): boolean {
-            let result = this.play(x, y, colour);
+        public addStone(x: number, y: number, colour: GameStone): boolean {
+            let result = this.tryPlay(x, y, colour);
             if (Utils.isArray(result)) {
-                if ((<GamePositionChange[]>result).length == 1) return true;
+                if ((<GamePositionChangeInternal[]>result).length == 1) return true;
                 else {
-                    this.undo(<GamePositionChange[]>result);
+                    this.revertAll(<GamePositionChangeInternal[]>result);
                 }
             }
 
             return false;
+        }
+
+        public addMarks(x: number, y: number, marks: GameMarks) {
+            let idx = this.getIndex(x, y);
+            if (idx < 0) throw "Game coordinates are not on the game board";
+            this.setBits(idx, marks, _marksMask, true);
+        }
+
+        public stone(x: number, y: number): Models.GameStone {
+            let idx = this.getIndex(x, y);
+            if (idx < 0) return undefined;
+            return GamePosition.getStoneColour(this.schema[idx]);
         }
     }
 }

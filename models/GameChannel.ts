@@ -1,6 +1,5 @@
 namespace Models {
     export class GameChannel extends Models.Channel {
-        parentChannelId: number;
         gameType: Models.GameType;
         description: string;
 
@@ -24,14 +23,16 @@ namespace Models {
             super(channelId, ChannelType.Game);
         }
 
-        public mergeGameChannel(game: KGS.GameChannel | KGS.ChallengeChannel): boolean {
+        public mergeGameChannel(game: KGS.GameChannel | KGS.ChallengeChannel | KGS.GameSummary): boolean {
             let touch: boolean = false;
-            if (this.parentChannelId != game.roomId) { this.parentChannelId = game.roomId; touch = true; }
 
             let gameType: Models.GameType = GameChannel.getGameType(game.gameType);
             if (this.gameType != gameType) { this.gameType = gameType; touch = true; }
 
-            if (this.description != game.name) { this.description = game.name; touch = true; }
+            if (((<KGS.GameChannel | KGS.ChallengeChannel>game).name !== undefined) && (this.description != (<KGS.GameChannel | KGS.ChallengeChannel>game).name)) {
+                this.description = (<KGS.GameChannel | KGS.ChallengeChannel>game).name;
+                touch = true;
+            }
 
             let score: string | number;
             if (gameType != Models.GameType.Challenge) {

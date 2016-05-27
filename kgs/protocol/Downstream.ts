@@ -66,7 +66,8 @@ namespace KGS {
         }
         export const _GAME_JOIN: string = "GAME_JOIN";
         export interface GAME_JOIN extends ChannelMessage, Downstream.GAME_UPDATE, Downstream.GAME_STATE {
-            users: User[]
+            users: User[],
+            gameSummary: GameSummary
         }
         export const _CHALLENGE_JOIN: string = "CHALLENGE_JOIN";
         export interface CHALLENGE_JOIN extends ChannelMessage, Downstream.GAME_STATE {

@@ -3,6 +3,7 @@ namespace Utils {
         Default,
         Info,
         Success,
+        Debug,
         Error,
         Warning
     }
@@ -15,6 +16,7 @@ namespace Utils {
     logOptions[LogSeverity.Default] = true;
     logOptions[LogSeverity.Info] = true;
     logOptions[LogSeverity.Success] = true;
+    logOptions[LogSeverity.Debug] = false;
     logOptions[LogSeverity.Error] = true;
     logOptions[LogSeverity.Warning] = true;
 
@@ -27,8 +29,13 @@ namespace Utils {
         logMethods[LogSeverity.Default] = (console.log)? console.log.bind(console) : undefined;
         logMethods[LogSeverity.Info] = (console.info)? console.info.bind(console) : logMethods[LogSeverity.Default];
         logMethods[LogSeverity.Success] = logMethods[LogSeverity.Info];
+        logMethods[LogSeverity.Debug] = logMethods[LogSeverity.Info];
         logMethods[LogSeverity.Warning] = (console.warn)? console.warn.bind(console) : logMethods[LogSeverity.Default];
         logMethods[LogSeverity.Error] = (console.error)? console.error.bind(console) : logMethods[LogSeverity.Warning];
+    }
+
+    export function logEnabled(severity: Utils.LogSeverity): boolean {
+        return ((logOptions[severity]) && (logMethods[severity]))? true : false;
     }
 
     export function log(severity: Utils.LogSeverity, message?: string, ...optionalParams: any[]) {

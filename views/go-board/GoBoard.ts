@@ -13,6 +13,7 @@ namespace Views {
         private _goban: JQuery;
 
         private _board: WGo.Board;
+        private _drawHandlers: GoBoardDrawHandlers = new GoBoardDrawHandlers();
         private _position: Models.GamePosition;
 
         public playerAway: Views.GoBoardPlayer;
@@ -128,6 +129,19 @@ namespace Views {
         }
 
         private _onBoardClick = (x: number, y: number) => {
+            if (Utils.logEnabled(Utils.LogSeverity.Debug)) {
+                let coordinateString = "(" + x.toString() + ", " + y.toString() + ")";
+                let coordinateObject = { x: x, y: y };
+                let stoneColour: string;
+                if (this._position) {
+                    let stone = this._position.stone(x, y);
+                    if (stone == Models.GameStone.White) stoneColour = "white";
+                    else if (stone == Models.GameStone.Black) stoneColour = "black";
+                }
+
+                Utils.log(Utils.LogSeverity.Debug, coordinateString, coordinateObject, stoneColour);
+            }
+
             if (this.playCallback) this.playCallback(x, y);
         }
 
@@ -140,13 +154,25 @@ namespace Views {
             this._position = null;
         }
 
+        private applyPositionChange(change: Models.GamePositionChange, blackBit: number, whiteBit: number, type: WGo.BoardDrawHandler | string) {
+            if ((change.set & blackBit) == blackBit) {
+                this._board.addObject(<WGo.BoardObject>{ x: change.x, y: change.y, c: WGo.B, type: type });
+            }
+            else if ((change.set & whiteBit) == whiteBit) {
+                this._board.addObject(<WGo.BoardObject>{ x: change.x, y: change.y, c: WGo.W, type: type });
+            }
+            else if ((change.unset & (blackBit | whiteBit)) != 0) {
+                this._board.removeObject(<WGo.BoardRemoveObject>{ x: change.x, y: change.y, type: type });
+            }
+        }
+
         private updateBoardPosition(oldPosition: Models.GamePosition, position: Models.GamePosition) {
             let changes = position.diff(oldPosition);
             for (let i = 0; i < changes.length; ++i) {
-                if (changes[i].add != null)
-                    this._board.addObject({ x: changes[i].x, y: changes[i].y, c: changes[i].add });
-                else if (changes[i].remove != null)
-                    this._board.removeObject({ x: changes[i].x, y: changes[i].y });
+                let change = changes[i];
+
+                this.applyPositionChange(change, Models.GameMarks.BlackStone, Models.GameMarks.WhiteStone, "SHELL");
+                this.applyPositionChange(change, Models.GameMarks.BlackTerritory, Models.GameMarks.WhiteTerritory, this._drawHandlers.moku);
             }
 
             this._position = position;
@@ -197,6 +223,36 @@ namespace Views {
 
                 this._resultOverlay.className = className;
                 this._resultHeading.innerText = headline;
+            }
+        }
+    }
+
+    class GoBoardDrawHandlers {
+        public moku: WGo.BoardDrawHandler = {
+            stone: this.wrapDrawFunction((ctx: CanvasRenderingContext2D, args: WGo.BoardDrawHandlerArgs, board: WGo.Board) => {
+                let xr = board.getX(args.x);
+                let yr = board.getY(args.y);
+                let sr = board.stoneRadius * 0.4;
+
+                ctx.beginPath();
+
+                if (args.c == WGo.W) {
+                    ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+                }
+                else {
+                    ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+                }
+
+                ctx.arc(xr - board.ls, yr - board.ls, Math.max(0, sr - 0.5), 0, 2 * Math.PI, true);
+                ctx.fill();
+            })
+        };
+
+        private wrapDrawFunction(handler: (ctx: CanvasRenderingContext2D, args: WGo.BoardDrawHandlerArgs, board: WGo.Board) => void): WGo.BoardDrawObject {
+            return {
+                draw: function (args: WGo.BoardDrawHandlerArgs, board: WGo.Board) {
+                    handler((<CanvasRenderingContext2D>this), args, board);
+                }
             }
         }
     }

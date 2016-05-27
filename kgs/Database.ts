@@ -75,11 +75,14 @@ namespace KGS {
             }
         }
 
-        public _updateGameChannel(digest: KGS.DataDigest, game: KGS.GameChannel | KGS.ChallengeChannel) {
-            let parentChannel = this._requireChannel(game.roomId) as Models.RoomChannel;
-            if (parentChannel.addGame(game.channelId)) digest.touchChannelGames(parentChannel.channelId);
+        public _updateGameChannel(digest: KGS.DataDigest, channelId: number, game: KGS.GameChannel | KGS.ChallengeChannel | KGS.GameSummary) {
+            if ((<KGS.GameChannel | KGS.ChallengeChannel>game).roomId != null) {
+                let parentChannelId = (<KGS.GameChannel | KGS.ChallengeChannel>game).roomId;
+                let parentChannel = this._requireChannel(parentChannelId) as Models.RoomChannel;
+                if (parentChannel.addGame(channelId)) digest.touchChannelGames(parentChannelId);
+            }
 
-            let gameChannel = this._createChannel(digest, game.channelId, Models.ChannelType.Game) as Models.GameChannel;
+            let gameChannel = this._createChannel(digest, channelId, Models.ChannelType.Game) as Models.GameChannel;
             if (gameChannel.mergeGameChannel(game)) digest.touchChannel(gameChannel.channelId);
 
             if (game.players) {
@@ -172,18 +175,16 @@ namespace KGS {
         }
 
         public GAME_JOIN = (digest: KGS.DataDigest, message: KGS.Downstream.GAME_JOIN) => {
-            let channel = this._database._createChannel(digest, message.channelId, Models.ChannelType.Game) as Models.GameChannel;
-
-            this._database._updateUsers(digest, message.users);
-            if (channel.mergeUsers(message.users)) digest.touchChannelUsers(message.channelId);
+            if (message.gameSummary) {
+                this._database._updateGameChannel(digest, message.channelId, message.gameSummary);
+            }
 
             this.GAME_UPDATE(digest, message);
+            this.GAME_STATE(digest, message);
 
-            if (message.clocks) {
-                let gameState = this._database._createGameState(digest, message.channelId);
-                gameState.mergeClockStates(digest.perfstamp, channel.phase, message.clocks.white, message.clocks.black);
-                digest.touchGameClocks(message.channelId);
-            }
+            this._database._updateUsers(digest, message.users);
+            let channel = this._database._createChannel(digest, message.channelId, Models.ChannelType.Game) as Models.GameChannel;
+            if (channel.mergeUsers(message.users)) digest.touchChannelUsers(message.channelId);
         }
 
         public CHALLENGE_JOIN = (digest: KGS.DataDigest, message: KGS.Downstream.CHALLENGE_JOIN) => {
@@ -251,12 +252,13 @@ namespace KGS {
         public GAME_LIST = (digest: KGS.DataDigest, message: KGS.Downstream.GAME_LIST) => {
             if (message.games) {
                 for (let i = 0; i < message.games.length; ++i) {
-                    this._database._updateGameChannel(digest, message.games[i]);
+                    let game = message.games[i];
+                    this._database._updateGameChannel(digest, game.channelId, game);
                 }
             }
         }
         public GAME_NOTIFY = (digest: KGS.DataDigest, message: KGS.Downstream.GAME_NOTIFY) => {
-            this._database._updateGameChannel(digest, message.game);
+            this._database._updateGameChannel(digest, message.game.channelId, message.game);
             if (digest.notifyChannelId == null) digest.notifyChannelId = message.game.channelId;
         }
 
