@@ -171,7 +171,8 @@ namespace KGS {
             actions: {
                 user: KGS.User,
                 action: "MOVE" | "EDIT" | "SCORE" | "CHALLENGE_CREATE" | "CHALLENGE_SETUP" | "CHALLENGE_WAIT" | "CHALLENGE_ACCEPT" | "CHALLENGE_SUBMITTED" | "EDIT_DELAY"
-            }[]
+            }[],
+            doneId?: number
         }
 
         export const _GAME_UPDATE: string = "GAME_UPDATE";

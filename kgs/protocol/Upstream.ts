@@ -65,9 +65,15 @@ namespace KGS {
         }
 
         export const _GAME_MOVE: string = "GAME_MOVE";
-        export interface GAME_MOVE extends ChannelMessage {
-            x?: number,
-            y?: number
+        export interface GAME_MOVE extends ChannelMessage, KGS.Location {
+        }
+        export const _GAME_MARK_LIFE: string = "GAME_MARK_LIFE";
+        export interface GAME_MARK_LIFE extends ChannelMessage, KGS.Coordinates {
+            alive: boolean;
+        }
+        export const _GAME_SCORING_DONE: string = "GAME_SCORING_DONE";
+        export interface GAME_SCORING_DONE extends ChannelMessage {
+            doneId: number;
         }
         export const _GAME_RESIGN: string = "GAME_RESIGN";
         export interface GAME_RESIGN extends ChannelMessage {

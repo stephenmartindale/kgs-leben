@@ -16,27 +16,28 @@ namespace Controllers {
 
         constructor(parent: Application) {
             super(parent);
-
-            this._joinedChannelIds = [];
-            this._channelControllers = {};
-            this._homeController = new Controllers.HomeController(this);
-            this._activeChannel = null;
-            this._operationChannelId = null;
-
-            this._channelList = this.application.layout.channelList;
-            this._channelList.selectionCallback = (channelId: number) => this.activateChannel(channelId);
-            this._channelList.closeCallback = (channelId: number) => this.unjoinChannel(channelId);
+            this.reinitialise();
         }
 
         public reinitialise() {
+            this.detachChildren();
+
             this._joinedChannelIds = [];
+            this._channelControllers = {};
             this._activeChannel = null;
             this._operationChannelId = null;
 
-            this.detachChildren();
-
-            this._channelControllers = {};
             this._homeController = new Controllers.HomeController(this);
+
+            if (this._channelList != null) {
+                this._channelList.selectionCallback = null;
+                this._channelList.closeCallback = null;
+            }
+
+            this._channelList = new Views.ChannelList();
+            this._channelList.selectionCallback = this._onChannelListSelection;
+            this._channelList.closeCallback = this._onChannelListClose;
+            this.application.layout.sidebar.show(this._channelList);
         }
 
         protected digest(digest: KGS.DataDigest) {
@@ -84,10 +85,10 @@ namespace Controllers {
                 }
 
                 if (activateChannelId != null) {
-                    this.activateChannel(activateChannelId);
+                    this._onChannelListSelection(activateChannelId);
                 }
                 else if (this._activeChannel == null) {
-                    this.activateChannel((this._joinedChannelIds.length > 0)? this._joinedChannelIds[0] : Controllers.HomeController.channelId);
+                    this._onChannelListSelection((this._joinedChannelIds.length > 0)? this._joinedChannelIds[0] : Controllers.HomeController.channelId);
                 }
                 else {
                     this.updateChannelList();
@@ -122,7 +123,7 @@ namespace Controllers {
             this._channelList.update(this.database.channels, this._joinedChannelIds, (this._activeChannel == this._homeController)? Controllers.HomeController.channelId : (<Controllers.ChannelBase>this._activeChannel).channelId);
         }
 
-        private activateChannel(channelId: number) {
+        private _onChannelListSelection = (channelId: number) => {
             let activate = (channelId == Controllers.HomeController.channelId)? this._homeController : this._channelControllers[channelId];
 
             if (this._activeChannel != activate) {
@@ -146,7 +147,7 @@ namespace Controllers {
 
         public joinChannel(channelId: number) {
             if (this.channelOperationInProgress) throw 'Channel operation in progress';
-            else if (this._joinedChannelIds.indexOf(channelId) >= 0) this.activateChannel(channelId);
+            else if (this._joinedChannelIds.indexOf(channelId) >= 0) this._onChannelListSelection(channelId);
             else {
                 this._operationChannelId = channelId;
 
@@ -157,7 +158,7 @@ namespace Controllers {
             }
         }
 
-        public unjoinChannel(channelId: number) {
+        private _onChannelListClose = (channelId: number) => {
             if (this.channelOperationInProgress) throw 'Channel operation in progress';
             else if (this._joinedChannelIds.indexOf(channelId) >= 0) {
                 this._operationChannelId = channelId;

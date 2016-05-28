@@ -18,7 +18,6 @@ namespace KGS {
     }
 
     export interface GameUserMap {              // An object mapping roles to user objects, telling who was in the game.
-
         white?: User,
         black?: User,
         white_2?: User,
@@ -112,5 +111,13 @@ namespace KGS {
     export interface ChallengeChannel extends KGS.GameChannelBase {
         gameType: "challenge",
         initialProposal: DownstreamProposal,
+    }
+
+    export interface Coordinates {
+        x: number;
+        y: number;
+    }
+    export interface Location {
+        loc: "PASS" | Coordinates
     }
 }

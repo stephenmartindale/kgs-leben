@@ -44,9 +44,15 @@ namespace Views {
         public hide() {
             this.root.classList.add('hidden');
         }
-
         public show() {
             this.root.classList.remove('hidden');
+        }
+        public get hidden(): boolean {
+            return this.root.classList.contains('hidden');
+        }
+        public set hidden(hide: boolean) {
+            if (hide) this.hide();
+            else this.show();
         }
     }
 }

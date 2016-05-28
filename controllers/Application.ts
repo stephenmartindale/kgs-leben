@@ -28,9 +28,9 @@ namespace Controllers {
         }
 
         public reinitialise() {
+            this.layout.main.clear();
+            this.layout.sidebar.clear();
             this._channelController.reinitialise();
-            this.layout.clearMain();
-            this.layout.clearSidebar();
         }
     }
 }

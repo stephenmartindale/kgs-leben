@@ -61,7 +61,8 @@ namespace Models {
         }
 
         private static getStoneColour(bits: number) {
-            return (bits == null)? null
+            return (bits === undefined)? undefined
+                 : (bits == null)? null
                  : ((bits & GameMarks.WhiteStone) == GameMarks.WhiteStone)? Models.GameStone.White
                  : ((bits & GameMarks.BlackStone) == GameMarks.BlackStone)? Models.GameStone.Black
                  : null;
@@ -269,10 +270,12 @@ namespace Models {
             this.setBits(idx, marks, _marksMask, true);
         }
 
-        public stone(x: number, y: number): Models.GameStone {
+        public get(x: number, y: number): number {
             let idx = this.getIndex(x, y);
-            if (idx < 0) return undefined;
-            return GamePosition.getStoneColour(this.schema[idx]);
+            return (idx >= 0)? this.schema[idx] : undefined;
+        }
+        public stone(x: number, y: number): Models.GameStone {
+            return GamePosition.getStoneColour(this.get(x, y));
         }
     }
 }

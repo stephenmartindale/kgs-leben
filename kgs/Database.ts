@@ -273,7 +273,11 @@ namespace KGS {
 
         public GAME_STATE = (digest: KGS.DataDigest, message: KGS.Downstream.GAME_STATE) => {
             let gameChannel = this._database._requireChannel(message.channelId, Models.ChannelType.Game) as Models.GameChannel;
-            if (gameChannel.mergeFlags(message)) digest.touchChannel(message.channelId);
+            let touchChannel: boolean = false;
+            if (gameChannel.mergeFlags(message)) touchChannel = true;
+            if (gameChannel.doneScoringId != message.doneId) { gameChannel.doneScoringId = message.doneId; touchChannel = true; }
+
+            if (touchChannel) digest.touchChannel(message.channelId);
 
             if (message.clocks) {
                 let gameState = this._database._createGameState(digest, message.channelId);

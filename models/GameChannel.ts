@@ -18,6 +18,7 @@ namespace Models {
         challengeCreator: string;
 
         actions: Models.GameActions;
+        doneScoringId: number;
 
         constructor(channelId: number) {
             super(channelId, ChannelType.Game);

@@ -40,8 +40,11 @@ namespace Controllers {
         public deactivate(): boolean {
             if (!this._activated) return false;
 
-            this.application.layout.clearMain();
-            this.application.layout.clearSidebar();
+            if (this._views) {
+                for (let j = (this._views.length - 1); j >= 0; --j) {
+                    this.application.layout.hideView(this._views[j].view, this._views[j].zone);
+                }
+            }
 
             this._activated = false;
             return true;

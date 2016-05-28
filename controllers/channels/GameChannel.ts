@@ -71,58 +71,93 @@ namespace Controllers {
                     home = temp;
                 }
 
+                let homeButtons: { text: string, callback: Function, dangerous?: boolean}[];
                 if (this._userColour != null) {
-                    let passCallback: Function = ((gameChannel.phase == Models.GamePhase.Active) && (gameChannel.hasAction(Models.GameActions.Move)))? this._passCallback : null;
-                    let resignCallback: Function = (gameChannel.phase != Models.GamePhase.Concluded)? this._resignCallback : null;
-                    this._board.playerHome.update(home.colour, home.clock, home.prisoners, home.komi, home.user, true, passCallback, resignCallback);
-                }
-                else {
-                    this._board.playerHome.update(home.colour, home.clock, home.prisoners, home.komi, home.user);
+                    homeButtons = [];
+
+                    if (gameChannel.phase != Models.GamePhase.Concluded) {
+                        if (gameChannel.phase == Models.GamePhase.Active) {
+                            if (gameChannel.hasAction(Models.GameActions.Score)) {
+                                homeButtons.push({ text: "done", callback: this._doneScoringCallback });
+                            }
+                            else {
+                                homeButtons.push({ text: "pass", callback: ((gameChannel.hasAction(Models.GameActions.Move))? this._passCallback : null) });
+                            }
+                        }
+
+                        homeButtons.push({ text: "resign", dangerous: true, callback: this._resignCallback });
+                    }
                 }
 
+                this._board.playerHome.update(home.colour, home.clock, home.prisoners, home.komi, home.user, homeButtons);
                 this._board.playerAway.update(away.colour, away.clock, away.prisoners, away.komi, away.user);
             }
         }
 
         private tryPlay(x: number, y: number): boolean {
             let gameChannel = this.channel as Models.GameChannel;
-            if (!gameChannel.hasAction(Models.GameActions.Move)) return false;
-
             let gameState = this.database.games[this.channelId];
             if ((!gameState) || (!gameState.tree)) return false;
 
-            if ((x != null) && (y != null)) {
-                let r = gameState.tree.tryPlay(x, y);
-                switch (r as Models.GameMoveError) {
-                    case Models.GameMoveError.Success:
-                        gameChannel.disableAction(Models.GameActions.Move);
-                        this.client.post(<KGS.Upstream.GAME_MOVE>{
-                            type: KGS.Upstream._GAME_MOVE,
-                            channelId: this.channelId,
-                            x: x,
-                            y: y
-                        });
-                        return true;
+            if (gameChannel.hasAction(Models.GameActions.Move)) {
+                if ((x != null) && (y != null)) {
+                    let r = gameState.tree.tryPlay(x, y);
+                    switch (r as Models.GameMoveError) {
+                        case Models.GameMoveError.Success:
+                            gameChannel.disableAction(Models.GameActions.Move);
+                            this.client.post(<KGS.Upstream.GAME_MOVE>{
+                                type: KGS.Upstream._GAME_MOVE,
+                                channelId: this.channelId,
+                                loc: { x: x, y: y }
+                            });
+                            return true;
 
-                    case Models.GameMoveError.InvalidLocation: console.log("given coordinates are not on board"); return false;
-                    case Models.GameMoveError.StonePresent: console.log("on given coordinates already is a stone"); return false;
-                    case Models.GameMoveError.Suicide: console.log("suicide (currently they are forbbiden)"); return false;
-                    case Models.GameMoveError.Ko: console.log("ko ko ko"); return false;
-                    default: console.log("unknown outcome"); return false;
+                        case Models.GameMoveError.InvalidLocation: console.log("given coordinates are not on board"); return false;
+                        case Models.GameMoveError.StonePresent: console.log("on given coordinates already is a stone"); return false;
+                        case Models.GameMoveError.Suicide: console.log("suicide (currently they are forbbiden)"); return false;
+                        case Models.GameMoveError.Ko: console.log("ko ko ko"); return false;
+                        default: console.log("unknown outcome"); return false;
+                    }
+                }
+                else {
+                    gameChannel.disableAction(Models.GameActions.Move);
+                    this.client.post(<KGS.Upstream.GAME_MOVE>{
+                        type: KGS.Upstream._GAME_MOVE,
+                        channelId: this.channelId,
+                        loc: "PASS"
+                    });
+                    return true;
                 }
             }
-            else {
-                gameChannel.disableAction(Models.GameActions.Move);
-                this.client.post(<KGS.Upstream.GAME_MOVE>{
-                    type: KGS.Upstream._GAME_MOVE,
-                    channelId: this.channelId,
-                });
-                return true;
+            else if (gameChannel.hasAction(Models.GameActions.Score)) {
+                let positionValue = gameState.tree.position.get(x, y);
+                if ((positionValue != null) && ((positionValue & (Models.GameMarks.BlackStone | Models.GameMarks.WhiteStone)) != 0)) {
+                    this.client.post(<KGS.Upstream.GAME_MARK_LIFE>{
+                        type: KGS.Upstream._GAME_MARK_LIFE,
+                        channelId: this.channelId,
+                        x: x,
+                        y: y,
+                        alive: ((positionValue & Models.GameMarks.Dead) == Models.GameMarks.Dead)
+                    });
+                    return true;
+                }
             }
+
+            return false;
         }
 
         private _passCallback = () => {
             this.tryPlay(undefined, undefined);
+        }
+        private _doneScoringCallback = () => {
+            let gameChannel = this.channel as Models.GameChannel;
+            if ((gameChannel.hasAction(Models.GameActions.Score)) && (gameChannel.doneScoringId != null)) {
+                this.client.post(<KGS.Upstream.GAME_SCORING_DONE>{
+                    type: KGS.Upstream._GAME_SCORING_DONE,
+                    channelId: this.channelId,
+                    doneId: gameChannel.doneScoringId
+                });
+            }
         }
         private _resignCallback = () => {
             if (this._userColour != null) {

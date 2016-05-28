@@ -15,8 +15,7 @@ namespace Views {
         private _komiHalf: HTMLSpanElement;
 
         private _buttonsDiv: HTMLDivElement;
-        private _buttonPass: Views.SafetyButton;
-        private _buttonResign: Views.SafetyButton;
+        private _buttons: Views.SafetyButton[];
 
         constructor(playerTeam: Models.PlayerTeam) {
             super(Views.Templates.cloneTemplate<HTMLDivElement>('go-board-player'));
@@ -31,12 +30,11 @@ namespace Views {
 
                 this._buttonsDiv = Templates.createDiv('player-buttons hidden');
                 playerStats.insertBefore(this._buttonsDiv, playerStats.firstElementChild);
-
-                this._buttonPass = new Views.SafetyButton("pass", false);
-                this._buttonPass.attach(this._buttonsDiv);
-
-                this._buttonResign = new Views.SafetyButton("resign", true);
-                this._buttonResign.attach(this._buttonsDiv);
+                this._buttons = new Array<Views.SafetyButton>(2);
+                for (let u = 0; u < this._buttons.length; ++u) {
+                    this._buttons[u] = new Views.SafetyButton();
+                    this._buttons[u].attach(this._buttonsDiv);
+                }
             }
             else {
                 this.root.insertBefore(playerStats, playerInfo);
@@ -65,7 +63,7 @@ namespace Views {
             this._clock.deactivate();
         }
 
-        public update(colour: Models.GameStone, clock: Models.GameClock, prisoners: number, komi: { base: number, half?: boolean }, user: Models.User, showButtons?: boolean, passCallback?: Function, resignCallback?: Function) {
+        public update(colour: Models.GameStone, clock: Models.GameClock, prisoners: number, komi: { base: number, half?: boolean }, user: Models.User, buttons?: { text: string, callback: Function, dangerous?: boolean}[]) {
             // Player Colour
             if (colour == Models.GameStone.White) {
                 this._userStone.src = 'img/stone-white.png';
@@ -117,15 +115,21 @@ namespace Views {
 
             // Player Buttons
             if (this._buttonsDiv) {
-                if (showButtons) {
+                if (buttons) {
                     this._buttonsDiv.classList.remove('hidden');
-                    if (this._buttonPass) {
-                        this._buttonPass.callback = passCallback;
-                        this._buttonPass.disabled = (passCallback == null);
-                    }
-                    if (this._buttonResign) {
-                        this._buttonResign.callback = resignCallback;
-                        this._buttonResign.disabled = (resignCallback == null);
+
+                    for (let u = 0; u < this._buttons.length; ++u) {
+                        if (u < buttons.length) {
+                            this._buttons[u].text = buttons[u].text;
+                            this._buttons[u].dangerous = (buttons[u].dangerous)? true : false;
+                            this._buttons[u].callback = buttons[u].callback;
+                            this._buttons[u].disabled = (buttons[u].callback == null);
+                            this._buttons[u].show();
+                        }
+                        else {
+                            this._buttons[u].callback = null;
+                            this._buttons[u].hide();
+                        }
                     }
                 }
                 else this._buttonsDiv.classList.add('hidden');

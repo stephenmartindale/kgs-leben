@@ -1,7 +1,6 @@
 /// <reference path="../View.ts" />
 namespace Views {
     export class SafetyButton extends Views.View<HTMLDivElement> {
-        private _text: string;
         private _disabled: boolean;
         private _primed: boolean;
 
@@ -10,26 +9,20 @@ namespace Views {
 
         public callback: Function;
 
-        constructor(text: string, danger?: boolean) {
+        constructor(text?: string, dangerous?: boolean) {
             super(Templates.cloneTemplate<HTMLDivElement>('safety-button'));
-            if (danger) {
-                this.root.classList.add('danger');
-            }
-
-            this._text = text;
             this._disabled = false;
             this._primed = false;
 
-            document.body.addEventListener('click', this._onClickCaptured, true);
-
             this._primary = <HTMLDivElement>this.root.children[0];
-            this._primary.innerText = text;
-            this._primary.title = text;
             this._primary.onclick = this._onPrimaryClick;
-
             this._confirm = <HTMLDivElement>this.root.children[1];
-            this._confirm.title = text;
             this._confirm.onclick = this._onConfirmClick;
+
+            if (text) this.text = text;
+            if (dangerous) this.dangerous = dangerous;
+
+            document.body.addEventListener('click', this._onClickCaptured, true);
         }
 
         private _onClickCaptured = (event: MouseEvent) => {
@@ -54,6 +47,15 @@ namespace Views {
             }
         }
 
+        public get text(): string {
+            return this._primary.innerText;
+        }
+        public set text(text: string) {
+            this._primary.innerText = text;
+            this._confirm.title = text;
+            if (!this._primed) this._primary.title = text;
+        }
+
         public get primed(): boolean {
             return this._primed;
         }
@@ -61,7 +63,7 @@ namespace Views {
             if (!value) {
                 this._primed = false;
                 this.root.classList.remove('primed');
-                this._primary.title = this._text;
+                this._primary.title = this._primary.innerText;
             }
             else {
                 this.root.classList.add('primed');
@@ -83,6 +85,14 @@ namespace Views {
                 this._disabled = true;
                 this.root.classList.add('disabled');
             }
+        }
+
+        public get dangerous(): boolean {
+            return this.root.classList.contains('danger');
+        }
+        public set dangerous(dangerous: boolean) {
+            if (dangerous) this.root.classList.add('danger');
+            else this.root.classList.remove('danger');
         }
     }
 }

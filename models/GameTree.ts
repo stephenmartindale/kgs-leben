@@ -130,14 +130,14 @@ namespace Models {
                 if (properties) {
                     for (let p = 0; p < properties.length; ++p) {
                         let pass: boolean = null;
-                        let loc: KGS.SGF.LocationObject = null;
+                        let loc: KGS.Coordinates = null;
                         if ((<KGS.SGF.LocationProperty>properties[p]).loc) {
                             if ((<KGS.SGF.LocationProperty>properties[p]).loc == "PASS") {
                                 pass = true;
                             }
                             else if (Utils.isObject((<KGS.SGF.LocationProperty>properties[p]).loc)) {
                                 pass = false;
-                                loc = (<KGS.SGF.LocationProperty>properties[p]).loc as KGS.SGF.LocationObject;
+                                loc = (<KGS.SGF.LocationProperty>properties[p]).loc as KGS.Coordinates;
                             }
                         }
 
@@ -159,6 +159,11 @@ namespace Models {
                             case KGS.SGF._TERRITORY:
                                 if (loc) position.addMarks(loc.x, loc.y, (colour == Models.GameStone.White)? Models.GameMarks.WhiteTerritory : Models.GameMarks.BlackTerritory);
                                 else Utils.log(Utils.LogSeverity.Warning, "KGS SGF TERRITORY property could not be effected");
+                                break;
+
+                            case KGS.SGF._DEAD:
+                                if (loc) position.addMarks(loc.x, loc.y, Models.GameMarks.Dead);
+                                else Utils.log(Utils.LogSeverity.Warning, "KGS SGF DEAD property could not be effected");
                                 break;
                         }
                     }

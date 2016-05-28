@@ -1,7 +1,0 @@
-.main-container {
-    @extend .block-absolute;
-    z-index: $zindex-main;
-}
-.main-container > * {
-    @extend .center;
-}

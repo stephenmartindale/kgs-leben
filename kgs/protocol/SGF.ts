@@ -9,16 +9,11 @@ namespace KGS {
         export interface ColourProperty extends Property {
             color: "white" | "black"
         }
-        export interface LocationObject {
-            x: number;
-            y: number;
-        }
-        export interface LocationProperty extends Property {
-            loc: "PASS" | LocationObject
+        export interface LocationProperty extends KGS.Location, Property {
         }
         export interface LocationLocationProperty extends Property {
-            loc: LocationObject,
-            loc2: LocationObject
+            loc: KGS.Coordinates,
+            loc2: KGS.Coordinates
         }
         export interface IntProperty extends Property {
             int: number

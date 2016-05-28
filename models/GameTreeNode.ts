@@ -33,14 +33,16 @@ namespace Models {
                 this._properties.push(property);
         }
 
-        private locationsEqual(left: "PASS" | KGS.SGF.LocationObject, right: "PASS" | KGS.SGF.LocationObject) {
-            if ((left == null) || (right == null)) return (left == right);
-            if (left === right) return true;
-            else if ((Utils.isObject(left)) && (Utils.isObject(right))) {
-                let l = left as KGS.SGF.LocationObject;
-                let r = right as KGS.SGF.LocationObject;
+        private locationsEqual(left: KGS.Location, right: KGS.Location) {
+            if (left.loc == right.loc) return true;
+
+            if ((left.loc != null) && (Utils.isObject(left.loc))
+             && (right.loc != null) && (Utils.isObject(right.loc))) {
+                let l = left.loc as KGS.Coordinates;
+                let r = right.loc as KGS.Coordinates;
                 return ((l.x == r.x) && (l.y == r.y));
             }
+
             return false;
         }
 
@@ -61,11 +63,11 @@ namespace Models {
                     let propertyName: string = (<KGS.SGF.Property>property).name;
                     if ((<KGS.SGF.LocationProperty>property).loc == null) return this.findProperty(propertyName);
                     else {
-                        let location = (<KGS.SGF.LocationProperty>property).loc;
+                        let location = <KGS.SGF.LocationProperty>property;
                         let firstProperty: number = notFound;
                         for (let i = 0; i < this._properties.length; ++i) {
                             if (this._properties[i].name == propertyName) {
-                                if (this.locationsEqual((<KGS.SGF.LocationProperty>this._properties[i]).loc, location)) return i;
+                                if (this.locationsEqual((<KGS.SGF.LocationProperty>this._properties[i]), location)) return i;
                                 else if (firstProperty == notFound) firstProperty = i;
                             }
                         }

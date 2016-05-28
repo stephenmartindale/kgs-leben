@@ -139,8 +139,10 @@ gulp.task('build:styles:views', function() {
 });
 gulp.task('build:styles', ['build:styles:views'], function() {
     return gulp.src(inputs.styles.sources)
+               .pipe(sourcemaps.init())
                .pipe(sass({ includePaths: inputs.styles.include }).on('error', sass.logError))
                .pipe(postcss([autoprefixer({ browsers: browsers })]))
+               .pipe(sourcemaps.write("."))
                .pipe(gulp.dest(path.join(outputs.root, outputs.styles)));
 });
 

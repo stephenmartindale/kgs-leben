@@ -13,13 +13,23 @@
     background-color: $gray-lighter;
 }
 #sidebar > div {
-    flex: 1 1 auto;
     position: relative;
     overflow: visible;
+}
+#sidebar > div:last-child {
+    flex: 1 1 auto;
 }
 
 #main, #sidebar {
     transition: right 120ms ease-out;
+}
+
+#main > div {
+    @extend .block-absolute;
+    z-index: $zindex-main;
+}
+#main > div > * {
+    @extend .center;
 }
 
 @media (max-width: map-get($grid-breakpoints, "lg") - 1px) {
