@@ -21,6 +21,7 @@ $go-board-size-min:         9;
 $go-board-size-max:         19;
 
 // View Parameters
+$view-sidebar-right-margin: 28px;
 $view-go-clock-segment-off: darken($gray-dark, 2%);
 $view-go-clock-segment-on:  $gray-lightest;
 $view-go-clock-width:       240px;

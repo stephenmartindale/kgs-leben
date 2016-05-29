@@ -21,9 +21,6 @@ namespace Views {
 
         public playCallback: (x: number, y: number) => void;
 
-        private _resultOverlay: HTMLDivElement;
-        private _resultHeading: HTMLHeadingElement;
-
         constructor(size?: number) {
             super(Templates.cloneTemplate<HTMLDivElement>('go-board'));
 
@@ -44,9 +41,6 @@ namespace Views {
             let teamHome = flexRoot.querySelector('.team-home') as HTMLElement;
             this.playerHome = new Views.GoBoardPlayer(Models.PlayerTeam.Home);
             this.playerHome.attach(teamHome);
-
-            this._resultOverlay = this.root.querySelector('.result-overlay') as HTMLDivElement;
-            this._resultHeading = this._resultOverlay.querySelector('h3') as HTMLHeadingElement;
         }
 
         public activate(): void {
@@ -132,14 +126,22 @@ namespace Views {
             if (Utils.logEnabled(Utils.LogSeverity.Debug)) {
                 let coordinateString = "(" + x.toString() + ", " + y.toString() + ")";
                 let coordinateObject = { x: x, y: y };
-                let stoneColour: string;
                 if (this._position) {
-                    let stone = this._position.stone(x, y);
-                    if (stone == Models.GameStone.White) stoneColour = "white";
-                    else if (stone == Models.GameStone.Black) stoneColour = "black";
-                }
+                    try {
+                        let stoneColour: string;
+                        let bits = this._position.get(x, y);
+                        if ((bits & Models.GameMarks.WhiteStone) != 0) stoneColour = "white";
+                        else if ((bits & Models.GameMarks.BlackStone) != 0) stoneColour = "black";
 
-                Utils.log(Utils.LogSeverity.Debug, coordinateString, coordinateObject, stoneColour);
+                        Utils.log(Utils.LogSeverity.Debug, coordinateString, coordinateObject, stoneColour);
+                    }
+                    catch (error) {
+                        Utils.log(Utils.LogSeverity.Debug, coordinateString, coordinateObject, error);
+                    }
+                }
+                else {
+                    Utils.log(Utils.LogSeverity.Debug, coordinateString, coordinateObject);
+                }
             }
 
             if (this.playCallback) this.playCallback(x, y);
@@ -179,50 +181,20 @@ namespace Views {
         }
 
         public updateBoard(position: Models.GamePosition) {
-            if (position != null) {
-                if (this._size != position.size) {
-                    this._size = position.size;
-                    this._board.setSize(position.size);
-                    if (this.activated) {
-                        this.optimiseBoard();
-                    }
-
-                    this.updateBoardPosition(null, position);
-                }
-                else this.updateBoardPosition(this._position, new Models.GamePosition(position));
-            }
-            else this.clear();
-        }
-
-        public updateOverlay(gameChannel: Models.GameChannel, userColour: Models.GameStone) {
-            if (gameChannel.phase == Models.GamePhase.Active) {
-                this._resultOverlay.classList.add('hidden');
+            if (position == null) {
+                this.clear();
             }
             else {
-                let className = 'result-overlay';
-                let headline: string;
+                let copy = new Models.GamePosition(position);
 
-                switch (gameChannel.phase) {
-                    case Models.GamePhase.Adjourned: headline = "Adjourned"; break;
-                    case Models.GamePhase.Paused: headline = "Paused"; break;
-                    default:
-                        if (gameChannel.result) {
-                            headline = gameChannel.result.getHeadline(userColour, gameChannel.playerWhite, gameChannel.playerBlack);
-                            if ((userColour != null) && (gameChannel.result.victor != null)) {
-                                if (gameChannel.result.victor == userColour) {
-                                    className += ' victory';
-                                }
-                                else {
-                                    className += ' defeat';
-                                }
-                            }
-                        }
-                        else headline = "unknown result";
-                        break;
+                if (this._size != copy.size) {
+                    this._size = copy.size;
+                    this._board.setSize(this._size);
+                    if (this.activated) this.optimiseBoard();
+
+                    this.updateBoardPosition(null, copy);
                 }
-
-                this._resultOverlay.className = className;
-                this._resultHeading.innerText = headline;
+                else this.updateBoardPosition(this._position, copy);
             }
         }
     }

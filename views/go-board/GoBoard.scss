@@ -9,6 +9,9 @@
 
 .go-board .flex-absolute > div {
     position: relative;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
     flex: 1 0 auto;
 }
 
@@ -18,12 +21,6 @@
         max-width: ($i * $go-stone-diameter);
         max-height: ($i * $go-stone-diameter);
     }
-}
-
-.go-board .flex-absolute > div {
-    min-width: 0;
-    min-height: 0;
-    overflow: hidden;
 }
 
 .go-board .team-home > div, .go-board .team-away > div {
@@ -43,38 +40,4 @@
 }
 .go-board.portrait .team-home > div {
     bottom: auto;
-}
-
-.go-board .result-overlay.hidden {
-    display: none;
-}
-.go-board .result-overlay {
-    @extend .block-absolute;
-    height: 150px;
-    margin: auto 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: $zindex-main + 3;
-    background: top center url("../img/result-overlay.png") no-repeat;
-}
-
-.go-board .result-overlay h3, .go-board .result-overlay p {
-    text-align: center;
-    margin: 0;
-}
-.go-board .result-overlay p {
-    margin-bottom: 8px;
-}
-
-.go-board .result-overlay h3 {
-    font-size: 18pt;
-    font-weight: normal;
-    color: $gray-lightest;
-}
-.go-board .result-overlay.defeat h3 {
-    color: $brand-warning;
-}
-.go-board .result-overlay.victory h3 {
-    color: $brand-success;
 }

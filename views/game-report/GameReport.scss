@@ -1,0 +1,39 @@
+.game-report {
+    margin: 0.4rem 0 2rem 0;
+}
+.game-report.hidden, .game-report table.hidden {
+    display: none;
+}
+
+.game-report h3 {
+    text-align: center;
+    background-color: $gray-lightest;
+    padding: 0.6rem 0;
+}
+
+.game-report table {
+    width: 100%;
+}
+.game-report th {
+    text-align: right;
+    font-weight: normal;
+    font-size: 130%;
+}
+.game-report th, .game-report td {
+    vertical-align: text-bottom;
+}
+.game-report td:nth-child(1), .game-report td:nth-child(4) {
+    padding-right: 0.8rem;
+    text-align: right;
+}
+.game-report td:nth-child(2), .game-report td:nth-child(5) {
+    padding-right: 0.2rem;
+    font-size: 140%;
+    text-align: right;
+}
+.game-report th:last-child, .game-report td:last-child {
+    padding-right: $view-sidebar-right-margin;
+}
+.game-report tbody tr:last-child {
+    background-color: $gray-lightest;
+}

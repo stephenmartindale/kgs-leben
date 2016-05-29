@@ -75,16 +75,6 @@ namespace Models {
             return (this._activeNodeId != null)? this._positions[this._activeNodeId] : null;
         }
 
-        public tryPlay(x: number, y: number): GameMoveError {
-            let position = this.position;
-            if (!position) throw "Moves may not be played without a pre-existing game Position";
-
-            let clone = new Models.GamePosition(position);
-            let previousPosition = this.previousPosition;
-
-            return clone.play(x, y, position.turn, previousPosition);
-        }
-
         public activate(nodeId: number) {
             if ((nodeId == null) || (nodeId < RootNodeId)) {
                 this.revertPosition(null);
@@ -144,27 +134,40 @@ namespace Models {
                         let colour: Models.GameStone = null;
                         if ((<KGS.SGF.ColourProperty>properties[p]).color) colour = ((<KGS.SGF.ColourProperty>properties[p]).color == "white")? GameStone.White : GameStone.Black;
 
+                        let malformed: boolean = false;
+                        let moveResult: Models.GameMoveResult;
                         switch (properties[p].name) {
                             case KGS.SGF._MOVE:
-                                if (pass) position.pass(colour);
-                                else if (loc) position.play(loc.x, loc.y, colour);
-                                else Utils.log(Utils.LogSeverity.Warning, "KGS SGF MOVE property could not be effected");
+                                if ((loc) && (colour)) moveResult = position.play(loc.x, loc.y, colour, previousPosition);
+                                else if (!pass) malformed = true;
                                 break;
 
                             case KGS.SGF._ADDSTONE:
-                                if (loc) position.addStone(loc.x, loc.y, colour);
-                                else Utils.log(Utils.LogSeverity.Warning, "KGS SGF ADDSTONE property could not be effected");
+                                if ((loc) && (colour)) moveResult = position.addStone(loc.x, loc.y, colour);
+                                else malformed = true;
                                 break;
 
                             case KGS.SGF._TERRITORY:
-                                if (loc) position.addMarks(loc.x, loc.y, (colour == Models.GameStone.White)? Models.GameMarks.WhiteTerritory : Models.GameMarks.BlackTerritory);
-                                else Utils.log(Utils.LogSeverity.Warning, "KGS SGF TERRITORY property could not be effected");
+                                if ((loc) && (colour)) position.addMarks(loc.x, loc.y, (colour == Models.GameStone.White)? Models.GameMarks.WhiteTerritory : Models.GameMarks.BlackTerritory);
+                                else malformed = true;
                                 break;
 
                             case KGS.SGF._DEAD:
                                 if (loc) position.addMarks(loc.x, loc.y, Models.GameMarks.Dead);
-                                else Utils.log(Utils.LogSeverity.Warning, "KGS SGF DEAD property could not be effected");
+                                else malformed = true;
                                 break;
+
+                            default:
+                                Utils.log(Utils.LogSeverity.Debug, "SGF property '" + properties[p].name + "' unknown or unsupported");
+                                break;
+                        }
+
+                        if (malformed) {
+                            Utils.log(Utils.LogSeverity.Warning, "SGF property '" + properties[p].name + "' was malformed and could not be effected", properties[p]);
+                        }
+
+                        if ((moveResult) && (moveResult != GameMoveResult.Success)) {
+                            Utils.log(Utils.LogSeverity.Error, "Error when applying SGF property '" + properties[p].name + "' to game position: " + GamePosition.moveResultToString(moveResult), properties[p], moveResult);
                         }
                     }
                 }
@@ -172,6 +175,28 @@ namespace Models {
                 this._positions[activateId] = position;
                 this._activeNodeId = activateId;
                 previousPosition = position;
+            }
+        }
+
+        public testMove(x: number, y: number, colour: GameStone): boolean {
+            let position = this.position;
+            if (!position) {
+                Utils.log(Utils.LogSeverity.Warning, "The game tree does not have a current position");
+                return false;
+            }
+            else if (!position.validate(x, y)) {
+                Utils.log(Utils.LogSeverity.Debug, "The coordinates (" + x.toString() + ", " + y.toString() + ") are not on the Go board");
+                return false;
+            }
+
+            let clone = new Models.GamePosition(position);
+            let moveResult = clone.play(x, y, colour, this.previousPosition);
+            if (moveResult == GameMoveResult.Success) {
+                return true;
+            }
+            else {
+                Utils.log(Utils.LogSeverity.Info, GamePosition.moveResultToString(moveResult));
+                return false;
             }
         }
     }

@@ -1,6 +1,6 @@
 ul.sidebar-menu {
     @extend .list-none;
-    margin: 16px 28px 16px -6px;
+    margin: 16px $view-sidebar-right-margin 16px -6px;
 }
 
 ul.sidebar-menu > li {

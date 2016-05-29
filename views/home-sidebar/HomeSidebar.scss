@@ -2,7 +2,7 @@
     display: block;
     background-color: lighten($gray-light, 16%);
     margin-top: 1em;
-    margin-right: 28px;
+    margin-right: $view-sidebar-right-margin;
     padding: 0.2em 30px;
     font-size: smaller;
 }

@@ -81,15 +81,15 @@ namespace Models {
             }
         }
 
-        public splitKomi(): KomiSplit {
+        public static splitKomi(komi: number): KomiSplit {
             let reverse: boolean = false;
             let base: number = 0;
             let half: boolean = false;
 
-            if (this.komi) {
-                reverse = (this.komi < 0);
-                base = Math.floor(this.komi);
-                half = (this.komi != base);
+            if (komi) {
+                reverse = (komi < 0);
+                base = Math.floor(komi);
+                half = (komi != base);
             }
 
             if (!reverse) {
