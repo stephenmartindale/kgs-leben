@@ -14,6 +14,8 @@ namespace KGS {
         public get userNames(): string[] { return Object.keys(this.users); }
 
         public games: DatabaseDictionary<Models.GameState>;
+
+        public automatch: Models.AutomatchState;
     }
 
     class DatabaseInternal extends KGS.Database {
@@ -29,6 +31,8 @@ namespace KGS {
             this.channels = {};
             this.users = {};
             this.games = {};
+
+            this.automatch = new Models.AutomatchState();
         }
 
         public _createChannel(digest: KGS.DataDigest, channelId: number, channelType: Models.ChannelType): Models.Channel {
@@ -78,8 +82,10 @@ namespace KGS {
         public _updateGameChannel(digest: KGS.DataDigest, channelId: number, game: KGS.GameChannel | KGS.ChallengeChannel | KGS.GameSummary) {
             if ((<KGS.GameChannel | KGS.ChallengeChannel>game).roomId != null) {
                 let parentChannelId = (<KGS.GameChannel | KGS.ChallengeChannel>game).roomId;
-                let parentChannel = this._requireChannel(parentChannelId) as Models.RoomChannel;
-                if (parentChannel.addGame(channelId)) digest.touchChannelGames(parentChannelId);
+                let parentChannel = this.channels[parentChannelId];
+                if ((parentChannel != null) && (parentChannel.channelType == Models.ChannelType.Room)) {
+                    if ((<Models.RoomChannel>parentChannel).addGame(channelId)) digest.touchChannelGames(parentChannelId);
+                }
             }
 
             let gameChannel = this._createChannel(digest, channelId, Models.ChannelType.Game) as Models.GameChannel;
@@ -326,6 +332,17 @@ namespace KGS {
 
             let gameChannel = this._database._createChannel(digest, message.channelId, Models.ChannelType.Game) as Models.GameChannel;
             if (gameChannel.mergeProposal(message.proposal)) digest.touchChannel(gameChannel.channelId);
+        }
+
+        public AUTOMATCH_PREFS = (digest: KGS.DataDigest, message: KGS.Downstream.AUTOMATCH_PREFS) => {
+            if (this._database.automatch.mergePreferences(message)) digest.automatch = true;
+        }
+        public AUTOMATCH_STATUS = (digest: KGS.DataDigest, message: KGS.Downstream.AUTOMATCH_STATUS) => {
+            let seeking = (message.enabled)? true : false;
+            if (this._database.automatch.seeking != seeking) {
+                this._database.automatch.seeking = seeking;
+                digest.automatch = true;
+            }
         }
     }
 }

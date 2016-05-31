@@ -64,6 +64,16 @@ namespace KGS {
         export interface CHALLENGE_ACCEPT extends ChallengeResponse {
         }
 
+        export const _AUTOMATCH_CREATE: string = "AUTOMATCH_CREATE";
+        export interface AUTOMATCH_CREATE extends KGS.Message, KGS.AutomatchPreferences {
+        }
+        export const _AUTOMATCH_SET_PREFS: string = "AUTOMATCH_SET_PREFS";
+        export interface AUTOMATCH_SET_PREFS extends KGS.Message, KGS.AutomatchPreferences {
+        }
+        export const _AUTOMATCH_CANCEL: string = "AUTOMATCH_CANCEL";
+        export interface AUTOMATCH_CANCEL extends KGS.Message {
+        }
+
         export const _GAME_MOVE: string = "GAME_MOVE";
         export interface GAME_MOVE extends ChannelMessage, KGS.Location {
         }

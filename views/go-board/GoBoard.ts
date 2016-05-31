@@ -175,6 +175,7 @@ namespace Views {
 
                 this.applyPositionChange(change, Models.GameMarks.BlackStone, Models.GameMarks.WhiteStone, "SHELL");
                 this.applyPositionChange(change, Models.GameMarks.BlackTerritory, Models.GameMarks.WhiteTerritory, this._drawHandlers.moku);
+                this.applyPositionChange(change, Models.GameMarks.LastMove, Models.GameMarks.LastMove, this._drawHandlers.lastMove);
             }
 
             this._position = position;
@@ -216,6 +217,24 @@ namespace Views {
                 }
 
                 ctx.arc(xr - board.ls, yr - board.ls, Math.max(0, sr - 0.5), 0, 2 * Math.PI, true);
+                ctx.fill();
+            })
+        };
+
+        public lastMove: WGo.BoardDrawHandler = {
+            stone: this.wrapDrawFunction((ctx: CanvasRenderingContext2D, args: WGo.BoardDrawHandlerArgs, board: WGo.Board) => {
+                let xr = board.getX(args.x);
+                let yr = board.getY(args.y);
+                let sr = board.stoneRadius;
+
+                ctx.beginPath();
+
+                if (board.obj_arr[args.x][args.y][0].c == WGo.B)
+                    ctx.fillStyle = "rgba(128, 128, 128, 0.6)";
+                else
+                    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+
+                ctx.arc(xr - board.ls, yr - board.ls, Math.max(0, (sr * 0.3) - 0.5), 0, 2 * Math.PI);
                 ctx.fill();
             })
         };

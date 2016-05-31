@@ -38,8 +38,10 @@ declare namespace WGo {
         removeObject(obj: BoardRemoveObject | BoardRemoveObject[]): void;
         removeAllObjects(): void;
 
-        stoneRadius: number;        // Size of stone radius in pixels. (read only)
-        ls: number;                 // Line-Shift (defined in wgo.js line 1050)
+        stoneRadius: number;                   // Size of stone radius in pixels. (read only)
+        ls: number;                            // Line-Shift (defined in wgo.js line 1050)
+        obj_arr: ColourCoordinates[][][];      // Object Structure
+
         getX(x: number): number;    // Returns absolute x-coordinate of file or column x
         getY(y: number): number;    // Returns absolute y-coordinate of rank or row y
     }

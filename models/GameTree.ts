@@ -118,6 +118,8 @@ namespace Models {
 
                 let properties = node.properties;
                 if (properties) {
+                    let lastMove: KGS.Coordinates;
+                    let clearLastMove: boolean;
                     for (let p = 0; p < properties.length; ++p) {
                         let pass: boolean = null;
                         let loc: KGS.Coordinates = null;
@@ -138,22 +140,34 @@ namespace Models {
                         let moveResult: Models.GameMoveResult;
                         switch (properties[p].name) {
                             case KGS.SGF._MOVE:
-                                if ((loc) && (colour)) moveResult = position.play(loc.x, loc.y, colour, previousPosition);
+                                if ((loc) && (colour)) {
+                                    moveResult = position.play(loc.x, loc.y, colour, previousPosition);
+                                    lastMove = loc;
+                                }
                                 else if (!pass) malformed = true;
                                 break;
 
                             case KGS.SGF._ADDSTONE:
-                                if ((loc) && (colour)) moveResult = position.addStone(loc.x, loc.y, colour);
+                                if ((loc) && (colour)) {
+                                    moveResult = position.addStone(loc.x, loc.y, colour);
+                                    clearLastMove = true;
+                                }
                                 else malformed = true;
                                 break;
 
                             case KGS.SGF._TERRITORY:
-                                if ((loc) && (colour)) position.addMarks(loc.x, loc.y, (colour == Models.GameStone.White)? Models.GameMarks.WhiteTerritory : Models.GameMarks.BlackTerritory);
+                                if ((loc) && (colour)) {
+                                    position.addMarks(loc.x, loc.y, (colour == Models.GameStone.White)? Models.GameMarks.WhiteTerritory : Models.GameMarks.BlackTerritory);
+                                    clearLastMove = true;
+                                }
                                 else malformed = true;
                                 break;
 
                             case KGS.SGF._DEAD:
-                                if (loc) position.addMarks(loc.x, loc.y, Models.GameMarks.Dead);
+                                if (loc) {
+                                    position.addMarks(loc.x, loc.y, Models.GameMarks.Dead);
+                                    clearLastMove = true;
+                                }
                                 else malformed = true;
                                 break;
 
@@ -170,6 +184,9 @@ namespace Models {
                             Utils.log(Utils.LogSeverity.Error, "Error when applying SGF property '" + properties[p].name + "' to game position: " + GamePosition.moveResultToString(moveResult), properties[p], moveResult);
                         }
                     }
+
+                    if (clearLastMove) position.lastMove(null, null);
+                    else if (lastMove) position.lastMove(lastMove.x, lastMove.y);
                 }
 
                 this._positions[activateId] = position;

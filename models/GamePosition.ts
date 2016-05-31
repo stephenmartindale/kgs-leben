@@ -33,6 +33,9 @@ namespace Models {
         public white: Models.GamePositionScore;
         public black: Models.GamePositionScore;
 
+        private _lastMove: number;
+        private _koMove: number;
+
         constructor(size?: number);
         constructor(original: GamePosition);
         constructor(arg?: number | GamePosition) {
@@ -51,6 +54,8 @@ namespace Models {
                 this.schema = original.schema.slice();
                 this.white = { prisoners: original.white.prisoners, captures: original.white.captures, territory: original.white.territory };
                 this.black = { prisoners: original.black.prisoners, captures: original.black.captures, territory: original.black.territory };
+                this._lastMove = original._lastMove;
+                this._koMove = original._koMove;
             }
         }
 
@@ -75,8 +80,8 @@ namespace Models {
             let length = (this.size * this.size);
             let changes: GamePositionChange[] = [];
             for (let i = 0; i < length; ++i) {
-                let oldBits = ((old != null) && (old.schema[i] != null))? old.schema[i] : 0;
-                let newBits = (this.schema[i] != null)? this.schema[i] : 0;
+                let oldBits = (old != null)? old._get(i) : 0;
+                let newBits = this._get(i);
                 if (oldBits != newBits) {
                     let x = ~~(i / this.size);
                     let y = i - (x * this.size);
@@ -101,11 +106,18 @@ namespace Models {
             return (this.index(x, y) >= 0);
         }
 
+        private _get(i: number): number {
+            let bits = this.schema[i];
+            if (bits == null) bits = 0;
+            if (this._lastMove == i) bits |= GameMarks.LastMove;
+            if (this._koMove == i) bits |= GameMarks.Ko;
+            return bits;
+        }
+
         public get(x: number, y: number): number {
             let i = this.index(x, y);
             if (i < 0) throw _coordinatesInvalidError;
-            let bits = this.schema[i];
-            return (bits != null)? bits : 0;
+            return this._get(i);
         }
 
         private set(i: number, bits: number) {
@@ -236,6 +248,15 @@ namespace Models {
                     if (((setBits & deadBlackStone) != 0) && ((newBits & deadBlackStone) == deadBlackStone)) this.white.captures += 1;
                 }
             }
+        }
+
+        public lastMove(x: number, y: number): void {
+            if ((x != null) && (y != null)) {
+                let i = this.index(x, y);
+                if ((i != null) && (i < 0)) throw _coordinatesInvalidError;
+                this._lastMove = i;
+            }
+            else this._lastMove = null;
         }
 
         public static moveResultToString(moveResult: GameMoveResult): string {

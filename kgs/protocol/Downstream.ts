@@ -91,17 +91,11 @@ namespace KGS {
         }
 
         export const _AUTOMATCH_PREFS: string = "AUTOMATCH_PREFS";
-        export interface AUTOMATCH_PREFS extends Message {
-            maxHandicap?: number,
-            estimatedRank?: string,
-            fastOk?: boolean,
-            unrankedOk?: boolean,
-            humanOk?: boolean,
-            mediumOk?: boolean,
-            freeOk?: boolean,
-            rankedOk?: boolean,
-            blitzOk?: boolean,
-            robotOk?: boolean
+        export interface AUTOMATCH_PREFS extends Message, AutomatchPreferences {
+        }
+        export const _AUTOMATCH_STATUS: string = "AUTOMATCH_STATUS";
+        export interface AUTOMATCH_STATUS extends Message {
+            enabled: boolean,
         }
 
         export const _PLAYBACK_ADD: string = "PLAYBACK_ADD";
@@ -147,6 +141,12 @@ namespace KGS {
         export const _GAME_NOTIFY: string = "GAME_NOTIFY";
         export interface GAME_NOTIFY extends Message {
             game: GameChannel
+        }
+
+        export const _GAME_PREP_STATUS: string = "GAME_PREP_STATUS";
+        export interface GAME_PREP_STATUS extends ChannelMessage {
+            prepType: "END" | "TOURNAMENT" | "AUTOMATCH",
+            time?: number        // The time (in seconds) until the game goes back to normal. (Not present when prepType is "END")
         }
 
         export const _GAME_CONTAINER_REMOVE_GAME: string = "GAME_CONTAINER_REMOVE_GAME";

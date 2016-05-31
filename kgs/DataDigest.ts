@@ -30,5 +30,7 @@ namespace KGS {
         public touchGameClocks(channelId: number) { this.gameClocks[channelId] = true; }
         public gameActions: { [channelId: number]: boolean } = {};
         public touchGameActions(channelId: number) { this.gameActions[channelId] = true; }
+
+        public automatch: boolean = false;
     }
 }

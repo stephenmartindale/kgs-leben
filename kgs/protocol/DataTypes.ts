@@ -120,4 +120,17 @@ namespace KGS {
     export interface Location {
         loc: "PASS" | Coordinates
     }
+
+    export interface AutomatchPreferences {
+        maxHandicap: number,      // The maximum number of handicap stones accepted in an automatch game.
+        estimatedRank?: string,   // The rank we claim to be. 1k is the highest allowed.
+        freeOk?: boolean, 	      // If set, free (unrated) games are OK.
+        rankedOk?: boolean, 	  // If set, rated games are OK.
+        robotOk?: boolean, 	      // If set, games against robots are OK.
+        humanOk?: boolean, 	      // If set, games against humans are OK.
+        blitzOk?: boolean, 	      // If set, blitz games are OK.
+        fastOk?: boolean, 	      // If set, fast games are OK.
+        mediumOk?: boolean, 	  // If set, medium speed games are OK.
+        unrankedOk?: boolean, 	  // If set, playing against unranked players are OK.
+    }
 }
