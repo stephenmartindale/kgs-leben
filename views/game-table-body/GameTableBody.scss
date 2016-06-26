@@ -1,15 +1,14 @@
 div.game-list tbody td {
+    @extend .control-clickable;
     padding: 4px;
-    user-select: none;
 }
 
 div.game-list tbody tr:nth-child(odd) {
-   background-color: lighten($gray-dark, 5%);
+    background-color: lighten($colour-dark, 5%);
 }
 
 div.game-list tbody tr:hover {
-    background-color: $gray;
-    cursor: pointer;
+    background-color: lighten($colour-dark, 10%);
 }
 
 div.game-list tbody td span {

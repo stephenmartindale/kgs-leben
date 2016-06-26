@@ -1,0 +1,32 @@
+$text-box-padding-vertical:    0.6rem;
+$text-box-padding-horizontal:  0.6rem;
+
+input[type=text], input[type=password], input[type=number], input[type=time] {
+    @extend .control-text;
+    box-sizing: border-box;
+    background-color: $colour-white;
+    border: 1px solid darken($colour-light, 15%);
+    outline: none;
+    padding: $text-box-padding-vertical $text-box-padding-horizontal;
+
+    &.disabled, &:disabled, .theme-dark &.disabled, .theme-dark &:disabled {
+        background-color: transparent;
+        border-color: transparent;
+    }
+
+    .theme-dark & {
+        color: $colour-light;
+        background-color: $colour-dark;
+        border: 1px solid lighten($colour-dark, 15%);
+    }
+}
+
+input[type=number] {
+    font-size: larger;
+    line-height: 1.5rem;
+    padding: 0 0 0 4px;
+}
+
+input[type=checkbox] {
+    @extend .control-clickable;
+}

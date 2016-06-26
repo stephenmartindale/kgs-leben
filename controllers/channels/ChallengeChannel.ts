@@ -62,7 +62,7 @@ namespace Controllers {
             }
 
             if (player == null) {
-                proposalForm.handicap = Models.User.estimateHandicap(challenger.rank, me.rank);
+                proposalForm.handicap = Models.UserRank.estimateHandicap(challenger.rank, me.rank);
             }
 
             if (gameChannel.proposal.nigiri) {

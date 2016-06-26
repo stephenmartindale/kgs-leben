@@ -16,7 +16,7 @@ namespace Views {
 
             this._primary = <HTMLDivElement>this.root.children[0];
             this._primary.onclick = this._onPrimaryClick;
-            this._confirm = <HTMLDivElement>this.root.children[1];
+            this._confirm = <HTMLDivElement>this.root.children[2];
             this._confirm.onclick = this._onConfirmClick;
 
             if (text) this.text = text;
@@ -88,11 +88,17 @@ namespace Views {
         }
 
         public get dangerous(): boolean {
-            return this.root.classList.contains('danger');
+            return this._confirm.classList.contains('negative');
         }
         public set dangerous(dangerous: boolean) {
-            if (dangerous) this.root.classList.add('danger');
-            else this.root.classList.remove('danger');
+            if (dangerous) {
+                this._confirm.classList.add('negative');
+                this._confirm.classList.remove('positive');
+            }
+            else {
+                this._confirm.classList.add('positive');
+                this._confirm.classList.remove('negative');
+            }
         }
     }
 }

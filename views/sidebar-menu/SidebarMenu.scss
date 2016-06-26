@@ -4,23 +4,22 @@ ul.sidebar-menu {
 }
 
 ul.sidebar-menu > li {
+    @extend .control-clickable;
     position: relative;
-    padding: 2px 0 2px 6px;
-    border-left: 6px solid $gray-light;
+    padding: 4px 0 4px 6px;
+    border-left: 6px solid $colour-medium;
     white-space: nowrap;
-    user-select: none;
-    cursor: pointer;
 }
 
 ul.sidebar-menu > li:hover {
-    border-left-color: $gray;
-    background-color: $gray-lightest;
+    border-left-color: darken($colour-medium, 5%);
+    background-color: $colour-lighter;
 }
 
 ul.sidebar-menu > li.active,
 ul.sidebar-menu > li.active:hover {
-    background-color: $gray-lightest;
-    border-left-color: $brand-warning;
+    border-left-color: $colour-negative;
+    background-color: $colour-lighter;
     font-weight: bold;
 }
 
@@ -30,26 +29,10 @@ ul.sidebar-menu > li:before {
     text-align: center;
 }
 
-ul.sidebar-menu > li.kgs-info,
-ul.sidebar-menu > li.kgs-info:hover {
-    border-left-color: $brand-info;
-}
-ul.sidebar-menu > li.kgs-info:before {
-    color: $brand-info;
-}
-
-ul.sidebar-menu > li.kgs-warning,
-ul.sidebar-menu > li.kgs-warning:hover {
-    border-left-color: $brand-warning;
-}
-ul.sidebar-menu > li.kgs-warning:before {
-    color: $brand-warning;
-}
-
 ul.sidebar-menu span.btn-close {
     @extend .block-absolute;
     left: auto;
-    padding: 0 0.5rem 0 0.2rem;
+    padding: 4px;
     opacity: 0;
     transition: opacity 100ms;
 }
@@ -58,5 +41,5 @@ ul.sidebar-menu > li:hover span.btn-close {
 }
 ul.sidebar-menu span.btn-close:hover {
     opacity: 1;
-    color: $brand-danger;
+    color: $colour-negative;
 }

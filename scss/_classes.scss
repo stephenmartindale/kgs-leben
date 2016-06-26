@@ -1,3 +1,12 @@
+.theme-dark {
+    background-color: $colour-dark;
+    color: $colour-light;
+}
+.theme-light {
+    background-color: $colour-light;
+    color: $colour-dark;
+}
+
 .div-fill {
     top: 0;
     right: 0;
@@ -28,14 +37,26 @@
     position: absolute;
 }
 
+.flex-centerer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+.flex-column-set {
+    display: flex;
+    flex-direction: row;
+}
+.flex-column-set > * {
+    flex: 1 1 auto;
+}
+
 .hidden {
     visibility: hidden;
 }
-.center {
-    margin: 0 auto;
-}
 
-.list-none {
+.list-none, .list-none > li {
     margin: 0;
     padding: 0;
     list-style: none;
@@ -43,10 +64,12 @@
 
 .secondary {
     font-size: small;
-    color: $gray;
 }
-.bg-inverse .secondary {
-    color: $gray-light;
+.theme-light .secondary {
+    color: lighten($colour-dark, 30%);
+}
+.theme-dark .secondary {
+    color: darken($colour-light, 30%);
 }
 
 .table {
@@ -57,4 +80,21 @@
 }
 .table > * > * {
     display: table-cell;
+}
+
+.control {
+    user-select: none;
+    cursor: default;
+}
+.control.disabled {
+    cursor: default !important;
+}
+.control-text {
+    @extend .control;
+    user-select: text;
+    cursor: text;
+}
+.control-clickable {
+    @extend .control;
+    cursor: pointer;
 }

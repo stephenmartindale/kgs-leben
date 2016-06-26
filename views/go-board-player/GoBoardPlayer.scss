@@ -52,6 +52,9 @@ $view-go-board-player-padding: 10px;
 .go-board-player .score-info {
     @extend .table;
 }
+.go-board-player .score-info * {
+    @extend .control;
+}
 .go-board-player .score-info > div > span {
     text-align: right;
 }
@@ -67,6 +70,9 @@ $view-go-board-player-padding: 10px;
 .go-board-player .player-info {
     display: block;
     overflow: hidden;
+}
+.go-board-player .player-info * {
+    @extend .control;
 }
 .go-board .team-home .go-board-player .player-info > * {
     float: left;
@@ -91,7 +97,6 @@ $view-go-board-player-padding: 10px;
 }
 .go-board-player .player-info img.avatar {
     height: $view-go-clock-height;
-    border-radius: $border-radius;
 }
 
 .go-board-player .player-buttons {

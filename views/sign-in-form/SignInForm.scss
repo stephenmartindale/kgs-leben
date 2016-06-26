@@ -1,24 +1,37 @@
-form.sign-in-form {
-    max-width: 360px;
-    padding: 30px;
-    margin: 0 auto;
+.sign-in-form {
+    overflow: hidden;
+    max-width: 280px;
+    padding: 42px;
+    margin: 42px auto;
 }
 
-form.sign-in-form h2 {
+.sign-in-form h2 {
     margin-bottom: 2rem;
     font-size: 2rem;
 }
 
-form.sign-in-form input[name=username], form.sign-in-form input[name=password] {
-    padding: 10px;
-    font-size: 16px;
-    margin-bottom: 1px;
+.sign-in-form input[name=username], form.sign-in-form input[name=password] {
+    width: 100%;
+    font-size: 18px;
 }
 
-form.sign-in-form .checkbox label {
+.sign-in-form .checkbox {
+    margin-top: 16px;
+}
+
+.sign-in-form .checkbox label {
     margin: 0.5rem 0;
 }
 
-form.sign-in-form button[type=submit] {
+.sign-in-form button[type=submit] {
     margin: 2rem 0 2rem;
+    float: right;
+}
+
+.sign-in-form .error-notice, .sign-in-form .remember-me-warning {
+    color: $colour-negative;
+}
+.sign-in-form .remember-me-warning {
+    font-size: small;
+    font-style: oblique;
 }

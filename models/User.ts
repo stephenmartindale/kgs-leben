@@ -20,15 +20,12 @@ namespace Models {
         public name: string;
         public rank: string;
 
-        private _approximateRating: number;
-
         private _flags: string;
         public flags: UserFlags;
 
         constructor(user: KGS.User) {
             this.name = user.name;
             this.rank = user.rank;
-            this._approximateRating = User.estimateRating(user.rank);
 
             this.mergeFlags(user.flags);
         }
@@ -36,12 +33,7 @@ namespace Models {
         public mergeUser(user: KGS.User): boolean {
             let touch: boolean = false;
             if (this.name != user.name) { this.name = user.name; touch = true; }
-
-            if (this.rank != user.rank) {
-                this.rank = user.rank;
-                this._approximateRating = User.estimateRating(user.rank);
-                touch = true;
-            }
+            if (this.rank != user.rank) { this.rank = user.rank; touch = true; }
 
             return ((touch) || (this.mergeFlags(user.flags)));
         }
@@ -80,57 +72,8 @@ namespace Models {
             return false;
         }
 
-        private static _rankRegex = /(\d+)\s*([kKdD])[yYuUaAnN]*\s*(\??)/;
-        private static _ratingHalfStone = 50;
-
-        public static estimateRating(rank: string): number {
-            if (!rank) return undefined;
-            let parts = User._rankRegex.exec(rank);
-            if (!parts) return undefined;
-
-            let bonus: number = (parts[3] != '?')? 50 : 0;
-            if ((parts[2] == 'd') || (parts[2] == 'D')) {
-                return 2900 + (+parts[1] * 100) + bonus;
-            }
-            else {
-                return 3000 - (+parts[1] * 100) + bonus;
-            }
-        }
-
-        public static estimateHandicap(leftRank: string, rightRank: string) {
-            let leftRating = User.estimateRating(leftRank);
-            let rightRating = User.estimateRating(rightRank);
-            if ((leftRating != null) && (rightRating != null))
-                return ~~(leftRating / 100) - ~~(rightRating / 100);
-            else
-                return 0;
-        }
-
-        public static ratingToRank(rating: number): string {
-            if (rating >= 3000) {
-                return (~~(rating / 100) - 29).toString() + " dan";
-            }
-            else {
-                return (30 - ~~(rating / 100)).toString() + " kyu";
-            }
-        }
-
         public hasFlag(flags: UserFlags): boolean {
             return ((this.flags & flags) == flags);
-        }
-
-        public static compare(left: User, right: User): number {
-            if ((left) && (right)) {
-                if ((left._approximateRating != null) && (right._approximateRating != null)) {
-                    return (left._approximateRating - right._approximateRating);
-                }
-                else if (left._approximateRating != null) return +10000;
-                else if (right._approximateRating != null) return -10000;
-            }
-            else if (left) return +10000;
-            else if (right) return -10000;
-
-            return 0;
         }
     }
 }

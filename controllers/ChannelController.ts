@@ -3,6 +3,7 @@
 namespace Controllers {
     export class ChannelController extends ControllerBase<Application> {
         private _channelList: Views.ChannelList;
+        private _ambientStatus: Controllers.AmbientStatusController;
 
         private _joinedChannelIds: number[];
         private _channelControllers: {
@@ -38,6 +39,9 @@ namespace Controllers {
             this._channelList.selectionCallback = this._onChannelListSelection;
             this._channelList.closeCallback = this._onChannelListClose;
             this.application.layout.sidebar.show(this._channelList);
+
+            this._ambientStatus = new AmbientStatusController(this);
+            this._ambientStatus.activate();
         }
 
         protected digest(digest: KGS.DataDigest) {

@@ -1,16 +1,17 @@
 #main {
     @extend .block-fixed;
+    @extend .theme-dark;
     right: 33%;
     z-index: $zindex-main;
 }
 
 #sidebar {
     @extend .flex-fixed;
+    @extend .theme-light;
     flex-direction: column;
     left: auto;
     width: 33%;
     z-index: $zindex-sidebar;
-    background-color: $gray-lighter;
 }
 #sidebar > div {
     position: relative;
@@ -20,31 +21,12 @@
     flex: 1 1 auto;
 }
 
-#main, #sidebar {
-    transition: right 120ms ease-out;
-}
-
 #main > div {
     @extend .block-absolute;
     z-index: $zindex-main;
 }
-#main > div > * {
-    @extend .center;
-}
 
-@media (max-width: map-get($grid-breakpoints, "lg") - 1px) {
-    #main {
-        right: 48px;
-    }
-    #sidebar {
-        width: 330px;
-    }
-    #sidebar.inactive:not(:hover) {
-        right: 48px - 330px;
-    }
-}
-
-@media (min-width: map-get($grid-breakpoints, "xxl")) {
+@media (min-width: map-get($responsive-breakpoints, "xxl")) {
     #main {
         right: 528px;
     }

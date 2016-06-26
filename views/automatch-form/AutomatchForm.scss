@@ -1,0 +1,51 @@
+.automatch {
+    padding-left: 12px;
+}
+
+.disabled .automatch label, .disabled .automatch input {
+    color: $colour-medium;
+    cursor: default;
+}
+
+.automatch > .hidden {
+    display: none;
+}
+.automatch > div {
+    margin-bottom: 12px;
+}
+
+.automatch > div.automatch-float-row {
+    overflow: hidden;
+}
+.automatch > div.automatch-float-row > div {
+    float: left;
+    line-height: 1.8em;
+    vertical-align: baseline;
+}
+.automatch > div.automatch-float-row > div + div {
+    margin-left: 12px;
+}
+
+.automatch div.input-estimated-rank, .automatch div.input-max-handicap {
+    & input {
+        float: left;
+    }
+
+    &::after {
+        float: left;
+        margin-left: -50px;
+        pointer-events: none;
+        color: $colour-medium;
+        font-size: 8pt;
+    }
+}
+.automatch div.input-estimated-rank::after {
+    content: "kyu";
+}
+.automatch div.input-max-handicap::after {
+    content: "stones";
+}
+
+.automatch div.hidden {
+    display: none;
+}

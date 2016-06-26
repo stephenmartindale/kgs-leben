@@ -1,19 +1,12 @@
-﻿// Colors
-//
-$gray-dark:                 #292f36;
-$gray:                      #797989;
-$gray-light:                lighten($gray, 18%);
-$gray-lighter:              #e5e5e5;
-$gray-lightest:             lighten($gray-lighter, 5%);
-
-$brand-primary:             #292f36;
-$brand-success:             #4ecdc4;
-$brand-info:                $brand-success;
-$brand-warning:             #ff6b6b;
-$brand-danger:              darken($brand-warning, 10%);
-
-$body-bg:                   $gray-dark;
-$body-color:                $gray-dark;
+﻿// Colours
+$colour-black:      #000000;
+$colour-dark:       #292f36;
+$colour-medium:     #bcbcbc;
+$colour-light:      #e5e5e5;
+$colour-lighter:    #f2f2f2;
+$colour-white:      #ffffff;
+$colour-positive:   #4ecdc4;
+$colour-negative:   #ff6b6b;
 
 // Go Specific Variables
 $go-stone-diameter:         22mm;
@@ -21,33 +14,19 @@ $go-board-size-min:         9;
 $go-board-size-max:         19;
 
 // View Parameters
-$view-sidebar-right-margin: 28px;
-$view-go-clock-segment-off: darken($gray-dark, 2%);
-$view-go-clock-segment-on:  $gray-lightest;
-$view-go-clock-width:       240px;
-$view-go-clock-height:      86px;
-
-// Bootstrap Options (4.0.0-alpha.2)
-//
-// Quickly modify global styling by enabling or disabling optional features.
-$enable-flex:               true;
-$enable-rounded:            true !default;
-$enable-shadows:            false !default;
-$enable-gradients:          false !default;
-$enable-transitions:        false !default;
-$enable-hover-media-query:  false;     // N.B.: If enabled, CSS must be post-processed with https://github.com/twbs/mq4-hover-shim
-$enable-grid-classes:       true !default;
+$view-sidebar-right-margin:                 28px;
+$view-go-clock-segment-off:                 darken($colour-dark, 2%);
+$view-go-clock-segment-on:                  $colour-light;
+$view-go-clock-width:                       240px;
+$view-go-clock-height:                      86px;
 
 // Z-indices
-//
-// (See also: Bootstrap's Z-index master list in bootstrap/scss/_variables.scss near line 355)
 $zindex-main:               1;
 $zindex-sidebar:            $zindex-main + 100;
 $zindex-lightbox:           2000;
 
 // Responsive Breakpoints
-//
-$grid-breakpoints: (
+$responsive-breakpoints: (
   xs: 0,
   sm: 544px,
   md: 768px,

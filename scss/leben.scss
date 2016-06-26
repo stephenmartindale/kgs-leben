@@ -1,24 +1,15 @@
 ﻿// Sass Configuration Partial
 @import "variables";
 
-// Dependency: Bootstrap 4
-@import "mixins";
-@import "bootstrap-reboot";
-@import "forms";
-@import "buttons";
-@import "jumbotron";
-@import "utilities";
-@import "utilities-background";
-
 // Dependency: Font-Awesome
 @import "font-awesome";
 
 // KGS Leben
+@import "reset";
 @import "classes";
-@import "elements";
 @import "layout";
 
 // Rolled up Views Partial
 /* __views.scss is produced by Gulp in its temporary working directory
    by concatenating all the Sass scripts nested inside the 'views' directory. */
-@import "_views";
+@import "../views/_views";

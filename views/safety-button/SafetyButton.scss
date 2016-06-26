@@ -1,7 +1,4 @@
 $view-safety-button-thumb-width: 32px;
-$view-safety-button-vertical-padding: 1px;
-$view-safety-button-horizontal-padding: 10px;
-$view-safety-button-horizontal-spacing: 2px;
 
 .safety-button {
     display: block;
@@ -9,68 +6,27 @@ $view-safety-button-horizontal-spacing: 2px;
 }
 
 .safety-button > div {
+    display: block;
     float: left;
 }
 
-.safety-button .primary, .safety-button .primary:after, .safety-button .confirmation {
-    font-size: 12pt;
-    line-height: 24px;
+.safety-button .fa-thumbs-up {
+    background-color: $colour-positive;
+}
+.safety-button.danger .fa-thumbs-up {
+    background-color: $colour-negative;
 }
 
-.safety-button .primary, .safety-button .primary:after {
-    @extend .btn;
-    @extend .btn-default;
-    background-color: $gray;
-}
-
-.safety-button .primary {
-    margin-right: $view-safety-button-thumb-width + (2 * $view-safety-button-horizontal-spacing);
-    padding: $view-safety-button-vertical-padding $view-safety-button-horizontal-padding;
-    transition: background-color 160ms ease, color 160ms ease;
-}
-.safety-button.primed .primary {
-    background-color: darken($gray, 10%);
-    color: $gray-lightest;
-}
-.safety-button.disabled .primary {
-    background-color: darken($gray, 20%);
-    color: darken($gray-lightest, 30%);
-    cursor: default;
-}
-
-.safety-button .confirmation {
-    @extend .btn-success;
-}
-.safety-button.danger .confirmation {
-    @extend .btn-warning;
-}
-
-.safety-button .primary:after {
-    @extend .fa;
-    content: "\f165";
-    position: relative;
-    float: right;
-    margin-right: -($view-safety-button-horizontal-padding + $view-safety-button-thumb-width + $view-safety-button-horizontal-spacing + 1);
-    margin-top: -($view-safety-button-vertical-padding + 1);
-    margin-bottom: -($view-safety-button-vertical-padding + 1);
-}
-.safety-button .primary:after, .safety-button .confirmation {
-    padding: $view-safety-button-vertical-padding 0;
+.safety-button > div.button:not(:first-child) {
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: 2px;
     width: $view-safety-button-thumb-width;
-}
-
-.safety-button .confirmation {
-    @extend .fa;
-    @extend .btn;
-    @extend .fa-thumbs-up;
-}
-
-.safety-button .primary:after, .safety-button .confirmation {
     visibility: hidden;
     opacity: 0;
     transition: visibility 100ms ease-in-out, opacity 100ms ease-in-out;
 }
-.safety-button.primed .primary:after, .safety-button.primed .confirmation {
+.safety-button.primed > div.button:not(:first-child) {
     visibility: visible;
     opacity: 1;
 }

@@ -5,7 +5,7 @@ $switch-narrow-width: 25px;
 .switch {
     position: relative;
     overflow: hidden;
-    font-size: 16px;
+    font-size: 14px;
     margin-bottom: 0.2em;
 }
 .switch label {
@@ -20,18 +20,15 @@ $switch-narrow-width: 25px;
     text-align: center;
     font-weight: bold;
     font-variant: small-caps;
-    color: $gray-light;
     cursor: pointer;
 }
 .switch-narrow label {
     width: $switch-narrow-width;
 }
-.switch label:hover, .switch input:checked + label {
-    color: $gray-lightest;
-}
+
 .switch input:disabled + label {
-    cursor: not-allowed;
-    color: darken($gray-light, 14%);
+    cursor: default;
+    color: darken($colour-light, 40%);
 }
 
 .switch input {
@@ -57,29 +54,11 @@ $switch-narrow-width: 25px;
     left: 0px;
     width: $switch-width;
     height: $switch-height;
-    border-radius: $border-radius;
-    background-color: $gray;
-    background-image: linear-gradient(to bottom left, $gray, darken($gray, 8%));
+    background-color: darken($colour-medium, 30%);
     transition: left 0.15s ease-out;
-}
-input.switch-success:checked ~ .switch-selection {
-    background-color: $brand-success;
-    background-image: linear-gradient(to bottom left, $brand-success, darken($brand-success, 8%));
-}
-input.switch-warning:checked ~ .switch-selection {
-    background-color: $brand-warning;
-    background-image: linear-gradient(to bottom left, $brand-warning, darken($brand-warning, 8%));
-}
-input.switch-danger:checked ~ .switch-selection {
-    background-color: $brand-danger;
-    background-image: linear-gradient(to bottom left, $brand-danger, darken($brand-danger, 8%));
+    border-radius: 3px;
 }
 
 .switch-narrow .switch-selection {
     width: $switch-narrow-width;
-}
-.switch input:disabled ~ .switch-selection {
-    border: 2px solid darken($gray, 10%);
-    background-image: none;
-    background-color: transparent;
 }

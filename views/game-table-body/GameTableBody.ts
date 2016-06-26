@@ -63,37 +63,30 @@ namespace Views {
             else typeSpans[1].className = 'secondary';
 
             let playersSwapped: boolean = false;
-            let strongerPlayer: Models.User = (datum.playerWhite != null)? this.userDataSource(datum.playerWhite) : null;
-            let weakerPlayer: Models.User = (datum.playerBlack != null)? this.userDataSource(datum.playerBlack) : null;
-            if (Models.User.compare(weakerPlayer, strongerPlayer) > 0) {
-                let temp = strongerPlayer;
-                strongerPlayer = weakerPlayer;
-                weakerPlayer = temp;
-                playersSwapped = true;
-            }
-
-            let strongerPlayerSpans = domains[1].getElementsByTagName('span');
-            if (strongerPlayer) {
-                strongerPlayerSpans[0].className = (!playersSwapped)? 'fa-circle' : 'fa-circle-o';
-                strongerPlayerSpans[0].innerText = strongerPlayer.name;
-                strongerPlayerSpans[1].innerText = strongerPlayer.rank;
+            let whitePlayer: Models.User = (datum.playerWhite != null)? this.userDataSource(datum.playerWhite) : null;
+            let whitePlayerSpans = domains[1].getElementsByTagName('span');
+            if (whitePlayer) {
+                whitePlayerSpans[0].className = (!playersSwapped)? 'fa-circle' : 'fa-circle-o';
+                whitePlayerSpans[0].innerText = whitePlayer.name;
+                whitePlayerSpans[1].innerText = whitePlayer.rank;
             }
             else {
-                strongerPlayerSpans[0].className = '';
-                strongerPlayerSpans[0].innerText = '';
-                strongerPlayerSpans[1].innerText = '';
+                whitePlayerSpans[0].className = '';
+                whitePlayerSpans[0].innerText = '';
+                whitePlayerSpans[1].innerText = '';
             }
 
-            let weakerPlayerSpans = domains[2].getElementsByTagName('span');
-            if (weakerPlayer) {
-                weakerPlayerSpans[0].className = (!playersSwapped)? 'fa-circle-o' : 'fa-circle';
-                weakerPlayerSpans[0].innerText = weakerPlayer.name;
-                weakerPlayerSpans[1].innerText = weakerPlayer.rank;
+            let blackPlayer: Models.User = (datum.playerBlack != null)? this.userDataSource(datum.playerBlack) : null;
+            let blackPlayerSpans = domains[2].getElementsByTagName('span');
+            if (blackPlayer) {
+                blackPlayerSpans[0].className = (!playersSwapped)? 'fa-circle-o' : 'fa-circle';
+                blackPlayerSpans[0].innerText = blackPlayer.name;
+                blackPlayerSpans[1].innerText = blackPlayer.rank;
             }
             else {
-                weakerPlayerSpans[0].className = '';
-                weakerPlayerSpans[0].innerText = '';
-                weakerPlayerSpans[1].innerText = '';
+                blackPlayerSpans[0].className = '';
+                blackPlayerSpans[0].innerText = '';
+                blackPlayerSpans[1].innerText = '';
             }
 
             domains[3].innerText = datum.displaySize;

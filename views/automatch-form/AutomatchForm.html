@@ -1,0 +1,74 @@
+<section data-view="automatch-form">
+    <div class="automatch-form">
+        <h3>Auto-match</h3>
+        <div class="automatch">
+            <div class="automatch-float-row estimated-rank">
+                <div>
+                    <label for="automatchEstimatedRank">Estimated rank:</label>
+                </div>
+                <div class="input-estimated-rank">
+                    <input id="automatchEstimatedRank" name="automatchEstimatedRank" placeholder="25" type="number" step="1" min="1" max="30" />
+                </div>
+            </div>
+            <div class="automatch-float-row max-handicap">
+                <div class="label-max-handicap"><label for="automatchMaxHandicap">Maximum handicap:</label></div>
+                <div class="input-max-handicap">
+                    <input id="automatchMaxHandicap" name="automatchMaxHandicap" placeholder="9" type="number" step="1" min="0" max="9" />
+                </div>
+                <div>
+                    <input type="checkbox" name="automatchOpponentRankedOnly" id="automatchOpponentRankedOnly" checked />
+                    <label for="automatchOpponentRankedOnly">ranked opponents only</label>
+                </div>
+            </div>
+            <div class="flex-column-set">
+                <div>
+                    <ul class="list-none">
+                        <li>
+                            <input type="radio" name="automatchRank" id="automatchRankBoth" checked />
+                            <label for="automatchRankBoth">ranked &amp; free games</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="automatchRank" id="automatchRankRanked" />
+                            <label for="automatchRankRanked">ranked games only</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="automatchRank" id="automatchRankFree" />
+                            <label for="automatchRankFree">free games only</label>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <ul class="list-none">
+                        <li>
+                            <input type="radio" name="automatchOpponentType" id="automatchOpponentTypeEither" checked />
+                            <label for="automatchOpponentTypeEither">human &amp; robot opponents</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="automatchOpponentType" id="automatchOpponentTypeHumans" />
+                            <label for="automatchOpponentTypeHumans">human opponents only</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="automatchOpponentType" id="automatchOpponentTypeRobots" />
+                            <label for="automatchOpponentTypeRobots">robot opponents only</label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="automatch-float-row">
+                <div>
+                    <input type="checkbox" name="automatchSpeedMedium" id="automatchSpeedMedium" checked />
+                    <label for="automatchSpeedMedium">medium games</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="automatchSpeedFast" id="automatchSpeedFast" checked />
+                    <label for="automatchSpeedFast">fast games</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="automatchSpeedBlitz" id="automatchSpeedBlitz" checked />
+                    <label for="automatchSpeedBlitz">blitz games</label>
+                </div>
+            </div>
+            <button class="automatchCancelButton hidden">cancel auto-match</button>
+        </div>
+    </div>
+</section>

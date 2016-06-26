@@ -62,7 +62,7 @@ namespace Controllers {
                     user: this.database.users[gameChannel.playerWhite]
                 };
 
-                if ((this._userColour == Models.GameStone.White) || (Models.User.compare(home.user, away.user) > 0)) {
+                if (this._userColour == Models.GameStone.White) {
                     let temp = away;
                     away = home;
                     home = temp;

@@ -1,0 +1,54 @@
+$button-padding-vertical:    1px;
+$button-padding-horizontal:  10px;
+
+button, .button {
+    @extend .control-clickable;
+    font-size: 12pt;
+    line-height: 24px;
+    text-align: center;
+    background-color: darken($colour-light, 5%);
+    border: 0;
+    outline: none;
+    box-sizing: border-box;
+    padding: $button-padding-vertical $button-padding-horizontal;
+
+    &.large {
+        font-size: large;
+        line-height: 28px;
+        padding: 4px 12px;
+    }
+
+    &:hover, &:active {
+        border: 0;
+        background-color: darken($colour-light, 8%);
+    }
+
+    .theme-dark & {
+    background-color: lighten($colour-dark, 10%);
+    }
+    .theme-dark &.disabled, .theme-dark &.disabled:hover, .theme-dark .disabled &, .theme-dark .disabled &:hover {
+        background-color: lighten($colour-dark, 5%);
+        color: darken($colour-light, 40%);
+    }
+    .theme-dark &:hover {
+        background-color: lighten($colour-dark, 15%);
+    }
+
+    .theme-dark &.positive, .theme-light &.positive {
+        background-color: $colour-positive;
+    }
+    .theme-dark &.positive:hover, .theme-light &.positive:hover {
+        background-color: lighten($colour-positive, 10%);
+    }
+
+    .theme-dark &.negative, .theme-light &.negative {
+        background-color: $colour-negative;
+    }
+    .theme-dark &.negative:hover, .theme-light &.negative:hover {
+        background-color: lighten($colour-negative, 10%);
+    }
+
+    & span + span {
+        margin-left: 0.4rem;
+    }
+}

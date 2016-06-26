@@ -7,7 +7,7 @@
 
 .game-report h3 {
     text-align: center;
-    background-color: $gray-lightest;
+    background-color: $colour-lighter;
     padding: 0.6rem 0;
 }
 
@@ -35,5 +35,5 @@
     padding-right: $view-sidebar-right-margin;
 }
 .game-report tbody tr:last-child {
-    background-color: $gray-lightest;
+    background-color: $colour-lighter;
 }

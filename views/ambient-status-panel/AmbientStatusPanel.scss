@@ -1,0 +1,31 @@
+.ambient-status-panel div {
+    @extend .control;
+    text-align: center;
+    line-height: 26px;
+    vertical-align: top;
+    overflow: hidden;
+}
+.ambient-status-panel > div.hidden {
+    display: none;
+}
+.ambient-status-panel > div:last-child {
+    margin-bottom: 18px;
+}
+
+.ambient-status-panel div * {
+    display: inline-block;
+    height: 26px;
+    line-height: 26px;
+    vertical-align: top;
+}
+.ambient-status-panel div span {
+    font-style: oblique;
+}
+
+.ambient-status-panel div button {
+    margin-left: 12px;
+    color: $colour-negative;
+}
+.ambient-status-panel div button:hover {
+    color: $colour-negative;
+}

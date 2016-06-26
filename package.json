@@ -23,22 +23,22 @@
     },
 
     "devDependencies": {
-        "typescript": "1.8.9",
-        "node-sass": "^3.4.2",
-        "autoprefixer": "^6.3.5",
+        "typescript": "1.8.10",
+        "node-sass": "^3.7.0",
+        "autoprefixer": "^6.3.6",
 
         "gulp": "^3.9.1",
         "rimraf": "^2.5.2",
         "merge-stream": "^1.0.0",
         "gulp-concat": "^2.6.0",
         "gulp-sourcemaps": "^1.6.0",
-        "gulp-typescript": "^2.12.1",
-        "gulp-sass": "^2.2.0",
-        "gulp-postcss": "^6.1.0",
+        "gulp-typescript": "^2.13.6",
+        "gulp-sass": "^2.3.1",
+        "gulp-postcss": "^6.1.1",
 
-        "jquery": "~2.2.2",
-        "bootstrap": "4.0.0-alpha.2",
-        "font-awesome": "^4.5.0"
+        "jquery": "^3",
+        "normalize.css": "^4",
+        "font-awesome": "^4"
     },
 
     "dependencies": {}

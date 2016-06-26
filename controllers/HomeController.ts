@@ -1,5 +1,4 @@
 /// <reference path="ViewControllerBase.ts" />
-
 namespace Controllers {
     export class HomeController extends ViewControllerBase<ChannelController> {
         public static channelId: number = 0;
@@ -29,50 +28,58 @@ namespace Controllers {
 
         private initialiseSidebarView() {
             this._homeSidebar = new Views.HomeSidebar();
-            this._homeSidebar.automatchCallback = () => this.automatchCallback();
-            this._homeSidebar.automatchPreferencesCallback = () => this.automatchPreferencesCallback();
+            this._homeSidebar.automatchForm.automatchPreferencesCallback = this._automatchPreferencesCallback;
+            this._homeSidebar.automatchForm.automatchSeekCallback = this._automatchSeekCallback;
+            this._homeSidebar.automatchForm.automatchCancelCallback = this._automatchCancelCallback;
 
-            this.registerView(this._homeSidebar, LayoutZone.Sidebar, (digest?: KGS.DataDigest) => {});
+            this.registerView(this._homeSidebar, LayoutZone.Sidebar, (digest?: KGS.DataDigest) => {
+                if ((digest == null) || (digest.automatch) || (digest.users[this.database.username])) {
+                    let denyRankEstimate = (this.user) && (Models.UserRank.validate(this.user.rank));
+                    this._homeSidebar.automatchForm.update(this.database.automatch, denyRankEstimate);
+                }
+            });
         }
 
-        private postAutomatchMessage(type: string) {
-            let automatch = this.database.automatch;
+        private postAutomatchMessage(type: string, estimatedRank: Models.UserRank, maxHandicap: number, criteria: Models.AutomatchCriteria) {
             let message = <KGS.Message & KGS.AutomatchPreferences>{
                 type: type,
 
-                maxHandicap: automatch.maxHandicap,
+                maxHandicap: ((maxHandicap != null)? maxHandicap : 9),
 
-                freeOk:     ((automatch.criteria & Models.AutomatchCriteria.FreeGames) != 0),
-                rankedOk:   ((automatch.criteria & Models.AutomatchCriteria.RankedGames) != 0),
+                freeOk:     ((criteria & Models.AutomatchCriteria.FreeGames) != 0),
+                rankedOk:   ((criteria & Models.AutomatchCriteria.RankedGames) != 0),
 
-                robotOk:    ((automatch.criteria & Models.AutomatchCriteria.RobotPlayers) != 0),
-                humanOk:    ((automatch.criteria & Models.AutomatchCriteria.HumanPlayers) != 0),
-                unrankedOk: ((automatch.criteria & Models.AutomatchCriteria.UnrankedPlayers) != 0),
+                robotOk:    ((criteria & Models.AutomatchCriteria.RobotPlayers) != 0),
+                humanOk:    ((criteria & Models.AutomatchCriteria.HumanPlayers) != 0),
+                unrankedOk: ((criteria & Models.AutomatchCriteria.UnrankedPlayers) != 0),
 
-                blitzOk:    ((automatch.criteria & Models.AutomatchCriteria.BlitzSpeed) != 0),
-                fastOk:     ((automatch.criteria & Models.AutomatchCriteria.FastSpeed) != 0),
-                mediumOk:   ((automatch.criteria & Models.AutomatchCriteria.MediumSpeed) != 0)
+                blitzOk:    ((criteria & Models.AutomatchCriteria.BlitzSpeed) != 0),
+                fastOk:     ((criteria & Models.AutomatchCriteria.FastSpeed) != 0),
+                mediumOk:   ((criteria & Models.AutomatchCriteria.MediumSpeed) != 0)
             };
 
-            if ((Models.User.estimateRating(this.user.rank) == null) && (Models.User.estimateRating(automatch.estimatedRank) != null)) {
-                message.estimatedRank = automatch.estimatedRank;
+            let denyRankEstimate = (this.user) && (Models.UserRank.validate(this.user.rank));
+            if ((!denyRankEstimate) && (estimatedRank) && (estimatedRank.rank)) {
+                message.estimatedRank = Models.UserRank.rankToString(estimatedRank, false);
             }
 
-            console.log(automatch, message);
             this.client.post(message);
         }
 
-        private automatchCallback() {
-            if (this.database.automatch.seeking) {
-                this.client.post(<KGS.Upstream.AUTOMATCH_CANCEL>{ type: KGS.Upstream._AUTOMATCH_CANCEL });
-            }
-            else {
-                this.postAutomatchMessage(KGS.Upstream._AUTOMATCH_CREATE);
+        private _automatchPreferencesCallback = (estimatedRank: Models.UserRank, maxHandicap: number, criteria: Models.AutomatchCriteria) => {
+            this.postAutomatchMessage(KGS.Upstream._AUTOMATCH_SET_PREFS, estimatedRank, maxHandicap, criteria);
+        }
+
+        private _automatchSeekCallback = (estimatedRank: Models.UserRank, maxHandicap: number, criteria: Models.AutomatchCriteria) => {
+            if (!this.database.automatch.seeking) {
+                this.postAutomatchMessage(KGS.Upstream._AUTOMATCH_CREATE, estimatedRank, maxHandicap, criteria);
             }
         }
 
-        private automatchPreferencesCallback() {
-            this.postAutomatchMessage(KGS.Upstream._AUTOMATCH_SET_PREFS);
+        private _automatchCancelCallback = () => {
+            if (this.database.automatch.seeking) {
+            	this.client.post(<KGS.Upstream.AUTOMATCH_CANCEL>{ type: KGS.Upstream._AUTOMATCH_CANCEL });
+            }
         }
     }
 }

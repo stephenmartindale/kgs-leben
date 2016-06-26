@@ -15,6 +15,10 @@
     flex: 1 0 auto;
 }
 
+.go-board .goban {
+    @extend .control;
+}
+
 @for $i from $go-board-size-min through $go-board-size-max {
     .go-board.go-#{$i} .flex-absolute > div.goban {
         flex: 0 1 ($i * $go-stone-diameter);
