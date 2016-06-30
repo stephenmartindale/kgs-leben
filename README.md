@@ -45,6 +45,6 @@ Any HTTP web-server should be able to serve the _KGS Leben_ web application but 
 
 ##See Also
 
-  * [Probabilism](https://probabilism.wordpress.com/) for news on the project
+  * [Probabilism](https://probabilism.wordpress.com/category/kgs-leben/) for news on the project
   * [Life in 19x19](http://www.lifein19x19.com/forum/viewtopic.php?f=24&t=13145) for a discussion thread
   * [KGS Client Coding Google Group](https://groups.google.com/forum/#!forum/kgs-client-coding) for discussions related to the [KGS JSON API](https://www.gokgs.com/help/protocol.html)
