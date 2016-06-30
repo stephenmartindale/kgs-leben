@@ -17,14 +17,14 @@ The *KGS Leben* project is only a few months old and not presently suited for ge
 
 Development dependencies are limited:
 
-  * [Node.js](nodejs.org) and its package manager, NPM
-  * [Sass](sass-lang.com) for convenient and maintainable style-sheets
-  * [TypeScript](www.typescriptlang.org) provides type-safety for scripts and insulates the code-base from obscure JavaScript quirks
-  * [Gulp](gulpjs.com) is used as a flexible and scriptable build system
+  * [Node.js](http://nodejs.org/) and its package manager, NPM
+  * [Sass](http://sass-lang.com/) for convenient and maintainable style-sheets
+  * [TypeScript](http://www.typescriptlang.org/) provides type-safety for scripts and insulates the code-base from obscure JavaScript quirks
+  * [Gulp](http://gulpjs.com/) is used as a flexible and scriptable build system
 
 ##Building the Source
 
-Prior to compiling artefacts to be served, one must first install [Node.js](nodejs.org) and clone the source repository. Thereafter, simply follow the instructions below. (Command-line commands should be executed relative to the root of the cloned source tree; paths are also relative.)
+Prior to compiling artefacts to be served, one must first install [Node.js](http://nodejs.org/) and clone the source repository. Thereafter, simply follow the instructions below. (Command-line commands should be executed relative to the root of the cloned source tree; paths are also relative.)
 
   1. Use NPM to fetch the dependencies and development dependencies defined in [package.json](package.json)
 
@@ -38,7 +38,7 @@ Prior to compiling artefacts to be served, one must first install [Node.js](node
 
 ##Serving _KGS Leben_
 
-Any HTTP web-server should be able to serve the _KGS Leben_ web application but the path to the [JSON API](https://www.gokgs.com/help/protocol.html) is currently not configurable so the ability to serve Java Servlets is also required. [Apache Tomcat](tomcat.apache.org) is recommended. The web-server must be configured to serve two _routes_:
+Any HTTP web-server should be able to serve the _KGS Leben_ web application but the path to the [JSON API](https://www.gokgs.com/help/protocol.html) is currently not configurable so the ability to serve Java Servlets is also required. [Apache Tomcat](http://tomcat.apache.org/) is recommended. The web-server must be configured to serve two _routes_:
 
   * `/` should route to the static content found in the `dist` sub-directory produced by the build script
   * `/jsonClient/` should route to the [KGS JSON Client Servlet](https://www.gokgs.com/help/protocol.html) (distributed as a .WAR archive)
