@@ -14,4 +14,4 @@ Special Thanks
 
 * **[Jan "waltheri" Prokop](http://wgo.waltheri.net/)**
 
-  * Author of [WGo.js](https://github.com/waltheri/wgo.js), an open-source JavaScript implementation of a Goban, released under the [MIT License](wgo.js/LICENSE) and used for rending the Goban in _KGS Leben_.
+  * Author of [WGo.js](https://github.com/waltheri/wgo.js), an open-source JavaScript implementation of a _Goban_, released under the [MIT License](wgo.js/LICENSE) and used (forked) for rending the Goban in _KGS Leben_.
