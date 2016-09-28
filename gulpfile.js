@@ -12,7 +12,7 @@ var inputs = {
             root: 'views',
             html: '**/*.html',
             scss: '**/*.scss',
-            scssCatalog: '__views.scss'
+            scssCatalog: '_views.scss',
         },
     },
     scripts: {
@@ -21,25 +21,28 @@ var inputs = {
     },
     styles: {
         sources: 'scss/**/*.scss',
-        views: 'scss/_views.scss',
         normalize: 'node_modules/normalize.css/normalize.css'
     },
 };
 
 // Build Outputs
 var outputs = {
+    temp: ".build",
     root: "dist",
     templates: 'templates.html',
     scripts: 'js',
     styles: 'css',
     fonts: 'fonts',
-    images: 'img'
+    images: 'img',
+    sounds: 'sounds'
 };
 
 // Static Content
 var content = [
     { source: [ '*.html', 'LICENSE' ]},
     { source: 'images/**/*', destination: outputs.images },
+    { source: 'sounds/**/*.ogg', destination: outputs.sounds },
+    { source: 'sounds/**/*.m4a', destination: outputs.sounds },
 
     { source: 'node_modules/font-awesome/fonts/*.*', destination: outputs.fonts },
     { source: [ 'node_modules/jquery/dist/jquery.js', 'node_modules/jquery/dist/jquery.min.*' ], destination: outputs.scripts },
@@ -98,9 +101,12 @@ gulp.task('clean:templates', function(callback) {
 gulp.task('clean:scripts', function(callback) {
     rimraf(path.join(outputs.root, outputs.scripts), callback);
 });
+gulp.task('clean:tests', function(callback) {
+    rimraf(path.join(outputs.temp, "tests*"), callback);
+});
 gulp.task('clean:styles', function(callback) {
     rimraf(path.join(outputs.root, outputs.styles), () => {
-        rimraf(path.join(inputs.templates.sources.root, inputs.templates.sources.scssCatalog), callback);
+        rimraf(path.join(outputs.temp, inputs.templates.sources.scssCatalog), callback);
     });
 });
 gulp.task('clean:fonts', function(callback) {
@@ -109,9 +115,14 @@ gulp.task('clean:fonts', function(callback) {
 gulp.task('clean:images', function(callback) {
     rimraf(path.join(outputs.root, outputs.images), callback);
 });
+gulp.task('clean:sounds', function(callback) {
+    rimraf(path.join(outputs.root, outputs.sounds), callback);
+});
 
-gulp.task('clean', ['clean:styles'], function(callback) {
-    rimraf(outputs.root, callback);
+gulp.task('clean', function(callback) {
+    rimraf(outputs.temp, () => {
+        rimraf(outputs.root, callback);
+    });
 });
 
 // Task(s): Build View Templates
@@ -122,14 +133,34 @@ gulp.task('build:templates', function() {
 });
 
 // Task(s): Build TypeScript Outputs
-var tsconfig = typescript.createProject(inputs.scripts.project);
-gulp.task('build:scripts', function () {
+var initialiseTypeScriptProject = function(excludeTests) {
+    let settings;
+    if (!excludeTests) {
+        settings = { out: "tests.js" };
+    }
+
+    let tsconfig = typescript.createProject(inputs.scripts.project, settings);
+
+    if (excludeTests) {
+        tsconfig.config.exclude.push("**/*.tests.ts");
+    }
+
+    return tsconfig;
+}
+
+var buildTypeScriptProject = function(tsconfig, outputPath) {
     let ts = tsconfig.src()
                      .pipe(sourcemaps.init())
-                     .pipe(typescript(tsconfig));
+                     .pipe(tsconfig());
 
-    return ts.js.pipe(sourcemaps.write(".")).pipe(gulp.dest(path.join(outputs.root, outputs.scripts)))
-});
+    return ts.pipe(sourcemaps.write(".", { sourceRoot: function (file) {
+        return path.relative(path.join(file.cwd, file.path), file.base);
+    }})).pipe(gulp.dest(outputPath));
+}
+
+gulp.task('build:scripts', buildTypeScriptProject.bind(undefined, initialiseTypeScriptProject(true), path.join(outputs.root, outputs.scripts)));
+
+gulp.task('build:tests', buildTypeScriptProject.bind(undefined, initialiseTypeScriptProject(false), outputs.temp));
 
 // Task(s): Build Sass Outputs
 gulp.task('build:styles:normalize', function() {
@@ -148,7 +179,12 @@ gulp.task('build:styles:views', function(callback) {
             defaultEncoding: 'utf8',
             autoClose: true
         };
-        let fileStream = fs.createWriteStream(path.join(inputs.templates.sources.root, inputs.templates.sources.scssCatalog), fileStreamOptions);
+
+        let catalogFilename = path.join(outputs.temp, inputs.templates.sources.scssCatalog);
+
+        if (!fs.existsSync(path.dirname(catalogFilename))) fs.mkdirSync(path.dirname(catalogFilename));
+
+        let fileStream = fs.createWriteStream(catalogFilename, fileStreamOptions);
         let eol = os.EOL;
 
         fileStream.write("// View SASS Fragments...");
@@ -159,14 +195,12 @@ gulp.task('build:styles:views', function(callback) {
             let extensionLength = path.extname(inputs.templates.sources.scss).length;
             for (let j = 0; j < matches.length; ++j) {
                 let sassFilename = matches[j];
-                if (sassFilename != inputs.templates.sources.scssCatalog) {
-                    sassFilename = sassFilename.substring(0, sassFilename.length - extensionLength);
+                sassFilename = sassFilename.substring(0, sassFilename.length - extensionLength);
 
-                    fileStream.write("@import \"");
-                    fileStream.write(sassFilename);
-                    fileStream.write("\";");
-                    fileStream.write(eol);
-                }
+                fileStream.write("@import \"");
+                fileStream.write(path.relative(path.dirname(catalogFilename), path.join(globOptions.cwd, sassFilename)).replace(/\\/g, "/"));
+                fileStream.write("\";");
+                fileStream.write(eol);
             }
         }
 

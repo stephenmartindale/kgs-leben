@@ -14,6 +14,9 @@ $go-board-size-min:         9;
 $go-board-size-max:         19;
 
 // View Parameters
+$text-box-padding-vertical:    0.6rem;
+$text-box-padding-horizontal:  0.6rem;
+
 $view-sidebar-right-margin:                 28px;
 $view-go-clock-segment-off:                 darken($colour-dark, 2%);
 $view-go-clock-segment-on:                  $colour-light;

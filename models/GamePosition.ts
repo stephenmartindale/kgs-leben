@@ -47,6 +47,8 @@ namespace Models {
                 this.schema = [];
                 this.white = { prisoners: 0, captures: 0, territory: 0 };
                 this.black = { prisoners: 0, captures: 0, territory: 0 };
+                this._lastMove = null;
+                this._koMove = null;
             }
             else {
                 let original: GamePosition = <GamePosition>arg;
@@ -59,7 +61,7 @@ namespace Models {
             }
         }
 
-        private stoneEquality(other: GamePosition): boolean {
+        public stoneEquality(other: GamePosition): boolean {
             if (other == null) return false;
             else if (this.size != other.size) return false;
 
@@ -250,13 +252,126 @@ namespace Models {
             }
         }
 
-        public lastMove(x: number, y: number): void {
-            if ((x != null) && (y != null)) {
-                let i = this.index(x, y);
-                if ((i != null) && (i < 0)) throw _coordinatesInvalidError;
-                this._lastMove = i;
+        public get lastMove(): "PASS" | KGS.Coordinates {
+            if (null == this._lastMove) {
+                return null;
             }
-            else this._lastMove = null;
+            else if (this._lastMove < 0) {
+                return "PASS";
+            }
+            else {
+                return { x: ~~(this._lastMove / this.size), y: (this._lastMove % this.size) };
+            }
+        }
+
+        public static affectsPosition(p: KGS.SGF.Property) {
+            if (null != p) {
+                switch (p.name) {
+                    case KGS.SGF._MOVE:
+                    case KGS.SGF._ADDSTONE:
+                    case KGS.SGF._TERRITORY:
+                    case KGS.SGF._DEAD:
+                    case KGS.SGF._CIRCLE:
+                    case KGS.SGF._TRIANGLE:
+                    case KGS.SGF._SQUARE:
+                    case KGS.SGF._CROSS:
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        public effectEvent(properties: KGS.SGF.Property[]): void {
+            if (!properties) return null;
+
+            let lastMove: number = undefined;
+            for (let p = 0; p < properties.length; ++p) {
+                let pass: boolean = null;
+                let loc: KGS.Coordinates = null;
+                if ((<KGS.SGF.LocationProperty>properties[p]).loc) {
+                    if ((<KGS.SGF.LocationProperty>properties[p]).loc == "PASS") {
+                        pass = true;
+                    }
+                    else if (Utils.isObject((<KGS.SGF.LocationProperty>properties[p]).loc)) {
+                        pass = false;
+                        loc = (<KGS.SGF.LocationProperty>properties[p]).loc as KGS.Coordinates;
+                    }
+                }
+
+                let colour: Models.GameStone = null;
+                if ((<KGS.SGF.ColourProperty>properties[p]).color) colour = ((<KGS.SGF.ColourProperty>properties[p]).color == "white")? GameStone.White : GameStone.Black;
+
+                let malformed: boolean = false;
+                let moveResult: Models.GameMoveResult;
+                switch (properties[p].name) {
+                    case KGS.SGF._MOVE:
+                        if ((loc) && (colour)) {
+                            moveResult = this.play(loc.x, loc.y, colour, null);
+                            lastMove = this.index(loc.x, loc.y);
+                        }
+                        else if (pass)
+                            lastMove = -1;
+                        else
+                            malformed = true;
+                        break;
+
+                    case KGS.SGF._ADDSTONE:
+                        if ((loc) && (colour)) {
+                            moveResult = this.addStone(loc.x, loc.y, colour);
+                            lastMove = null;
+                        }
+                        else malformed = true;
+                        break;
+
+                    case KGS.SGF._TERRITORY:
+                        if ((loc) && (colour)) {
+                            this.addMarks(loc.x, loc.y, (colour == Models.GameStone.White)? Models.GameMarks.WhiteTerritory : Models.GameMarks.BlackTerritory);
+                            lastMove = null;
+                        }
+                        else malformed = true;
+                        break;
+
+                    case KGS.SGF._DEAD:
+                        if (loc) {
+                            this.addMarks(loc.x, loc.y, Models.GameMarks.Dead);
+                            lastMove = null;
+                        }
+                        else malformed = true;
+                        break;
+
+                    case KGS.SGF._CIRCLE:
+                        if (loc) this.addMarks(loc.x, loc.y, Models.GameMarks.Circle);
+                        else malformed = true;
+                        break;
+                    case KGS.SGF._TRIANGLE:
+                        if (loc) this.addMarks(loc.x, loc.y, Models.GameMarks.Triangle);
+                        else malformed = true;
+                        break;
+                    case KGS.SGF._SQUARE:
+                        if (loc) this.addMarks(loc.x, loc.y, Models.GameMarks.Square);
+                        else malformed = true;
+                        break;
+                    case KGS.SGF._CROSS:
+                        if (loc) this.addMarks(loc.x, loc.y, Models.GameMarks.Cross);
+                        else malformed = true;
+                        break;
+
+                    default:
+                        Utils.log(Utils.LogSeverity.Debug, "SGF property '" + properties[p].name + "' unknown or unsupported");
+                        break;
+                }
+
+                if (malformed) {
+                    Utils.log(Utils.LogSeverity.Warning, "SGF property '" + properties[p].name + "' was malformed and could not be effected", properties[p]);
+                }
+
+                if ((moveResult != undefined) && (moveResult != GameMoveResult.Success)) {
+                    Utils.log(Utils.LogSeverity.Error, "Error when applying SGF property '" + properties[p].name + "' to game position: " + GamePosition.moveResultToString(moveResult), properties[p], moveResult);
+                }
+            }
+
+            if (lastMove !== undefined) this._lastMove = lastMove;
         }
 
         public static moveResultToString(moveResult: GameMoveResult): string {

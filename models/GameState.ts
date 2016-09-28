@@ -13,19 +13,49 @@ namespace Models {
 
         public processSGFEvents(perfstamp: number, ...events: KGS.SGF.NodeEvent[]) {
             if ((events == null) || (events.length <= 0)) return;
+
+            let changedNodes: { [nodeId: number]: boolean } = {};
+            let activateNodeId: number = undefined;
+
             for (let i = 0; i < events.length; ++i) {
                 let event: KGS.SGF.NodeEvent = events[i];
                 switch (event.type) {
-                    case "PROP_ADDED": this.sgfPropAdded(perfstamp, <KGS.SGF.PROP_ADDED>event); break;
-                    case "PROP_REMOVED": this.sgfPropRemoved(perfstamp, <KGS.SGF.PROP_REMOVED>event); break;
-                    case "PROP_CHANGED": this.sgfPropChanged(perfstamp, <KGS.SGF.PROP_CHANGED>event); break;
-                    case "PROP_GROUP_ADDED": this.sgfPropGroupAdded(perfstamp, <KGS.SGF.PROP_GROUP_ADDED>event); break;
-                    case "PROP_GROUP_REMOVED": this.sgfPropGroupRemoved(perfstamp, <KGS.SGF.PROP_GROUP_REMOVED>event); break;
-                    case "CHILD_ADDED": this.sgfChildAdded(perfstamp, <KGS.SGF.CHILD_ADDED>event); break;
-                    case "CHILDREN_REORDERED": this.sgfChildrenReordered(perfstamp, <KGS.SGF.CHILDREN_REORDERED>event); break;
-                    case "ACTIVATED": this.sgfActivated(perfstamp, <KGS.SGF.ACTIVATED>event); break;
-                    default: Utils.log(Utils.LogSeverity.Info, "KGS SGF Event not recognised:", event.type, event);
+                    case "PROP_ADDED":
+                        this.sgfPropAdded(perfstamp, <KGS.SGF.PROP_ADDED>event, changedNodes);
+                        break;
+                    case "PROP_REMOVED":
+                        this.sgfPropRemoved(perfstamp, <KGS.SGF.PROP_REMOVED>event, changedNodes);
+                        break;
+                    case "PROP_CHANGED":
+                        this.sgfPropChanged(perfstamp, <KGS.SGF.PROP_CHANGED>event, changedNodes);
+                        break;
+                    case "PROP_GROUP_ADDED":
+                        this.sgfPropGroupAdded(perfstamp, <KGS.SGF.PROP_GROUP_ADDED>event, changedNodes);
+                        break;
+                    case "PROP_GROUP_REMOVED":
+                        this.sgfPropGroupRemoved(perfstamp, <KGS.SGF.PROP_GROUP_REMOVED>event, changedNodes);
+                        break;
+
+                    case "CHILD_ADDED":
+                        this.sgfChildAdded(perfstamp, <KGS.SGF.CHILD_ADDED>event);
+                        break;
+                    case "CHILDREN_REORDERED":
+                        this.sgfChildrenReordered(perfstamp, <KGS.SGF.CHILDREN_REORDERED>event);
+                        break;
+
+                    case "ACTIVATED":
+                        activateNodeId = event.nodeId;
+                        break;
+
+                    default:
+                        Utils.log(Utils.LogSeverity.Info, "KGS SGF Event not recognised:", event.type, event);
+                        break;
                 }
+            }
+
+            let changedNodeKeys = Object.keys(changedNodes);
+            if ((changedNodeKeys.length > 0) || (activateNodeId !== undefined)) {
+                this.tree.activate(changedNodes, activateNodeId);
             }
         }
 
@@ -37,48 +67,60 @@ namespace Models {
             this.clockBlack.rules = this.rules;
         }
 
-        private sgfAffectsPosition(propName: string): boolean {
-            // TODO: Only call refreshPosition() if the properties are position related.
-            // TODO: If 'adding' to the current active position, no need to refresh - just perform the add
-            return true;
-        }
-        private sgfPropAdded(perfstamp: number, event: KGS.SGF.PROP_ADDED) {
+        private sgfPropAdded(perfstamp: number, event: KGS.SGF.PROP_ADDED, changedNodes: { [nodeId: number]: boolean }) {
             let node = this.tree.get(event.nodeId);
-            node.addProperty(event.prop);
+            if ((node.addProperty(event.prop)) && (null != node.position) && (Models.GamePosition.affectsPosition(event.prop))) {
+                changedNodes[node.nodeId] = true;
+            }
+
             if (event.prop.name == KGS.SGF._RULES) this.setRules(event.prop as KGS.SGF.RULES);
-            if (this.sgfAffectsPosition(event.prop.name)) this.tree.refreshPosition(event.nodeId);
         }
-        private sgfPropRemoved(perfstamp: number, event: KGS.SGF.PROP_REMOVED) {
-            this.tree.get(event.nodeId).removeProperty(event.prop);
-            if (this.sgfAffectsPosition(event.prop.name)) this.tree.refreshPosition(event.nodeId);
-        }
-        private sgfPropChanged(perfstamp: number, event: KGS.SGF.PROP_CHANGED) {
+        private sgfPropRemoved(perfstamp: number, event: KGS.SGF.PROP_REMOVED, changedNodes: { [nodeId: number]: boolean }) {
             let node = this.tree.get(event.nodeId);
-            node.setProperty(event.prop);
+            if ((node.removeProperty(event.prop)) && (null != node.position) && (Models.GamePosition.affectsPosition(event.prop))) {
+                changedNodes[node.nodeId] = true;
+            }
+        }
+        private sgfPropChanged(perfstamp: number, event: KGS.SGF.PROP_CHANGED, changedNodes: { [nodeId: number]: boolean }) {
+            let node = this.tree.get(event.nodeId);
+            if ((node.setProperty(event.prop)) && (null != node.position) && (Models.GamePosition.affectsPosition(event.prop))) {
+                changedNodes[node.nodeId] = true;
+            }
+
             if (event.prop.name == KGS.SGF._RULES) this.setRules(event.prop as KGS.SGF.RULES);
-            if (this.sgfAffectsPosition(event.prop.name)) this.tree.refreshPosition(event.nodeId);
         }
-        private sgfPropGroupAdded(perfstamp: number, event: KGS.SGF.PROP_GROUP_ADDED) {
+
+        private sgfPropGroupAdded(perfstamp: number, event: KGS.SGF.PROP_GROUP_ADDED, changedNodes: { [nodeId: number]: boolean }) {
             let node = this.tree.get(event.nodeId);
-            let refreshPosition: boolean = false;
+            let positionAffected: boolean = false;
             for (let i = 0; i < event.props.length; ++i) {
-                node.addProperty(event.props[i]);
+                let prop = event.props[i];
+                if ((node.addProperty(prop)) && (Models.GamePosition.affectsPosition(prop))) {
+                    positionAffected = true;
+                }
+
                 if (event.props[i].name == KGS.SGF._RULES) this.setRules(event.props[i] as KGS.SGF.RULES);
-                if (this.sgfAffectsPosition(event.props[i].name)) refreshPosition = true;
             }
 
-            if (refreshPosition) this.tree.refreshPosition(event.nodeId);
+            if ((positionAffected) && (null != node.position)) {
+                changedNodes[node.nodeId] = true;
+            }
         }
-        private sgfPropGroupRemoved(perfstamp: number, event: KGS.SGF.PROP_GROUP_REMOVED) {
+        private sgfPropGroupRemoved(perfstamp: number, event: KGS.SGF.PROP_GROUP_REMOVED, changedNodes: { [nodeId: number]: boolean }) {
             let node = this.tree.get(event.nodeId);
-            let refreshPosition: boolean = false;
+            let positionAffected: boolean = false;
             for (let i = 0; i < event.props.length; ++i) {
-                node.removeProperty(event.props[i]);
-                if (this.sgfAffectsPosition(event.props[i].name)) refreshPosition = true;
+                let prop = event.props[i];
+                if ((node.removeProperty(event.props[i])) && (Models.GamePosition.affectsPosition(prop))) {
+                    positionAffected = true;
+                }
             }
 
-            if (refreshPosition) this.tree.refreshPosition(event.nodeId);
+            if ((positionAffected) && (null != node.position)) {
+                changedNodes[node.nodeId] = true;
+            }
         }
+
         private sgfChildAdded(perfstamp: number, event: KGS.SGF.CHILD_ADDED) {
             let parent = this.tree.get(event.nodeId);
             parent.addChild(event.childNodeId);
@@ -89,9 +131,6 @@ namespace Models {
                 parent.children = Utils.cloneArray(event.children, true);
             }
             else throw "Game Tree reordering children would alter the child set";
-        }
-        private sgfActivated(perfstamp: number, event: KGS.SGF.ACTIVATED) {
-            this.tree.activate(event.nodeId);
         }
 
         public mergeClockStates(perfstamp: number, gamePhase: Models.GamePhase, whiteClock: KGS.Downstream.ClockState, blackClock: KGS.Downstream.ClockState) {

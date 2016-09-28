@@ -14,6 +14,8 @@ namespace Views {
 
         private _board: WGo.Board;
         private _drawHandlers: GoBoardDrawHandlers = new GoBoardDrawHandlers();
+
+        private _treeNodeId: number;
         private _position: Models.GamePosition;
 
         public playerAway: Views.GoBoardPlayer;
@@ -153,10 +155,11 @@ namespace Views {
 
         public clear() {
             this._board.removeAllObjects();
+            this._treeNodeId = null;
             this._position = null;
         }
 
-        private applyPositionChange(change: Models.GamePositionChange, blackBit: number, whiteBit: number, type: WGo.BoardDrawHandler | string) {
+        private applyPositionChange(change: Models.GamePositionChange, blackBit: number, whiteBit: number, type: WGo.BoardDrawHandler | string): void {
             if ((change.set & blackBit) == blackBit) {
                 this._board.addObject(<WGo.BoardObject>{ x: change.x, y: change.y, c: WGo.B, type: type });
             }
@@ -168,35 +171,51 @@ namespace Views {
             }
         }
 
-        private updateBoardPosition(oldPosition: Models.GamePosition, position: Models.GamePosition) {
-            let changes = position.diff(oldPosition);
-            for (let i = 0; i < changes.length; ++i) {
-                let change = changes[i];
-
-                this.applyPositionChange(change, Models.GameMarks.BlackStone, Models.GameMarks.WhiteStone, "SHELL");
-                this.applyPositionChange(change, Models.GameMarks.BlackTerritory, Models.GameMarks.WhiteTerritory, this._drawHandlers.moku);
-                this.applyPositionChange(change, Models.GameMarks.LastMove, Models.GameMarks.LastMove, this._drawHandlers.lastMove);
-            }
-
-            this._position = position;
-        }
-
-        public updateBoard(position: Models.GamePosition) {
-            if (position == null) {
-                this.clear();
+        public updateBoard(gameNode: Models.GameTreeNode, soundStoneCallback: Function, soundPassCallback: Function): boolean {
+            if ((gameNode == null) || (gameNode.position == null)) {
+                if (this._position != null) {
+                    this.clear();
+                    return true;
+                }
             }
             else {
-                let copy = new Models.GamePosition(position);
-
-                if (this._size != copy.size) {
-                    this._size = copy.size;
+                let updated: boolean = false;
+                let oldPosition: Models.GamePosition;
+                if (this._size != gameNode.position.size) {
+                    this._size = gameNode.position.size;
                     this._board.setSize(this._size);
                     if (this.activated) this.optimiseBoard();
-
-                    this.updateBoardPosition(null, copy);
+                    this._position = oldPosition = null;
+                    updated = true;
                 }
-                else this.updateBoardPosition(this._position, copy);
+                else oldPosition = this._position;
+
+                let changes = gameNode.position.diff(oldPosition);
+                for (let i = 0; i < changes.length; ++i) {
+                    let change = changes[i];
+
+                    this.applyPositionChange(change, Models.GameMarks.BlackStone, Models.GameMarks.WhiteStone, "SHELL");
+                    this.applyPositionChange(change, Models.GameMarks.BlackTerritory, Models.GameMarks.WhiteTerritory, this._drawHandlers.moku);
+                    this.applyPositionChange(change, Models.GameMarks.LastMove, Models.GameMarks.LastMove, this._drawHandlers.lastMove);
+
+                    updated = true;
+                }
+
+                if (this._treeNodeId == gameNode.parentId) {
+                    let lastMove = gameNode.position.lastMove;
+                    if (lastMove == "PASS") soundPassCallback();
+                    else if (lastMove != null) soundStoneCallback();
+                }
+
+                this._treeNodeId = gameNode.nodeId;
+                if (updated) {
+                    this._position = new Models.GamePosition(gameNode.position);
+                }
+
+                return updated;
             }
+
+            return false;
         }
     }
 

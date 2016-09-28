@@ -2,5 +2,5 @@
 node_modules
 
 # Artefacts produced by Gulp script
-views/__views.scss
+.build
 dist

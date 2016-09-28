@@ -17,6 +17,11 @@ $view-safety-button-thumb-width: 32px;
     background-color: $colour-negative;
 }
 
+.safety-button > div.button {
+    height: 1.8em;
+    line-height: 1.8em;
+    vertical-align: middle;
+}
 .safety-button > div.button:not(:first-child) {
     padding-left: 0;
     padding-right: 0;

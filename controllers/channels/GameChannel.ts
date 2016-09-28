@@ -31,11 +31,10 @@ namespace Controllers {
             let updatePlayerPanels: boolean = ((updateBoard) || (digest.gameClocks[this.channelId]) || (digest.gameActions[this.channelId]));
             if (updatePlayerPanels) {
                 let gameState = this.database.games[this.channelId];
-                let position: Models.GamePosition = ((gameState) && (gameState.tree) && (gameState.tree.position))? gameState.tree.position : null;
+                let activeNode: Models.GameTreeNode = ((gameState) && (gameState.tree))? gameState.tree.activeNode : null;
 
                 if (updateBoard) {
-                    if (!position) this._board.clear();
-                    else this._board.updateBoard(position);
+                    this._board.updateBoard(activeNode, this._soundStoneCallback, this._soundPassCallback);
                 }
 
                 let gameChannel = this.channel as Models.GameChannel;
@@ -50,14 +49,14 @@ namespace Controllers {
                 let home = {
                     colour: Models.GameStone.Black,
                     clock: gameState.clockBlack,
-                    prisoners: (position)? position.black.prisoners : 0,
+                    prisoners: ((activeNode) && (activeNode.position))? activeNode.position.black.prisoners : 0,
                     komi: splitKomi.black,
                     user: this.database.users[gameChannel.playerBlack]
                 };
                 let away = {
                     colour: Models.GameStone.White,
                     clock: gameState.clockWhite,
-                    prisoners: (position)? position.white.prisoners : 0,
+                    prisoners: ((activeNode) && (activeNode.position))? activeNode.position.white.prisoners : 0,
                     komi: splitKomi.white,
                     user: this.database.users[gameChannel.playerWhite]
                 };
@@ -98,7 +97,7 @@ namespace Controllers {
 
             if (gameChannel.hasAction(Models.GameActions.Move)) {
                 if ((x != null) && (y != null)) {
-                    if (gameState.tree.testMove(x, y, this._userColour)) {
+                    if (gameState.tree.testMove(x, y, this._userColour) == Models.GameMoveResult.Success) {
                         gameChannel.disableAction(Models.GameActions.Move);
                         this.client.post(<KGS.Upstream.GAME_MOVE>{
                             type: KGS.Upstream._GAME_MOVE,
@@ -158,6 +157,13 @@ namespace Controllers {
                     channelId: this.channelId,
                 });
             }
+        }
+
+        private _soundStoneCallback = () => {
+            this.application.sounds.play("stone");
+        }
+        private _soundPassCallback = () => {
+            this.application.sounds.play("pass");
         }
 
         private initialiseReport() {

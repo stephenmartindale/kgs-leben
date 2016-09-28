@@ -5,6 +5,7 @@ namespace Controllers {
         private _layoutController: Controllers.LayoutController;
         private _connectionController: Controllers.ConnectionController;
         private _channelController: Controllers.ChannelController;
+        private _soundController: Controllers.SoundController;
 
         constructor() {
             super(null);
@@ -17,14 +18,19 @@ namespace Controllers {
             this._layoutController = new Controllers.LayoutController(this);
             this._connectionController = new Controllers.ConnectionController(this);
             this._channelController = new Controllers.ChannelController(this);
+            this._soundController = SoundController.initialise(this);
         }
 
         private static initialise() {
             $app = new Controllers.Application();
         }
 
-        public get layout() {
+        public get layout(): Controllers.LayoutController {
             return this._layoutController;
+        }
+
+        public get sounds(): Controllers.SoundController {
+            return this._soundController;
         }
 
         public reinitialise() {

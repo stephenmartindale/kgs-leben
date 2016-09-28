@@ -1,6 +1,3 @@
-$text-box-padding-vertical:    0.6rem;
-$text-box-padding-horizontal:  0.6rem;
-
 input[type=text], input[type=password], input[type=number], input[type=time] {
     @extend .control-text;
     box-sizing: border-box;

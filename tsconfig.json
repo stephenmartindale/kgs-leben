@@ -2,6 +2,7 @@
     "compilerOptions": {
         "target": "es5",
         "noImplicitAny": true,
+        "declaration": false,
 
         "out": "leben.js",
 
@@ -11,7 +12,7 @@
 
     "exclude": [
         "node_modules",
-        "gulp/.tmp",
+        ".build",
         "dist"
     ]
 }

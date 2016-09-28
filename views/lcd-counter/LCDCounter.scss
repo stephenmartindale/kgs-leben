@@ -11,7 +11,8 @@
 
 .lcd-counter svg {
     display: block;
-    height: 0.7rem;
+    height: 12px;
+    width: 65px;
     stroke-width: 0;
     fill: $view-go-clock-segment-off;
 }

@@ -2,8 +2,10 @@ namespace Models {
     export class GameTreeNode {
         public tree: GameTree;
         public nodeId: number;
-        public parent: number;
+        public parentId: number;
         public children: number[];
+
+        public position: Models.GamePosition;
 
         private _properties: KGS.SGF.Property[];
 
@@ -14,7 +16,7 @@ namespace Models {
 
         public addChild(childNodeId: number) {
             let child = this.tree.create(childNodeId);
-            child.parent = this.nodeId;
+            child.parentId = this.nodeId;
 
             if (this.children == null)
                 this.children = [childNodeId];
@@ -22,15 +24,21 @@ namespace Models {
                 this.children.push(childNodeId);
         }
 
+        public get parent(): GameTreeNode {
+            if (null == this.parentId) return null;
+            else if (null != this.tree) return this.tree.get(this.parentId);
+            else throw "Game Tree Node [" + this.nodeId.toString() + "] is an orphan";
+        }
+
         public get properties(): KGS.SGF.Property[] {
             return this._properties;
         }
 
-        public addProperty(property: KGS.SGF.Property) {
-            if (this._properties == null)
-                this._properties = [property];
-            else
-                this._properties.push(property);
+        public addProperty(property: KGS.SGF.Property): boolean {
+            if (this._properties == null) this._properties = [property];
+            else this._properties.push(property);
+
+            return true;
         }
 
         private locationsEqual(left: KGS.Location, right: KGS.Location) {
@@ -80,13 +88,14 @@ namespace Models {
             throw 'Argument was not a valid SGF Property';
         }
 
-        public setProperty(property: KGS.SGF.Property) {
+        public setProperty(property: KGS.SGF.Property) : boolean {
             let i: number = this.findProperty(property);
             if (i >= 0) {
                 this._properties[i] = property;
+                return true;
             }
             else {
-                this.addProperty(property);
+                return this.addProperty(property);
             }
         }
 

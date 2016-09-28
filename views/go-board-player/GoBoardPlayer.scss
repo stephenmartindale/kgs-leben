@@ -106,6 +106,9 @@ $view-go-board-player-padding: 10px;
 .go-board-player .player-buttons.hidden {
     display: none;
 }
+.go-board-player .player-buttons .safety-button .button:first-child {
+    width: 5em;
+}
 .go-board-player .player-buttons .safety-button + .safety-button {
     margin-top: 3px;
 }
