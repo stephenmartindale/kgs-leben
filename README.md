@@ -21,6 +21,7 @@ Development dependencies are limited:
   * [Sass](http://sass-lang.com/) for convenient and maintainable style-sheets
   * [TypeScript](http://www.typescriptlang.org/) provides type-safety for scripts and insulates the code-base from obscure JavaScript quirks
   * [Gulp](http://gulpjs.com/) is used as a flexible and scriptable build system
+  * [Mocha](https://mochajs.org/) provides a framework for testing domain models and algorithms
 
 ##Building the Source
 
@@ -35,6 +36,12 @@ Prior to compiling artefacts to be served, one must first install [Node.js](http
      `npm run build`
 
   3. A sub-directory named `dist` will be produced, containing all artefacts required to host _KGS Leben_.
+
+##Running the Unit-Tests
+
+The suite of automated tests for various domain models and algorithms within the project, powered by [Mocha](https://mochajs.org/), can be built and executed with a single NPM script:
+
+        npm test
 
 ##Serving _KGS Leben_
 

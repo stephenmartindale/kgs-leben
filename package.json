@@ -19,7 +19,8 @@
     "scripts": {
         "build": "gulp build",
         "clean": "gulp clean",
-        "rebuild": "gulp rebuild"
+        "rebuild": "gulp rebuild",
+        "test": "gulp build:tests && mocha --timeout 1000 .build/tests.js"
     },
 
     "devDependencies": {
