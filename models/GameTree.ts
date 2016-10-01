@@ -129,10 +129,8 @@ namespace Models {
             }
 
             let position: Models.GamePosition = this._activeNode.position;
-            let parentPosition: Models.GamePosition = (null != this._activeNode.parentId)? this.get(this._activeNode.parentId).position : null;
-
             let clone = new Models.GamePosition(position);
-            return clone.play(x, y, colour, parentPosition);
+            return clone.play(x, y, colour);
         }
     }
 }

@@ -54,8 +54,8 @@ declare namespace WGo {
     }
     export interface BoardDrawObject {
         // Both functions are called in "CanvasRenderingContext2D" context of given layer
-        draw: (args: BoardDrawHandlerArgs, board: Board) => void;    // this function should make drawing on the layer
-        clear?: (args: BoardDrawHandlerArgs, board: Board) => void;  // this function should clear drawing produced by draw function (if this function is ommited, default clearing function is used instead)
+        draw: (this: CanvasRenderingContext2D, args: BoardDrawHandlerArgs, board: Board) => void;    // this function should make drawing on the layer
+        clear?: (this: CanvasRenderingContext2D, args: BoardDrawHandlerArgs, board: Board) => void;  // this function should clear drawing produced by draw function (if this function is ommited, default clearing function is used instead)
     }
     interface BoardDrawHandler {    // WGo.Board.DrawHandler
         stone?: BoardDrawObject;    // Highest default Canvas layer

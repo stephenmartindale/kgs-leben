@@ -14,7 +14,7 @@ namespace Models {
             this.nodeId = nodeId;
         }
 
-        public addChild(childNodeId: number) {
+        public addChild(childNodeId: number): Models.GameTreeNode {
             let child = this.tree.create(childNodeId);
             child.parentId = this.nodeId;
 
@@ -22,6 +22,8 @@ namespace Models {
                 this.children = [childNodeId];
             else
                 this.children.push(childNodeId);
+
+            return child;
         }
 
         public get parent(): GameTreeNode {

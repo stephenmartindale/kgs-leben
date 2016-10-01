@@ -391,10 +391,10 @@ describe('Models.GameState', () => {
         schema[5 * 9 + 7] = Models.GameMarks.BlackStone;
 
         if (!modified) {
-            schema[4 * 9 + 4] = Models.GameMarks.BlackStone;
+            schema[4 * 9 + 4] = Models.GameMarks.BlackStone | Models.GameMarks.LastMove;
         }
         else {
-            schema[3 * 9 + 3] = Models.GameMarks.BlackStone | Models.GameMarks.Triangle;
+            schema[3 * 9 + 3] = Models.GameMarks.BlackStone | Models.GameMarks.LastMove | Models.GameMarks.Triangle;
         }
 
         return schema;
@@ -405,13 +405,14 @@ describe('Models.GameState', () => {
         schema[2 * 9 + 2] = Models.GameMarks.WhiteStone;
         schema[2 * 9 + 6] = Models.GameMarks.WhiteStone;
         schema[3 * 9 + 6] = Models.GameMarks.WhiteStone;
-        schema[5 * 9 + 6] = Models.GameMarks.WhiteStone;
+        schema[5 * 9 + 6] = Models.GameMarks.WhiteStone | Models.GameMarks.LastMove;
         schema[4 * 9 + 5] = Models.GameMarks.WhiteStone;
         schema[4 * 9 + 7] = Models.GameMarks.WhiteStone;
         schema[6 * 9 + 2] = Models.GameMarks.BlackStone;
         schema[6 * 9 + 6] = Models.GameMarks.BlackStone;
         schema[5 * 9 + 5] = Models.GameMarks.BlackStone;
         schema[5 * 9 + 7] = Models.GameMarks.BlackStone;
+        schema[4 * 9 + 6] = Models.GameMarks.Ko;
 
         if (!modified) {
             schema[4 * 9 + 4] = Models.GameMarks.BlackStone;
@@ -427,7 +428,7 @@ describe('Models.GameState', () => {
         let schema: number[] = [];
         schema[20] = Models.GameMarks.WhiteStone;
         schema[37] = Models.GameMarks.WhiteStone;
-        schema[23] = Models.GameMarks.WhiteStone;
+        schema[23] = Models.GameMarks.WhiteStone | Models.GameMarks.LastMove;
         schema[24] = Models.GameMarks.WhiteStone;
         schema[16] = Models.GameMarks.WhiteStone;
         schema[25] = Models.GameMarks.BlackStone;
@@ -490,7 +491,8 @@ describe('Models.GameState', () => {
 
         it("position should be correct", () => {
             let expected: number[] = testPositionSchemaAt18(false);
-            assert(Utils.arrayEquals(expected, gameState.tree.activeNode.position.schema, Utils.ComparisonFlags.Values), "position-schema does not match");
+            assert(Models.GamePositionEvent.Move == gameState.tree.activeNode.position.lastEvent, "last position-event should be 'move'");
+            Tests.GamePosition.assertSchemaEquality(expected, gameState.tree.activeNode.position.schema);
         });
     });
 
@@ -507,7 +509,8 @@ describe('Models.GameState', () => {
         it("should have an active path at node #18", () => {
             assert(null != gameState.tree.activeNode, "activeNode is null");
             assert(18 == gameState.tree.activeNode.nodeId, "activeNode is not node #18");
-            assert(Utils.arrayEquals(schemaAt18, gameState.tree.activeNode.position.schema, Utils.ComparisonFlags.Values), "position-schema does not match");
+            assert(Models.GamePositionEvent.Move == gameState.tree.activeNode.position.lastEvent, "last position-event should be 'move'");
+            Tests.GamePosition.assertSchemaEquality(schemaAt18, gameState.tree.activeNode.position.schema);
         });
 
         for (let k = 0; k < activateSequence.length; ++k) {
@@ -522,7 +525,8 @@ describe('Models.GameState', () => {
                 assert(9 == gameState.tree.activeNode.position.size, "position is not 9 by 9");
 
                 let expected: number[] = testPositionSchema(nodeId, false);
-                assert(Utils.arrayEquals(expected, gameState.tree.activeNode.position.schema, Utils.ComparisonFlags.Values), "position-schema does not match");
+                assert(Models.GamePositionEvent.Move == gameState.tree.activeNode.position.lastEvent, "last position-event should be 'move'");
+                Tests.GamePosition.assertSchemaEquality(expected, gameState.tree.activeNode.position.schema);
             });
 
             if (nodeId == 12) {
@@ -544,7 +548,8 @@ describe('Models.GameState', () => {
         it("should have an active path at node #18", () => {
             assert(null != gameState.tree.activeNode, "activeNode is null");
             assert(18 == gameState.tree.activeNode.nodeId, "activeNode is not node #18");
-            assert(Utils.arrayEquals(schemaAt18, gameState.tree.activeNode.position.schema, Utils.ComparisonFlags.Values), "position-schema does not match");
+            assert(Models.GamePositionEvent.Move == gameState.tree.activeNode.position.lastEvent, "last position-event should be 'move'");
+            Tests.GamePosition.assertSchemaEquality(schemaAt18, gameState.tree.activeNode.position.schema);
         });
 
         it("can update inactive nodes with SGF events", () => {
@@ -554,7 +559,8 @@ describe('Models.GameState', () => {
         it("should have an active path at node #18", () => {
             assert(null != gameState.tree.activeNode, "activeNode is null");
             assert(18 == gameState.tree.activeNode.nodeId, "activeNode is not node #18");
-            assert(Utils.arrayEquals(schemaAt18, gameState.tree.activeNode.position.schema, Utils.ComparisonFlags.Values), "position-schema does not match");
+            assert(Models.GamePositionEvent.Move == gameState.tree.activeNode.position.lastEvent, "last position-event should be 'move'");
+            Tests.GamePosition.assertSchemaEquality(schemaAt18, gameState.tree.activeNode.position.schema);
         });
 
         for (let k = 0; k < activateSequence.length; ++k) {
@@ -569,7 +575,8 @@ describe('Models.GameState', () => {
                 assert(9 == gameState.tree.activeNode.position.size, "position is not 9 by 9");
 
                 let expected: number[] = testPositionSchema(nodeId, true);
-                assert(Utils.arrayEquals(expected, gameState.tree.activeNode.position.schema, Utils.ComparisonFlags.Values), "position-schema does not match");
+                assert(Models.GamePositionEvent.Move == gameState.tree.activeNode.position.lastEvent, "last position-event should be 'move'");
+                Tests.GamePosition.assertSchemaEquality(expected, gameState.tree.activeNode.position.schema);
             });
 
             if (nodeId == 12) {
@@ -592,7 +599,8 @@ describe('Models.GameState', () => {
             assert(11 == gameState.tree.activeNode.nodeId, "activeNode is not node #11");
 
             let expected: number[] = testPositionSchemaAt11(false);
-            assert(Utils.arrayEquals(expected, gameState.tree.activeNode.position.schema, Utils.ComparisonFlags.Values), "position-schema does not match");
+            assert(Models.GamePositionEvent.Move == gameState.tree.activeNode.position.lastEvent, "last position-event should be 'move'");
+            Tests.GamePosition.assertSchemaEquality(expected, gameState.tree.activeNode.position.schema);
         });
 
         it("can update active node with SGF events", () => {
@@ -604,7 +612,8 @@ describe('Models.GameState', () => {
             assert(11 == gameState.tree.activeNode.nodeId, "activeNode is not node #11");
 
             let expected: number[] = testPositionSchemaAt11(true);
-            assert(Utils.arrayEquals(expected, gameState.tree.activeNode.position.schema, Utils.ComparisonFlags.Values), "position-schema does not match");
+            assert(Models.GamePositionEvent.Move == gameState.tree.activeNode.position.lastEvent, "last position-event should be 'move'");
+            Tests.GamePosition.assertSchemaEquality(expected, gameState.tree.activeNode.position.schema);
         });
 
         for (let k = 0; k < activateSequence.length; ++k) {
@@ -619,7 +628,8 @@ describe('Models.GameState', () => {
                 assert(9 == gameState.tree.activeNode.position.size, "position is not 9 by 9");
 
                 let expected: number[] = testPositionSchema(nodeId, true);
-                assert(Utils.arrayEquals(expected, gameState.tree.activeNode.position.schema, Utils.ComparisonFlags.Values), "position-schema does not match");
+                assert(Models.GamePositionEvent.Move == gameState.tree.activeNode.position.lastEvent, "last position-event should be 'move'");
+                Tests.GamePosition.assertSchemaEquality(expected, gameState.tree.activeNode.position.schema);
             });
 
             if (nodeId == 12) {
@@ -642,7 +652,8 @@ describe('Models.GameState', () => {
             assert(12 == gameState.tree.activeNode.nodeId, "activeNode is not node #12");
 
             let expected: number[] = testPositionSchemaAt12(false);
-            assert(Utils.arrayEquals(expected, gameState.tree.activeNode.position.schema, Utils.ComparisonFlags.Values), "position-schema does not match");
+            assert(Models.GamePositionEvent.Move == gameState.tree.activeNode.position.lastEvent, "last position-event should be 'move'");
+            Tests.GamePosition.assertSchemaEquality(expected, gameState.tree.activeNode.position.schema);
         });
 
         it("can update node on active path with SGF events", () => {
@@ -654,7 +665,8 @@ describe('Models.GameState', () => {
             assert(12 == gameState.tree.activeNode.nodeId, "activeNode is not node #12");
 
             let expected: number[] = testPositionSchemaAt12(true);
-            assert(Utils.arrayEquals(expected, gameState.tree.activeNode.position.schema, Utils.ComparisonFlags.Values), "position-schema does not match");
+            assert(Models.GamePositionEvent.Move == gameState.tree.activeNode.position.lastEvent, "last position-event should be 'move'");
+            Tests.GamePosition.assertSchemaEquality(expected, gameState.tree.activeNode.position.schema);
         });
 
         for (let k = 0; k < activateSequence.length; ++k) {
@@ -669,7 +681,8 @@ describe('Models.GameState', () => {
                 assert(9 == gameState.tree.activeNode.position.size, "position is not 9 by 9");
 
                 let expected: number[] = testPositionSchema(nodeId, true);
-                assert(Utils.arrayEquals(expected, gameState.tree.activeNode.position.schema, Utils.ComparisonFlags.Values), "position-schema does not match");
+                assert(Models.GamePositionEvent.Move == gameState.tree.activeNode.position.lastEvent, "last position-event should be 'move'");
+                Tests.GamePosition.assertSchemaEquality(expected, gameState.tree.activeNode.position.schema);
             });
 
             if (nodeId == 12) {

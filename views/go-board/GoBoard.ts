@@ -197,14 +197,16 @@ namespace Views {
                     this.applyPositionChange(change, Models.GameMarks.BlackStone, Models.GameMarks.WhiteStone, "SHELL");
                     this.applyPositionChange(change, Models.GameMarks.BlackTerritory, Models.GameMarks.WhiteTerritory, this._drawHandlers.moku);
                     this.applyPositionChange(change, Models.GameMarks.LastMove, Models.GameMarks.LastMove, this._drawHandlers.lastMove);
+                    this.applyPositionChange(change, Models.GameMarks.Ko, Models.GameMarks.Ko, this._drawHandlers.ko);
 
                     updated = true;
                 }
 
                 if (this._treeNodeId == gameNode.parentId) {
-                    let lastMove = gameNode.position.lastMove;
-                    if (lastMove == "PASS") soundPassCallback();
-                    else if (lastMove != null) soundStoneCallback();
+                    switch (gameNode.position.lastEvent) {
+                        case Models.GamePositionEvent.Pass: soundPassCallback(); break;
+                        case Models.GamePositionEvent.Move: soundStoneCallback(); break;
+                    }
                 }
 
                 this._treeNodeId = gameNode.nodeId;
@@ -221,49 +223,62 @@ namespace Views {
 
     class GoBoardDrawHandlers {
         public moku: WGo.BoardDrawHandler = {
-            stone: this.wrapDrawFunction((ctx: CanvasRenderingContext2D, args: WGo.BoardDrawHandlerArgs, board: WGo.Board) => {
-                let xr = board.getX(args.x);
-                let yr = board.getY(args.y);
-                let sr = board.stoneRadius * 0.4;
+            stone: {
+                draw: function(this: CanvasRenderingContext2D, args: WGo.BoardDrawHandlerArgs, board: WGo.Board): void {
+                    let xr = board.getX(args.x);
+                    let yr = board.getY(args.y);
+                    let sr = board.stoneRadius * 0.4;
 
-                ctx.beginPath();
+                    this.beginPath();
 
-                if (args.c == WGo.W) {
-                    ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+                    if (args.c == WGo.W) {
+                        this.fillStyle = "rgba(255, 255, 255, 0.6)";
+                    }
+                    else {
+                        this.fillStyle = "rgba(0, 0, 0, 0.8)";
+                    }
+
+                    this.arc(xr - board.ls, yr - board.ls, Math.max(0, sr - 0.5), 0, 2 * Math.PI, true);
+                    this.fill();
                 }
-                else {
-                    ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
-                }
-
-                ctx.arc(xr - board.ls, yr - board.ls, Math.max(0, sr - 0.5), 0, 2 * Math.PI, true);
-                ctx.fill();
-            })
+            }
         };
 
         public lastMove: WGo.BoardDrawHandler = {
-            stone: this.wrapDrawFunction((ctx: CanvasRenderingContext2D, args: WGo.BoardDrawHandlerArgs, board: WGo.Board) => {
-                let xr = board.getX(args.x);
-                let yr = board.getY(args.y);
-                let sr = board.stoneRadius;
+            stone: {
+                draw: function(this: CanvasRenderingContext2D, args: WGo.BoardDrawHandlerArgs, board: WGo.Board): void {
+                    let xr = board.getX(args.x);
+                    let yr = board.getY(args.y);
+                    let sr = board.stoneRadius;
 
-                ctx.beginPath();
+                    this.beginPath();
 
-                if (board.obj_arr[args.x][args.y][0].c == WGo.B)
-                    ctx.fillStyle = "rgba(128, 128, 128, 0.6)";
-                else
-                    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+                    if (board.obj_arr[args.x][args.y][0].c == WGo.B)
+                        this.fillStyle = "rgba(128, 128, 128, 0.6)";
+                    else
+                        this.fillStyle = "rgba(0, 0, 0, 0.2)";
 
-                ctx.arc(xr - board.ls, yr - board.ls, Math.max(0, (sr * 0.3) - 0.5), 0, 2 * Math.PI);
-                ctx.fill();
-            })
-        };
-
-        private wrapDrawFunction(handler: (ctx: CanvasRenderingContext2D, args: WGo.BoardDrawHandlerArgs, board: WGo.Board) => void): WGo.BoardDrawObject {
-            return {
-                draw: function (args: WGo.BoardDrawHandlerArgs, board: WGo.Board) {
-                    handler((<CanvasRenderingContext2D>this), args, board);
+                    this.arc(xr - board.ls, yr - board.ls, Math.max(0, (sr * 0.3) - 0.5), 0, 2 * Math.PI);
+                    this.fill();
                 }
             }
-        }
+        };
+
+        public ko: WGo.BoardDrawHandler = {
+            stone: {
+                draw: function(this: CanvasRenderingContext2D, args: WGo.BoardDrawHandlerArgs, board: WGo.Board): void {
+                    let xr = board.getX(args.x);
+                    let yr = board.getY(args.y);
+                    let sr = board.stoneRadius;
+                    let w = sr * 0.6;
+
+                    this.strokeStyle = "rgba(0, 0, 0, 0.1)";
+                    this.lineWidth = 6;
+                    this.beginPath();
+                    this.rect(xr - (w / 2), yr - (w / 2), w, w);
+                    this.stroke();
+                }
+            }
+        };
     }
 }
