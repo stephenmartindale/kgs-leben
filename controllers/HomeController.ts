@@ -34,13 +34,13 @@ namespace Controllers {
 
             this.registerView(this._homeSidebar, LayoutZone.Sidebar, (digest?: KGS.DataDigest) => {
                 if ((digest == null) || (digest.automatch) || (digest.users[this.database.username])) {
-                    let denyRankEstimate = (this.user) && (Models.UserRank.validate(this.user.rank));
+                    let denyRankEstimate = (this.user) && (null != Models.User.rankToRating(this.user.rank));
                     this._homeSidebar.automatchForm.update(this.database.automatch, denyRankEstimate);
                 }
             });
         }
 
-        private postAutomatchMessage(type: string, estimatedRank: Models.UserRank, maxHandicap: number, criteria: Models.AutomatchCriteria) {
+        private postAutomatchMessage(type: string, estimatedRank: string, maxHandicap: number, criteria: Models.AutomatchCriteria) {
             let message = <KGS.Message & KGS.AutomatchPreferences>{
                 type: type,
 
@@ -58,19 +58,19 @@ namespace Controllers {
                 mediumOk:   ((criteria & Models.AutomatchCriteria.MediumSpeed) != 0)
             };
 
-            let denyRankEstimate = (this.user) && (Models.UserRank.validate(this.user.rank));
-            if ((!denyRankEstimate) && (estimatedRank) && (estimatedRank.rank)) {
-                message.estimatedRank = Models.UserRank.rankToString(estimatedRank, false);
+            let denyRankEstimate = (this.user) && (null != Models.User.rankToRating(this.user.rank));
+            if ((!denyRankEstimate) && (estimatedRank)) {
+                message.estimatedRank = estimatedRank;
             }
 
             this.client.post(message);
         }
 
-        private _automatchPreferencesCallback = (estimatedRank: Models.UserRank, maxHandicap: number, criteria: Models.AutomatchCriteria) => {
+        private _automatchPreferencesCallback = (estimatedRank: string, maxHandicap: number, criteria: Models.AutomatchCriteria) => {
             this.postAutomatchMessage(KGS.Upstream._AUTOMATCH_SET_PREFS, estimatedRank, maxHandicap, criteria);
         }
 
-        private _automatchSeekCallback = (estimatedRank: Models.UserRank, maxHandicap: number, criteria: Models.AutomatchCriteria) => {
+        private _automatchSeekCallback = (estimatedRank: string, maxHandicap: number, criteria: Models.AutomatchCriteria) => {
             if (!this.database.automatch.seeking) {
                 this.postAutomatchMessage(KGS.Upstream._AUTOMATCH_CREATE, estimatedRank, maxHandicap, criteria);
             }

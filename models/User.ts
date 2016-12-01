@@ -16,6 +16,12 @@ namespace Models {
         Biased             = (1 << 13)  // ~ 	User plays stronger players far more often that weaker ones.
     }
 
+    export const enum UserRankFormat {
+        Default,
+        Long,
+        Numeric
+    };
+
     export class User {
         public name: string;
         public rank: string;
@@ -74,6 +80,60 @@ namespace Models {
 
         public hasFlag(flags: UserFlags): boolean {
             return ((this.flags & flags) == flags);
+        }
+
+        private static unifyRating(rating: number): number {
+            if ((rating == null) || (rating < 0) || (rating == KGS.Constants.RatingNull)) return null;
+            else if (rating > KGS.Constants.Rating9Dan) return KGS.Constants.Rating9Dan;
+            else return rating;
+        }
+
+        public static ratingToRank(rating: number, unsettled?: boolean, format?: UserRankFormat): string {
+            // See the documentation for downstream message: DETAILS_RANK_GRAPH
+            // 30k is 0..99, 29k is 100..199, etc. 0x7fff indicates "no rank for this day."
+
+            rating = User.unifyRating(rating);
+            if (rating == null) return (format != UserRankFormat.Numeric)? "?" : null;
+
+
+            let dan: boolean = (rating >= KGS.Constants.RatingShodan);
+            let r: number = (dan)? (~~(rating / 100) - 29) : (30 - ~~(rating / 100));
+
+            let rank: string = r.toString();
+            if (format != UserRankFormat.Numeric) {
+                if (format == UserRankFormat.Long)
+                    rank += (dan)? " dan" : " kyu";
+                else
+                    rank += (dan)? "d" : "k";
+
+                if (unsettled) rank += "?";
+            }
+
+            return rank;
+        }
+
+        public static rankToRating(rank: string): number {
+            if (null == rank) return null;
+
+            let parts = KGS.Constants.RegularExpressions.Rank.exec(rank);
+            if ((!parts) || (!parts[1])) return null;
+
+            if (parts[3] == 'd') {
+                return 2900 + ((+parts[2]) * 100);
+            }
+            else {
+                return KGS.Constants.RatingShodan - ((+parts[2]) * 100);
+            }
+        }
+
+        public static estimateHandicap(player: (number | string), opponent: (number | string)) {
+            let playerRating: number = (Utils.isNumber(player))? User.unifyRating(<number>player) : User.rankToRating(<string>player);
+            if (playerRating == null) return null;
+
+            let opponentRating: number = (Utils.isNumber(opponent))? User.unifyRating(<number>opponent) : User.rankToRating(<string>opponent);
+            if (opponentRating == null) return null;
+
+            return ~~(opponentRating / 100) - ~~(playerRating / 100);
         }
     }
 }

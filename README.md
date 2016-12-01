@@ -6,10 +6,14 @@ KGS Leben
 The *KGS Leben* project is only a few months old and not presently suited for general consumption. The following features have been implemented:
 
   * **Spectating**  --  Games played by other people can be joined and the user can watch as play continues. _Kibitz_ messages sent to the chat box will be broadcast to other spectators in the channel but the chat feature is currently non-functional in _game_ channels so the user will see neither these nor the messages typed by others.
-  * **Game Playing** -- Once a game has started in which the user is a player, the user can play moves, pass, resign, win and lose on time and mark live and dead groups, should the game proceed to the scoring phase, and agree on the game's result.
+  * **Game Playing** -- Once a game has started in which the user is a player, the user can play moves, pass, resign, win and lose on time and mark live and dead groups, should the game proceed to the scoring phase, and agree on the game's result. Sound cues are played for stones and *pass* moves.
   * **Joining open Challenges** -- The user can join an existing _game challenge_ in a room, negotiate the terms of the game via the usual dialogue and proceed to play.
   * **Auto-match** -- On the _Home_ view, in the sidebar, a selection of controls allows the user to set their preferences for the _automatic match-making queue_ and provides a button to join (and leave) the queue. Preferences are synchronised with the server automatically.
   * **Chatting in Rooms** -- Conversing in _rooms_ is operational in both directions. Upon a successful sign-in, the user will join the rooms that they were in when they last signed out of the server, from the _Leben_ client or the legacy one, _Cgoban_. Joining new rooms is not implemented simply because no room-list screen has been created - behind the scenes, work to do this is complete.
+
+##Project Status
+
+*KGS Leben* is currently **on hold**. That is to say, I simply do not have time to work on the project at present due to a career-related change in priorities. [Ilya Kirillov's *Go Universe*](https://github.com/IlyaKirillov/GoUniverse) looks like another promising project for Go players to follow.
 
 ##Technologies
 

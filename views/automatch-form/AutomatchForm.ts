@@ -23,8 +23,8 @@ namespace Views {
         private _cancelButton: HTMLButtonElement;
         private _automatchButton: Views.SafetyButton;
 
-        public automatchPreferencesCallback: (estimatedRank: Models.UserRank, maxHandicap: number, criteria: Models.AutomatchCriteria) => void;
-        public automatchSeekCallback: (estimatedRank: Models.UserRank, maxHandicap: number, criteria: Models.AutomatchCriteria) => void;
+        public automatchPreferencesCallback: (estimatedRank: string, maxHandicap: number, criteria: Models.AutomatchCriteria) => void;
+        public automatchSeekCallback: (estimatedRank: string, maxHandicap: number, criteria: Models.AutomatchCriteria) => void;
         public automatchCancelCallback: Function;
 
         constructor() {
@@ -88,9 +88,9 @@ namespace Views {
                 this.root.querySelector('.estimated-rank').classList.remove('hidden');
                 this._denyRankEstimates = false;
 
-                let rank: Models.UserRank = Models.UserRank.parse(state.estimatedRank);
-                if (rank) {
-                    this._estimatedRank.value = rank.rank.toString();
+                let rating: number = Models.User.rankToRating(state.estimatedRank);
+                if ((null != rating) && (rating < KGS.Constants.RatingShodan)) {
+                    this._estimatedRank.value = Models.User.ratingToRank(rating, false, Models.UserRankFormat.Numeric);
                 }
                 else {
                     this._estimatedRank.value = null;
@@ -146,13 +146,13 @@ namespace Views {
             this._updating = false;
         }
 
-        public get estimatedRank(): Models.UserRank {
+        public get estimatedRank(): string {
             if (this._denyRankEstimates) return null;
 
             let rankString = this._estimatedRank.value;
             if (!rankString) rankString = this._estimatedRank.placeholder;
 
-            return { rank: (+rankString), dan: false };
+            return rankString + "k";
         }
 
         public get maxHandicap(): number {
